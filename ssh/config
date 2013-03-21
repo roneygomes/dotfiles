@@ -1,0 +1,3 @@
+Host *.kde.org
+        User roneygomes
+        IdentityFile ~/.ssh/kde_dsa

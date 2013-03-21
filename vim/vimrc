@@ -1,0 +1,146 @@
+"-------------------------------------------------------------------------------
+" Pathogen runtime path manipulation
+"-------------------------------------------------------------------------------
+execute pathogen#infect('plugins/{}')
+syntax on
+filetype plugin indent on
+
+"-------------------------------------------------------------------------------
+" General Settings
+"-------------------------------------------------------------------------------
+colorscheme koehler
+
+
+"-------------------------------------------------------------------------------
+" Some configurations required for Windows.
+"-------------------------------------------------------------------------------
+if has("win64") || has("win32") || has("win16")
+    au GUIEnter * simalt ~x
+    set backupdir=c:/Program\ Files/Vim/backups
+else
+    set backupdir=~/.vim/tmp,.
+endif
+"-------------------------------------------------------------------------------
+" Various settings
+"-------------------------------------------------------------------------------
+set nocp
+set nocompatible                "Use Vim settings, rather then Vi settings.
+set clipboard=unnamed
+set autoindent                  " copy indent from current line
+set autoread                    " read open files again when changed outside Vim
+set autowrite                   " write a modified buffer on each :next , ...
+set backspace=indent,eol,start  " backspacing over everything in insert mode
+set background=dark
+set backup                      " keep a backup file
+set browsedir=current           " which directory to use for the file browser
+set incsearch                   " do incremental searching
+set nowrap                      " do not wrap lines
+set ruler                       " show the cursor position all the time
+set showcmd                     " display incomplete commands
+set autoindent                 	" smart autoindenting when starting a new line
+set expandtab
+set shiftwidth=4
+set softtabstop=4               " number of spaces that a <Tab> counts for
+set wildignore=*.bak,*.o,*.e,*~ " wildmenu: ignore these extensions
+set wildmenu                    " command-line completion in an enhanced mode
+
+"-------------------------------------------------------------------------------
+" The current directory is the directory of the file in the current window.
+"-------------------------------------------------------------------------------
+if has("autocmd")
+  autocmd BufEnter * :lchdir %:p:h
+endif
+
+"-------------------------------------------------------------------------------
+" Leave the editor with Ctrl-q (KDE): Write all changed buffers and exit Vim
+"-------------------------------------------------------------------------------
+nnoremap <C-q> :wqall<CR>
+
+"-------------------------------------------------------------------------------
+" When editing a file, always jump to the last known cursor position.
+" Don't do it when the position is invalid or when inside an event handler
+" (happens when dropping a file on gvim).
+"-------------------------------------------------------------------------------
+if has("autocmd")
+  autocmd BufReadPost *
+        \ if line("'\"") > 0 && line("'\"") <= line("$") |
+        \   exe "normal! g`\"" |
+        \ endif
+endif
+
+"-------------------------------------------------------------------------------
+" Some hotkeys. 
+"-------------------------------------------------------------------------------
+"    F2 - Write file without confirmation.
+"    F3 - Calls the file explorer (NERDTree). 
+"-------------------------------------------------------------------------------
+
+inoremap <silent> <F2> <ESC> :write <CR>
+inoremap <silent> <F3> <ESC> :NERDTree <CR>
+
+nnoremap <silent> <F2> :write <CR>
+nnoremap <silent> <F3> :NERDTree <CR>
+
+"-------------------------------------------------------------------------------
+" Autocomplete parenthesis, brackets and braces.
+"-------------------------------------------------------------------------------
+inoremap ( ()<Left>
+inoremap [ []<Left>
+inoremap { {}<Left>
+
+vnoremap ( s()<Esc>P<Right>%
+vnoremap [ s[]<Esc>P<Right>%
+vnoremap { s{}<Esc>P<Right>%
+
+"-------------------------------------------------------------------------------
+" Autocomplete Quotes
+"-------------------------------------------------------------------------------
+inoremap  "  ""<Left>
+inoremap  `  ``<Left>
+
+"-------------------------------------------------------------------------------
+" Some GUI Settings 
+"-------------------------------------------------------------------------------
+set number 	        "show line numbers
+set guioptions-=m       "remove menu bar
+set guioptions-=T       "remove toolbar
+set guioptions-=r       "remove right-hand scroll bar
+set guioptions-=L       "remove left-hand scroll bar
+set guifont=Droid\ Sans\ Mono:h10
+
+"-------------------------------------------------------------------------------
+" Highlight Whitespaces
+"-------------------------------------------------------------------------------
+au BufNewFile,BufRead * syn match brancomala '\s\+$' | hi brancomala ctermbg=red
+
+"-------------------------------------------------------------------------------
+" Eighty Colors Margin Delimiter  
+"-------------------------------------------------------------------------------
+if exists('+colorcolumn')
+    set colorcolumn=81
+else
+    au BufWinEnter * let w:m2=matchadd('ErrorMsg', '\%>81v.\+', -1)
+endif
+
+"-------------------------------------------------------------------------------
+" NERDTree setup.
+"-------------------------------------------------------------------------------
+
+let NERDTreeAutoCenter=1 	"auto center is on
+let NERDTreeCaseSensitiveSort=1 "case sensitive sorting is on
+let NERDTreeChDirMode=2 	"set the CWD to the current root
+
+" Specify the following order of appearence to files under a 
+" certain node in the directories tree:
+" 1 - *.h files.
+" 2 - *.c files.
+" 3 - *.cpp files.
+" 4 - Any kind of files (in alphabetical order).
+" 5 - Folders.
+let NERDTreeSortOrder=['\.h$', '\.c$', '\.cpp$', '*', '\/$' ]
+
+autocmd FileType python set ft=python.django " For SnipMate
+autocmd FileType html set ft=htmldjango.html " For SnipMate
+
+
+
