@@ -3,3 +3,12 @@
 	email = roney477@gmail.com
 [core]
 	editor = vim
+
+[url "git://anongit.kde.org/"]
+        insteadOf = kde:
+
+[url "https://github.com/"]
+        insteadOf = github:
+
+[url "git@git.kde.org/"]
+        pushInsteadOf = kde:
