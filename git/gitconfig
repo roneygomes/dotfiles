@@ -10,5 +10,5 @@
 [url "https://github.com/"]
         insteadOf = github:
 
-[url "git@git.kde.org/"]
+[url "git@git.kde.org:"]
         pushInsteadOf = kde:
