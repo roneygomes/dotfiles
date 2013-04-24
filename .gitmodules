@@ -7,3 +7,9 @@
 [submodule "vim/plugins/YouCompleteMe"]
 	path = vim/plugins/YouCompleteMe
 	url = https://github.com/Valloric/YouCompleteMe.git
+[submodule "vim/plugins/Syntastic"]
+	path = vim/plugins/Syntastic
+	url = https://github.com/scrooloose/syntastic.git
+[submodule "vim/plugins/taglist"]
+	path = vim/plugins/taglist
+	url = https://github.com/vim-scripts/taglist.vim.git
