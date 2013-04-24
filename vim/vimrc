@@ -76,10 +76,7 @@ endif
 "-------------------------------------------------------------------------------
 
 inoremap <silent> <F2> <ESC> :write <CR>
-inoremap <silent> <F3> <ESC> :NERDTree <CR>
-
 nnoremap <silent> <F2> :write <CR>
-nnoremap <silent> <F3> :NERDTree <CR>
 
 "-------------------------------------------------------------------------------
 " Autocomplete parenthesis, brackets and braces.
@@ -125,10 +122,12 @@ endif
 "-------------------------------------------------------------------------------
 " NERDTree setup.
 "-------------------------------------------------------------------------------
-
 let NERDTreeAutoCenter=1 	"auto center is on
 let NERDTreeCaseSensitiveSort=1 "case sensitive sorting is on
 let NERDTreeChDirMode=2 	"set the CWD to the current root
+let g:NERDTreeDirArrows=0
+
+map <F3> :NERDTreeToggle<cr>
 
 " Specify the following order of appearence to files under a 
 " certain node in the directories tree:
@@ -138,9 +137,20 @@ let NERDTreeChDirMode=2 	"set the CWD to the current root
 " 4 - Any kind of files (in alphabetical order).
 " 5 - Folders.
 let NERDTreeSortOrder=['\.h$', '\.c$', '\.cpp$', '*', '\/$' ]
+autocmd VimEnter * NERDTree
 
+"-------------------------------------------------------------------------------
 autocmd FileType python set ft=python.django " For SnipMate
 autocmd FileType html set ft=htmldjango.html " For SnipMate
 
+"-------------------------------------------------------------------------------
+" Taglist setup.
+"-------------------------------------------------------------------------------
 
+let Tlist_Ctags_Cmd         = "/usr/bin/ctags"
+let Tlist_WinWidth          = 50
+let Tlist_Auto_Open         = 1
+let Tlist_Use_Right_Window  = 1
+
+map <F4> :TlistToggle<cr>
 
