@@ -125,7 +125,7 @@ endif
 let NERDTreeAutoCenter=1 	"auto center is on
 let NERDTreeCaseSensitiveSort=1 "case sensitive sorting is on
 let NERDTreeChDirMode=2 	"set the CWD to the current root
-let g:NERDTreeDirArrows=0
+"let g:NERDTreeDirArrows=0
 
 map <F3> :NERDTreeToggle<cr>
 
