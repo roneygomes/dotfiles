@@ -121,3 +121,6 @@ export TODOTXT_DEFAULT_ACTION=ls
 alias t='todo.sh -tn -d ~/.todo.cfg'
 source ~/.todo_completion
 complete -F _todo t
+
+#KDE
+source ~/.kde-bashrc
