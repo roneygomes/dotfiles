@@ -115,3 +115,9 @@ fi
 
 export PATH=$PATH:~/kde/bin
 export PATH=$PATH:~/bin
+
+#TODO.txt
+export TODOTXT_DEFAULT_ACTION=ls
+alias t='todo.sh -tn -d ~/.todo.cfg'
+source ~/.todo_completion
+complete -F _todo t
