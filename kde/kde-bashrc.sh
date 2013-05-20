@@ -9,7 +9,7 @@ export LIB_SUFFIX=64
 export BASEDIR=~/repos/kde
 
 # Give the build a name, e.g. master, 4.6, debug, etc
-export BUILDNAME=master
+# export BUILDNAME=master
 
 # Set up which Qt to use
 # Use the system Qt, adjust path as required
@@ -24,11 +24,11 @@ export QTDIR=/usr
 # Set up the KDE paths
 export KDE_SRC=$BASEDIR/src
 export KDE_BUILD=$BASEDIR/build
-export KDEDIR=$BASEDIR/inst/$BUILDNAME
+export KDEDIR=$BASEDIR/inst
 export KDEDIRS=$KDEDIR
-export KDEHOME=$BASEDIR/home/.$BUILDNAME
-export KDETMP=/tmp/$BUILDNAME-$USER
-export KDEVARTMP=/var/tmp/$BUILDNAME-$USER
+export KDEHOME=$BASEDIR/home
+export KDETMP=/tmp/$USER
+export KDEVARTMP=/var/tmp/$USER
 
 mkdir -p $KDETMP
 mkdir -p $KDEVARTMP
