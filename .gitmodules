@@ -4,12 +4,6 @@
 [submodule "vim/plugins/Command-T"]
 	path = vim/plugins/Command-T
 	url = https://github.com/wincent/Command-T.git
-[submodule "vim/plugins/Syntastic"]
-	path = vim/plugins/Syntastic
-	url = https://github.com/scrooloose/syntastic.git
-[submodule "vim/plugins/taglist"]
-	path = vim/plugins/taglist
-	url = https://github.com/vim-scripts/taglist.vim.git
 [submodule "vim/plugins/snipmate"]
 	path = vim/plugins/snipmate
 	url = https://github.com/garbas/vim-snipmate.git
@@ -22,3 +16,12 @@
 [submodule "vim/plugins/vim-snippets"]
 	path = vim/plugins/vim-snippets
 	url = https://github.com/honza/vim-snippets.git
+[submodule "vim/plugins/omnicppcomplete"]
+	path = vim/plugins/omnicppcomplete
+	url = https://github.com/vim-scripts/OmniCppComplete.git
+[submodule "vim/plugins/supertab"]
+	path = vim/plugins/supertab
+	url = https://github.com/ervandew/supertab.git
+[submodule "vim/plugins/tagbar"]
+	path = vim/plugins/tagbar
+	url = https://github.com/majutsushi/tagbar.git
