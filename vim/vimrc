@@ -2,27 +2,12 @@
 " Pathogen runtime path manipulation
 "-------------------------------------------------------------------------------
 execute pathogen#infect('plugins/{}')
-syntax on
-filetype plugin indent on
-
-"-------------------------------------------------------------------------------
-" General Settings
-"-------------------------------------------------------------------------------
-colorscheme koehler
 
 
 "-------------------------------------------------------------------------------
-" Some configurations required for Windows.
+"                               GENERAL 
 "-------------------------------------------------------------------------------
-if has("win64") || has("win32") || has("win16")
-    au GUIEnter * simalt ~x
-    set backupdir=c:/Program\ Files/Vim/backups
-else
-    set backupdir=~/.tmp,.
-endif
-"-------------------------------------------------------------------------------
-" Various settings
-"-------------------------------------------------------------------------------
+
 set nocp
 set nocompatible                "Use Vim settings, rather then Vi settings.
 set clipboard=unnamed
@@ -32,7 +17,6 @@ set autowrite                   " write a modified buffer on each :next , ...
 set backspace=indent,eol,start  " backspacing over everything in insert mode
 set background=dark
 set backup                      " keep a backup file
-set browsedir=current           " which directory to use for the file browser
 set incsearch                   " do incremental searching
 set nowrap                      " do not wrap lines
 set ruler                       " show the cursor position all the time
@@ -41,8 +25,18 @@ set autoindent                 	" smart autoindenting when starting a new line
 set expandtab
 set shiftwidth=4
 set softtabstop=4               " number of spaces that a <Tab> counts for
-set wildignore=*.bak,*.o,*.e,*~ " wildmenu: ignore these extensions
 set wildmenu                    " command-line completion in an enhanced mode
+set number                      " show line numbers.
+
+syntax      on
+colorscheme koehler
+filetype    plugin indent on
+
+"-------------------------------------------------------------------------------
+" Closes the info panel after a successful completion. 
+"-------------------------------------------------------------------------------
+autocmd InsertLeave  * if pumvisible() == 0|pclose|endif
+autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
 
 "-------------------------------------------------------------------------------
 " The current directory is the directory of the file in the current window.
@@ -50,11 +44,6 @@ set wildmenu                    " command-line completion in an enhanced mode
 if has("autocmd")
   autocmd BufEnter * :lchdir %:p:h
 endif
-
-"-------------------------------------------------------------------------------
-" Leave the editor with Ctrl-q (KDE): Write all changed buffers and exit Vim
-"-------------------------------------------------------------------------------
-nnoremap <C-q> :wqall<CR>
 
 "-------------------------------------------------------------------------------
 " When editing a file, always jump to the last known cursor position.
@@ -69,41 +58,14 @@ if has("autocmd")
 endif
 
 "-------------------------------------------------------------------------------
-" Some hotkeys. 
+" Some configurations required for Windows.
 "-------------------------------------------------------------------------------
-"    F2 - Write file without confirmation.
-"    F3 - Calls the file explorer (NERDTree). 
-"-------------------------------------------------------------------------------
-
-inoremap <silent> <F2> <ESC> :write <CR>
-nnoremap <silent> <F2> :write <CR>
-
-"-------------------------------------------------------------------------------
-" Autocomplete parenthesis, brackets and braces.
-"-------------------------------------------------------------------------------
-inoremap ( ()<Left>
-inoremap [ []<Left>
-inoremap { {}<Left>
-
-vnoremap ( s()<Esc>P<Right>%
-vnoremap [ s[]<Esc>P<Right>%
-vnoremap { s{}<Esc>P<Right>%
-
-"-------------------------------------------------------------------------------
-" Autocomplete Quotes
-"-------------------------------------------------------------------------------
-inoremap  "  ""<Left>
-inoremap  `  ``<Left>
-
-"-------------------------------------------------------------------------------
-" Some GUI Settings 
-"-------------------------------------------------------------------------------
-set number 	        "show line numbers
-set guioptions-=m       "remove menu bar
-set guioptions-=T       "remove toolbar
-set guioptions-=r       "remove right-hand scroll bar
-set guioptions-=L       "remove left-hand scroll bar
-set guifont=Droid\ Sans\ Mono:h10
+if has("win64") || has("win32") || has("win16")
+    au GUIEnter * simalt ~x
+    set backupdir=c:/Program\ Files/Vim/backups
+else
+    set backupdir=~/.tmp,.
+endif
 
 "-------------------------------------------------------------------------------
 " Highlight Whitespaces
@@ -119,43 +81,61 @@ else
     au BufWinEnter * let w:m2=matchadd('ErrorMsg', '\%>81v.\+', -1)
 endif
 
-"-------------------------------------------------------------------------------
-" NERDTree setup.
-"-------------------------------------------------------------------------------
-let NERDTreeAutoCenter=1 	"auto center is on
-let NERDTreeCaseSensitiveSort=1 "case sensitive sorting is on
-let NERDTreeChDirMode=2 	"set the CWD to the current root
-"let g:NERDTreeDirArrows=0
 
+"-------------------------------------------------------------------------------
+"                                   MAPPINGS 
+"-------------------------------------------------------------------------------
+
+"-------------------------------------------------------------------------------
+" F2 for saving current buffer.
+"-------------------------------------------------------------------------------
+inoremap <silent> <F2> <ESC> :write <CR> 
+nnoremap <silent> <F2> :write <CR>
+
+"-------------------------------------------------------------------------------
+" F3 for closing/opening NERDTree's panel.
+"-------------------------------------------------------------------------------
 map <F3> :NERDTreeToggle<cr>
 
-" Specify the following order of appearence to files under a 
-" certain node in the directories tree:
-" 1 - *.h files.
-" 2 - *.c files.
-" 3 - *.cpp files.
-" 4 - Any kind of files (in alphabetical order).
-" 5 - Folders.
-let NERDTreeSortOrder=['\.h$', '\.c$', '\.cpp$', '*', '\/$' ]
-autocmd VimEnter * NERDTree
+"-------------------------------------------------------------------------------
+" F4 for closing/opening Tagbar's panel.
+"-------------------------------------------------------------------------------
+map <F4> :TagbarToggle<cr>
 
 "-------------------------------------------------------------------------------
-autocmd FileType python set ft=python.django " For SnipMate
-autocmd FileType html set ft=htmldjango.html " For SnipMate
+" Automatic completion for parenthesis, brackets and quotes. 
+"-------------------------------------------------------------------------------
+inoremap ( ()<Left>
+inoremap [ []<Left>
+inoremap { {}<Left>
+
+vnoremap ( s()<Esc>P<Right>%
+vnoremap [ s[]<Esc>P<Right>%
+vnoremap { s{}<Esc>P<Right>%
+
+inoremap  "  ""<Left>
+inoremap  `  ``<Left>
+
 
 "-------------------------------------------------------------------------------
-" Taglist setup.
+"                               PLUGINS SETUP
 "-------------------------------------------------------------------------------
 
-let Tlist_Ctags_Cmd         = "/usr/bin/ctags"
-let Tlist_WinWidth          = 50
-let Tlist_Auto_Open         = 1
-let Tlist_Use_Right_Window  = 1
-
-map <F4> :TlistToggle<cr>
+"-------------------------------------------------------------------------------
+" NERDTree
+"-------------------------------------------------------------------------------
+let NERDTreeAutoCenter          = 1 "auto center is on
+let NERDTreeCaseSensitiveSort   = 1 "case sensitive sorting is on
+let NERDTreeChDirMode           = 2 "set the CWD to the current root
+let NERDTreeSortOrder           = ['\.h$', '\.c$', '\.cpp$', '*', '\/$' ]
 
 "-------------------------------------------------------------------------------
-" Autocompletion.
+" Tagbar
+"-------------------------------------------------------------------------------
+let g:tagbar_iconchars = ['▾', '▸']
+
+"-------------------------------------------------------------------------------
+" OmniCppComplete
 "-------------------------------------------------------------------------------
 set tags +=~/.tags/qt4.tags
 
@@ -164,8 +144,9 @@ let OmniCpp_MayCompleteArrow    = 1
 let OmniCpp_MayCompleteScope    = 1 
 let OmniCpp_NamespaceSearch     = 2 
 
+"-------------------------------------------------------------------------------
+" Supertab 
+"-------------------------------------------------------------------------------
 let g:SuperTabMappingForward    = '<s-tab>'
 let g:SuperTabMappingBackward   = '<tab>'
 
-autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
-autocmd InsertLeave * if pumvisible() == 0|pclose|endif
