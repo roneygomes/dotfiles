@@ -1,9 +1,6 @@
 [submodule "vim/plugins/nerdtree"]
 	path = vim/plugins/nerdtree
 	url = https://github.com/scrooloose/nerdtree.git
-[submodule "vim/plugins/Command-T"]
-	path = vim/plugins/Command-T
-	url = https://github.com/wincent/Command-T.git
 [submodule "vim/plugins/snipmate"]
 	path = vim/plugins/snipmate
 	url = https://github.com/garbas/vim-snipmate.git
@@ -25,9 +22,3 @@
 [submodule "vim/plugins/tagbar"]
 	path = vim/plugins/tagbar
 	url = https://github.com/majutsushi/tagbar.git
-[submodule "vim/plugins/powerline"]
-	path = vim/plugins/powerline
-	url = https://github.com/Lokaltog/powerline
-[submodule "vim/plugins/solarized"]
-	path = vim/plugins/solarized
-	url = github:altercation/vim-colors-solarized.git
