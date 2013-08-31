@@ -13,13 +13,13 @@ export BASEDIR=~/repos/kde
 
 # Set up which Qt to use
 # Use the system Qt, adjust path as required
-export QTDIR=/usr
+# export QTDIR=/usr
 
 # Uncomment to use your own build of qt-kde
-#export QTDIR=$BASEDIR/inst/master/qt-kde
-#export PATH=$QTDIR/bin:$PATH
-#export LD_LIBRARY_PATH=$QTDIR/lib:$LD_LIBRARY_PATH
-#export PKG_CONFIG_PATH=$QTDIR/lib/pkgconfig:$PKG_CONFIG_PATH
+export QTDIR=$HOME/Qt-4.8
+export PATH=$QTDIR/bin:$PATH
+export LD_LIBRARY_PATH=$QTDIR/lib:$LD_LIBRARY_PATH
+export PKG_CONFIG_PATH=$QTDIR/lib/pkgconfig:$PKG_CONFIG_PATH
 
 # Set up the KDE paths
 export KDE_SRC=$BASEDIR/src
