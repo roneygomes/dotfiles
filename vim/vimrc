@@ -139,6 +139,7 @@ let g:tagbar_iconchars = ['▾', '▸']
 "-------------------------------------------------------------------------------
 set tags                        +=~/.tags/qt4.tags
 set tags                        +=./.tags
+set tags                        +=~/.tags/kde.tags
 set completeopt                 =menu,longest,preview
 
 let OmniCpp_MayCompleteDot      = 1
