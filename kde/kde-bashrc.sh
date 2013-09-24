@@ -6,7 +6,7 @@
 export LIB_SUFFIX=64
 
 # Set where your base KDE development folder is located, usually ~/kde
-export BASEDIR=~/repos/kde
+export BASEDIR=~/Programming/Projetos/kde
 
 # Give the build a name, e.g. master, 4.6, debug, etc
 # export BUILDNAME=master
@@ -16,7 +16,7 @@ export BASEDIR=~/repos/kde
 # export QTDIR=/usr
 
 # Uncomment to use your own build of qt-kde
-export QTDIR=$HOME/Qt-4.8
+export QTDIR=~/Programming/Qt/Qt-4.8.5
 export PATH=$QTDIR/bin:$PATH
 export LD_LIBRARY_PATH=$QTDIR/lib:$LD_LIBRARY_PATH
 export PKG_CONFIG_PATH=$QTDIR/lib/pkgconfig:$PKG_CONFIG_PATH
