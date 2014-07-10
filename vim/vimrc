@@ -62,9 +62,9 @@ endif
 "-------------------------------------------------------------------------------
 if has("win64") || has("win32") || has("win16")
     au GUIEnter * simalt ~x
-    set backupdir=c:/Program\ Files/Vim/backups
+    set backupdir=~/tmp
 else
-    set backupdir=~/.tmp,.
+    set backupdir=~/.tmp
 endif
 
 "-------------------------------------------------------------------------------
