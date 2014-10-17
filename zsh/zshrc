@@ -50,6 +50,7 @@ alias t="todo.sh -d ~/.todo/todo.cfg"
 # ------------------------------------------------------------------------------
 # source ~/.kde-bashrc.sh
 source $ZSH/oh-my-zsh.sh
+source /usr/local/bin/virtualenvwrapper.sh
 
 # ------------------------------------------------------------------------------
 # Add an "alert" alias for long running commands.  Use like so: sleep 10; alert
