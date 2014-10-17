@@ -43,7 +43,6 @@ plugins=(git git git-extras debian archlinux)
 # ------------------------------------------------------------------------------
 alias zshconfig="vim ~/.zshrc"
 alias ohmyzsh="vim ~/.oh-my-zsh"
-alias t="todo.sh -d ~/.todo/todo.cfg"
 
 # ------------------------------------------------------------------------------
 #                                   SOURCES 
@@ -61,5 +60,4 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 # ------------------------------------------------------------------------------
 #                           ENVIRONMENT VARIABLES 
 # ------------------------------------------------------------------------------
-export TODOTXT_DEFAULT_ACTION=ls
 
