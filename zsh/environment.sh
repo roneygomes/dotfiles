@@ -1,17 +1,18 @@
-# In order to have this file available throughout your whole session place a
-# copy or a link to it in $HOME/.kde/env not forgetting it shall have the .sh
-# file extension.
-
 export CODE=$HOME/code
+export PROJECTS=$CODE/projects
+export TOOLS=$CODE/tools
 
 # ------------------------------------------------------------------------------
 # Java and Android
 # ------------------------------------------------------------------------------
-export JDK=$CODE/jdk
+export JDK=$TOOLS/jdk
 export JRE=$JDK/jre
 
-export ANDROID_SDK=$CODE/android-sdk-linux
+export ANDROID_SDK=$TOOLS/android-sdk-linux
 
+# ------------------------------------------------------------------------------
+# Path 
+# ------------------------------------------------------------------------------
 export PATH=$PATH:$HOME/bin
 
 export PATH=$PATH:$JDK/bin
