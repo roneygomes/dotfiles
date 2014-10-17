@@ -7,6 +7,7 @@ export TOOLS=$CODE/tools
 # ------------------------------------------------------------------------------
 export JDK=$TOOLS/jdk
 export JRE=$JDK/jre
+export JAVA_HOME=$JDK
 
 export ANDROID_SDK=$TOOLS/android-sdk-linux
 
