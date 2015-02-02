@@ -68,6 +68,7 @@ endif
 if has("win64") || has("win32") || has("win16")
     au GUIEnter * simalt ~x
     set backupdir=~/tmp
+    set guifont=Consolas:h9
 else
     set backupdir=~/.tmp
 endif
