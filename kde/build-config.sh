@@ -56,12 +56,3 @@ export CMAKE_INCLUDE_PATH=$KDEDIR/include:$CMAKE_INCLUDE_PATH
 
 # Uncomment if you are using Icecream for distributed compiling
 #export PATH=/opt/icecream/bin:$PATH
-
-# Report what the environment is set to
-echo
-echo "*** Configured KDE Build Environment " $BUILDNAME " ***"
-echo
-echo "QTDIR=" $QTDIR
-echo "KDEDIR=" $KDEDIR
-echo "PATH=" $PATH
-echo
