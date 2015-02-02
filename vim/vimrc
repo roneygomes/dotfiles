@@ -28,8 +28,13 @@ set softtabstop=4               " number of spaces that a <Tab> counts for
 set wildmenu                    " command-line completion in an enhanced mode
 set number                      " show line numbers.
 
+set guioptions-=m               "remove menu bar
+set guioptions-=T               "remove toolbar
+set guioptions-=r               "remove right-hand scroll bar
+set guioptions-=L               "remove left-hand scroll bar
+
 syntax      on
-colorscheme koehler
+colorscheme candycode 
 filetype    plugin indent on
 
 "-------------------------------------------------------------------------------

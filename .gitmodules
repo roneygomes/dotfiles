@@ -25,3 +25,6 @@
 [submodule "vim/plugins/vim-oz"]
 	path = vim/plugins/vim-oz
 	url = https://github.com/elehack/vim-oz
+[submodule "vim/plugins/vim-qt-syntax"]
+	path = vim/plugins/vim-qt-syntax
+	url = https://bitbucket.org/kh3phr3n/vim-qt-syntax.git
