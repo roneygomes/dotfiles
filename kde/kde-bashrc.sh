@@ -52,12 +52,12 @@ function cmakekde {
  
         # Comment out the following two lines to stop builds waiting after
         # the configuration step, so that the user can check configure output
-        echo "Press <ENTER> to continue..."
-        read userinput
+        # echo "Press <ENTER> to continue..."
+        # read userinput
  
-        # Note: To speed up compiling, change 'make -j2' to 'make -jx',
+        # Note: To speed up compiling, change 'make -j3' to 'make -jx',
         #   where x is your number of processors +1
-        nice make -j2 && make install
+        nice make -j3 && make install
         #Use this line instead if using icecream
         #nice make CC=icecc -j6 && make install
         RETURN=$?
@@ -96,12 +96,12 @@ function kdebuild {
  
     # Comment out the following two lines to stop builds waiting after
     # the configuration step, so that the user can check configure output
-    echo "Press <ENTER> to continue..."
-    read userinput
+    # echo "Press <ENTER> to continue..."
+    # read userinput
  
-    # Note: To speed up compiling, change 'make -j2' to 'make -jx',
+    # Note: To speed up compiling, change 'make -j3' to 'make -jx',
     #   where x is your number of processors +1
-    nice make -j2 && make install
+    nice make -j3 && make install
     #Use this line instead if using icecream
     #nice make CC=icecc -j6 && make install
     RETURN=$?
@@ -156,9 +156,9 @@ function kdemake {
         cb
     fi
  
-    # Note: To speed up compiling, change 'make -j2' to 'make -jx',
+    # Note: To speed up compiling, change 'make -j3' to 'make -jx',
     #   where x is your number of processors +1
-    nice make -j2 && make install
+    nice make -j3 && make install
     #Use this line instead if using icecream
     #nice make CC=icecc -j6 && make install
     RETURN=$?
@@ -253,7 +253,7 @@ function cs {
 #
 function _cs_scandir
 {
-        local base ext
+    local base ext
  
     base=$1
     ext=$2
