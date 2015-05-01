@@ -35,7 +35,6 @@ set guioptions-=L               "remove left-hand scroll bar
 set guifont=Monospace\ 9
 
 syntax      on
-colorscheme candycode 
 filetype    plugin indent on
 
 "-------------------------------------------------------------------------------
