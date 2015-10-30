@@ -3,10 +3,7 @@
 "-------------------------------------------------------------------------------
 execute pathogen#infect('plugins/{}')
 
-
-"-------------------------------------------------------------------------------
-"                               GENERAL 
-"-------------------------------------------------------------------------------
+" General: ----------------------------------------------------------------- {{{
 
 set nocp
 set nocompatible                "Use Vim settings, rather then Vi settings.
@@ -37,24 +34,12 @@ set guifont=Monospace\ 9
 syntax      on
 filetype    plugin indent on
 
-"-------------------------------------------------------------------------------
-" Closes the info panel after a successful completion. 
-"-------------------------------------------------------------------------------
-autocmd InsertLeave  * if pumvisible() == 0|pclose|endif
-autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
-
-"-------------------------------------------------------------------------------
 " The current directory is the directory of the file in the current window.
-"-------------------------------------------------------------------------------
 if has("autocmd")
   autocmd BufEnter * :lchdir %:p:h
 endif
 
-"-------------------------------------------------------------------------------
-" When editing a file, always jump to the last known cursor position.
-" Don't do it when the position is invalid or when inside an event handler
-" (happens when dropping a file on gvim).
-"-------------------------------------------------------------------------------
+" Always jump to the last known cursor position.
 if has("autocmd")
   autocmd BufReadPost *
         \ if line("'\"") > 0 && line("'\"") <= line("$") |
@@ -62,9 +47,7 @@ if has("autocmd")
         \ endif
 endif
 
-"-------------------------------------------------------------------------------
-" Some configurations required for Windows.
-"-------------------------------------------------------------------------------
+" Windows.
 if has("win64") || has("win32") || has("win16")
     au GUIEnter * simalt ~x
     set backupdir=~/tmp
@@ -73,76 +56,34 @@ else
     set backupdir=~/.tmp
 endif
 
-"-------------------------------------------------------------------------------
 " Highlight Whitespaces
-"-------------------------------------------------------------------------------
 au BufNewFile,BufRead * syn match brancomala '\s\+$' | hi brancomala ctermbg=red
 
-"-------------------------------------------------------------------------------
-" Eighty Colors Margin Delimiter  
-"-------------------------------------------------------------------------------
-if exists('+colorcolumn')
-    set colorcolumn=81
-else
-    au BufWinEnter * let w:m2=matchadd('ErrorMsg', '\%>81v.\+', -1)
-endif
+" ------------------------------------------------------------------------- }}}"
 
+" Mappings: ---------------------------------------------------------------- {{{
 
-"-------------------------------------------------------------------------------
-"                                   MAPPINGS 
-"-------------------------------------------------------------------------------
-
-"-------------------------------------------------------------------------------
 " F2 for saving current buffer.
-"-------------------------------------------------------------------------------
 inoremap <silent> <F2> <ESC> :write <CR> 
 nnoremap <silent> <F2> :write <CR>
 
-"-------------------------------------------------------------------------------
 " F3 for closing/opening NERDTree's panel.
-"-------------------------------------------------------------------------------
 map <F3> :NERDTreeToggle<cr>
 
-"-------------------------------------------------------------------------------
 " F4 for closing/opening Tagbar's panel.
-"-------------------------------------------------------------------------------
 map <F4> :TagbarToggle<cr>
+" -------------------------------------------------------------------------- }}}
 
-"-------------------------------------------------------------------------------
-" Automatic completion for parenthesis, brackets and quotes. 
-"-------------------------------------------------------------------------------
-inoremap ( ()<Left>
-inoremap [ []<Left>
-inoremap { {}<Left>
+" Plugins Settings --------------------------------------------------------- {{{
 
-vnoremap ( s()<Esc>P<Right>%
-vnoremap [ s[]<Esc>P<Right>%
-vnoremap { s{}<Esc>P<Right>%
-
-inoremap  "  ""<Left>
-inoremap  `  ``<Left>
-
-
-"-------------------------------------------------------------------------------
-"                               PLUGINS SETUP
-"-------------------------------------------------------------------------------
-
-"-------------------------------------------------------------------------------
-" NERDTree
-"-------------------------------------------------------------------------------
 let NERDTreeAutoCenter          = 1 "auto center is on
 let NERDTreeCaseSensitiveSort   = 1 "case sensitive sorting is on
 let NERDTreeChDirMode           = 2 "set the CWD to the current root
 let NERDTreeSortOrder           = ['\.h$', '\.c$', '\.cpp$', '*', '\/$' ]
 
-"-------------------------------------------------------------------------------
-" Tagbar
-"-------------------------------------------------------------------------------
 let g:tagbar_iconchars = ['▾', '▸']
 
-"-------------------------------------------------------------------------------
 " OmniCppComplete
-"-------------------------------------------------------------------------------
 set tags                        +=~/.tags/qt4.tags
 set tags                        +=./.tags
 set tags                        +=~/.tags/kde.tags
@@ -155,9 +96,8 @@ let OmniCpp_NamespaceSearch     = 2
 let OmniCpp_ShowPrototypeInAbbr = 1
 let OmniCpp_ShowScopeInAbbr     = 1
 
-"-------------------------------------------------------------------------------
 " Supertab 
-"-------------------------------------------------------------------------------
 let g:SuperTabMappingForward    = '<s-tab>'
 let g:SuperTabMappingBackward   = '<tab>'
 
+" -------------------------------------------------------------------------- }}}
