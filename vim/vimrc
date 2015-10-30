@@ -1,8 +1,3 @@
-"-------------------------------------------------------------------------------
-" Pathogen runtime path manipulation
-"-------------------------------------------------------------------------------
-execute pathogen#infect('plugins/{}')
-
 " General: ----------------------------------------------------------------- {{{
 
 set nocp
@@ -32,7 +27,6 @@ set guioptions-=L               "remove left-hand scroll bar
 set guifont=Monospace\ 9
 
 syntax      on
-filetype    plugin indent on
 
 " The current directory is the directory of the file in the current window.
 if has("autocmd")
@@ -101,3 +95,32 @@ let g:SuperTabMappingForward    = '<s-tab>'
 let g:SuperTabMappingBackward   = '<tab>'
 
 " -------------------------------------------------------------------------- }}}
+
+" Vundle: ------------------------------------------------------------------ {{{
+
+let is_vundle_installed = 0
+
+if !isdirectory($HOME . "/.vim/bundle/Vundle.vim")
+    silent !mkdir -p $HOME/.vim/bundle
+    silent !git clone https://github.com/gmarik/Vundle.vim $HOME/.vim/bundle/Vundle.vim
+    let is_vundle_installed = 1
+endif
+
+set rtp+=~/.vim/bundle/Vundle.vim
+filetype off
+
+call vundle#begin()
+
+Plugin 'VundleVim/Vundle.vim'
+Plugin 'scrooloose/nerdtree'
+Plugin 'ervandew/supertab'
+
+call vundle#end()
+filetype plugin indent on
+
+if is_vundle_installed == 1
+    :silent! PluginInstall
+    :qa
+endif
+
+" --------------------------------------------------------------------------- }}}
