@@ -1,5 +1,6 @@
 " General: ----------------------------------------------------------------- {{{
 
+set fdm=marker
 set nocp
 set nocompatible                "Use Vim settings, rather then Vi settings.
 set clipboard=unnamed
@@ -7,7 +8,6 @@ set autoindent                  " copy indent from current line
 set autoread                    " read open files again when changed outside Vim
 set autowrite                   " write a modified buffer on each :next , ...
 set backspace=indent,eol,start  " backspacing over everything in insert mode
-set background=dark
 set backup                      " keep a backup file
 set incsearch                   " do incremental searching
 set nowrap                      " do not wrap lines
@@ -19,6 +19,8 @@ set shiftwidth=4
 set softtabstop=4               " number of spaces that a <Tab> counts for
 set wildmenu                    " command-line completion in an enhanced mode
 set number                      " show line numbers.
+set relativenumber
+set background=dark
 
 set guioptions-=m               "remove menu bar
 set guioptions-=T               "remove toolbar
@@ -26,7 +28,8 @@ set guioptions-=r               "remove right-hand scroll bar
 set guioptions-=L               "remove left-hand scroll bar
 set guifont=Monospace\ 9
 
-syntax      on
+
+syntax enable      
 
 " The current directory is the directory of the file in the current window.
 if has("autocmd")
@@ -75,21 +78,6 @@ let NERDTreeCaseSensitiveSort   = 1 "case sensitive sorting is on
 let NERDTreeChDirMode           = 2 "set the CWD to the current root
 let NERDTreeSortOrder           = ['\.h$', '\.c$', '\.cpp$', '*', '\/$' ]
 
-let g:tagbar_iconchars = ['▾', '▸']
-
-" OmniCppComplete
-set tags                        +=~/.tags/qt4.tags
-set tags                        +=./.tags
-set tags                        +=~/.tags/kde.tags
-set completeopt                 =menu,longest,preview
-
-let OmniCpp_MayCompleteDot      = 1
-let OmniCpp_MayCompleteArrow    = 1
-let OmniCpp_MayCompleteScope    = 1
-let OmniCpp_NamespaceSearch     = 2
-let OmniCpp_ShowPrototypeInAbbr = 1
-let OmniCpp_ShowScopeInAbbr     = 1
-
 " Supertab 
 let g:SuperTabMappingForward    = '<s-tab>'
 let g:SuperTabMappingBackward   = '<tab>'
@@ -114,6 +102,7 @@ call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'scrooloose/nerdtree'
 Plugin 'ervandew/supertab'
+Plugin 'chriskempson/base16-vim'
 
 call vundle#end()
 filetype plugin indent on
@@ -123,4 +112,6 @@ if is_vundle_installed == 1
     :qa
 endif
 
+colorscheme base16-shapeshifter
 " --------------------------------------------------------------------------- }}}
+
