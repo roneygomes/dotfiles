@@ -26,10 +26,36 @@ set guioptions-=m               "remove menu bar
 set guioptions-=T               "remove toolbar
 set guioptions-=r               "remove right-hand scroll bar
 set guioptions-=L               "remove left-hand scroll bar
-set guifont=Monospace\ 9
-
 
 syntax enable      
+
+set backupdir=~/.vim/backup//
+set directory=~/.vim/swap//
+set undodir=~/.vim/undo//
+
+if !isdirectory($HOME . "/.vim/backup")
+    if has("win64") || has("win32") || has("win16")
+        silent !mkdir $HOME/.vim/backup
+    else
+        silent !mkdir -p $HOME/.vim/backup
+    endif
+endif
+
+if !isdirectory($HOME . "/.vim/swap")
+    if has("win64") || has("win32") || has("win16")
+        silent !mkdir $HOME/.vim/swap
+    else
+        silent !mkdir -p $HOME/.vim/swap
+    endif
+endif
+
+if !isdirectory($HOME . "/.vim/backup")
+    if has("win64") || has("win32") || has("win16")
+        silent !mkdir $HOME/.vim/undo
+    else
+        silent !mkdir -p $HOME/.vim/undo
+    endif
+endif
 
 " The current directory is the directory of the file in the current window.
 if has("autocmd")
@@ -46,11 +72,9 @@ endif
 
 " Windows.
 if has("win64") || has("win32") || has("win16")
-    au GUIEnter * simalt ~x
-    set backupdir=~/tmp
     set guifont=Consolas:h9
 else
-    set backupdir=~/.tmp
+    set guifont=Monospace\ 9
 endif
 
 " Highlight Whitespaces
@@ -109,9 +133,8 @@ Plugin 'tpope/vim-ragtag'
 Plugin 'tpope/vim-abolish'
 Plugin 'tpope/vim-surround'
 
-
-
 call vundle#end()
+
 filetype plugin indent on
 
 if is_vundle_installed == 1
