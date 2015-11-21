@@ -134,6 +134,7 @@ Plugin 'tpope/vim-commentary'
 Plugin 'tpope/vim-ragtag'
 Plugin 'tpope/vim-abolish'
 Plugin 'tpope/vim-surround'
+Plugin 'Yggdroot/indentLine'
 
 call vundle#end()
 
