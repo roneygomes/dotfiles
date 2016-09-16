@@ -36,20 +36,42 @@ CASE_SENSITIVE="true"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(git git git-extras debian archlinux)
+plugins=(git git git-extras)
 
 # ------------------------------------------------------------------------------
-#                               ALIASES 
+#                               ENV VARS
+# ------------------------------------------------------------------------------
+PATH=$PATH:~/bin
+PATH=$PATH:~/.cargo/bin
+
+export WORKON_HOME=~/.envs
+
+#-------------------------------------------------------------------------------
+#                               ALIASES
 # ------------------------------------------------------------------------------
 alias zshconfig="vim ~/.zshrc"
 alias ohmyzsh="vim ~/.oh-my-zsh"
 
+alias myip="ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p'"
+
+alias j6='ju 1.6'
+alias j7='ju 1.7'
+alias j8='ju 1.8'
+
+function jls() {
+  echo "Use ´j6, j7 and j8´ to conveniently switch between Java versions."
+  echo "For a specific version use ´ju lt <version>´ where available versions are listed below:"
+  /usr/libexec/java_home -V 2<&1 | grep -E "\d.\d.\d" | cut -d , -f 1 | colrm 1 4 | grep -v Home
+}
+
+function ju() {
+  export JAVA_HOME=$(/usr/libexec/java_home -v $1)
+  export PATH=$JAVA_HOME/bin:$PATH
+  java -version
+}
 # ------------------------------------------------------------------------------
-#                                   SOURCES 
+#                                   SOURCES
 # ------------------------------------------------------------------------------
 source $ZSH/oh-my-zsh.sh
+source /usr/local/bin/virtualenvwrapper.sh
 
-# ------------------------------------------------------------------------------
-# Add an "alert" alias for long running commands.  Use like so: sleep 10; alert
-# ------------------------------------------------------------------------------
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'

@@ -2,32 +2,33 @@
 
 set fdm=marker
 set nocp
-set nocompatible                "Use Vim settings, rather then Vi settings.
+set nocompatible                    " Use Vim settings, rather then Vi settings.
 set clipboard=unnamed
-set autoindent                  " copy indent from current line
-set autoread                    " read open files again when changed outside Vim
-set autowrite                   " write a modified buffer on each :next , ...
-set backspace=indent,eol,start  " backspacing over everything in insert mode
-set backup                      " keep a backup file
-set incsearch                   " do incremental searching
-set nowrap                      " do not wrap lines
-set ruler                       " show the cursor position all the time
-set showcmd                     " display incomplete commands
-set autoindent                 	" smart autoindenting when starting a new line
+set autoindent                      " copy indent from current line
+set autoread                        " read open files again when changed outside Vim
+set autowrite                       " write a modified buffer on each :next , ...
+set backspace=indent,eol,start      " backspacing over everything in insert mode
+set backup                          " keep a backup file
+set incsearch                       " do incremental searching
+set nowrap                          " do not wrap lines
+set ruler                           " show the cursor position all the time
+set showcmd                         " display incomplete commands
+set autoindent                      " smart autoindenting when starting a new line
 set expandtab
 set shiftwidth=4
-set softtabstop=4               " number of spaces that a <Tab> counts for
-set wildmenu                    " command-line completion in an enhanced mode
-set number                      " show line numbers.
+set softtabstop=4                   " number of spaces that a <Tab> counts for
+set wildmenu                        " command-line completion in an enhanced mode
+set number                          " show line numbers.
 set relativenumber
 set background=dark
+set diffopt=vertical                " always display diffs in a vertical pane
 
-set guioptions-=m               "remove menu bar
-set guioptions-=T               "remove toolbar
-set guioptions-=r               "remove right-hand scroll bar
-set guioptions-=L               "remove left-hand scroll bar
+set guioptions-=m                   " remove menu bar
+set guioptions-=T                   " remove toolbar
+set guioptions-=r                   " remove right-hand scroll bar
+set guioptions-=L                   " remove left-hand scroll bar
 
-syntax enable      
+syntax on
 
 set backupdir=~/.vim/backup//
 set directory=~/.vim/swap//
@@ -77,9 +78,6 @@ else
     set guifont=Monospace\ 9
 endif
 
-" Highlight Whitespaces
-au BufNewFile,BufRead * syn match brancomala '\s\+$' | hi brancomala ctermbg=red
-
 " ------------------------------------------------------------------------- }}}"
 
 " Mappings: ---------------------------------------------------------------- {{{
@@ -106,6 +104,19 @@ let NERDTreeSortOrder           = ['\.h$', '\.c$', '\.cpp$', '*', '\/$' ]
 let g:SuperTabMappingForward    = '<s-tab>'
 let g:SuperTabMappingBackward   = '<tab>'
 
+" Syntastic
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+let g:syntastic_always_populate_loc_list    = 1
+let g:syntastic_auto_loc_list               = 1
+let g:syntastic_check_on_open               = 1
+let g:syntastic_check_on_wq                 = 0
+
+" Rust
+let g:rustfmt_autosave                      = 1
+let g:rustfm_options                        = '--write-mode=overwrite'
 " -------------------------------------------------------------------------- }}}
 
 " Vundle: ------------------------------------------------------------------ {{{
@@ -123,18 +134,18 @@ filetype off
 
 call vundle#begin()
 
-Plugin 'VundleVim/Vundle.vim'
-Plugin 'scrooloose/nerdtree'
-Plugin 'chriskempson/base16-vim'
-Plugin 'Valloric/YouCompleteMe'
-Plugin 'ternjs/tern_for_vim'
-Plugin 'Raimondi/delimitMate'
-Plugin 'tpope/vim-fugitive'
-Plugin 'tpope/vim-commentary'
-Plugin 'tpope/vim-ragtag'
-Plugin 'tpope/vim-abolish'
-Plugin 'tpope/vim-surround'
-Plugin 'Yggdroot/indentLine'
+Plugin 'VundleVim/Vundle.vim'       " Plugin manager.
+Plugin 'scrooloose/nerdtree'        " File tree navigation.
+Plugin 'Raimondi/delimitMate'       " Automatically insert quotes, parentheses, braces etc.
+Plugin 'tpope/vim-surround'         " Surrounds text blocks with tags, brackets etc.
+Plugin 'Yggdroot/indentLine'        " Displays identation levels with thin vertical lines.
+Plugin 'tomasr/molokai'             " Molokai colors cheme.
+Plugin 'davidhalter/jedi-vim'       " Python auto completion.
+Plugin 'ervandew/supertab'          " Insert completion with <TAB>.
+Plugin 'elzr/vim-json'              " Improved syntax highlighting fro JSON files.
+Plugin 'rust-lang/rust.vim'         " Rust file detection, syntax highlighting etc.
+Plugin 'scrooloose/syntastic'       " Syntax checker.
+Plugin 'bitc/vim-bad-whitespace'    " Highlights white space and the end of lines.
 
 call vundle#end()
 
@@ -145,6 +156,6 @@ if is_vundle_installed == 1
     :qa
 endif
 
-colorscheme base16-shapeshifter
+colorscheme molokai 
 " --------------------------------------------------------------------------- }}}
 
