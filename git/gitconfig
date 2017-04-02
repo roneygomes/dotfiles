@@ -1,14 +1,14 @@
 [user]
 	name = Roney Gomes
-	email = roney477@gmail.com
 [core]
-	editor = vim
-
-[url "git://anongit.kde.org/"]
-        insteadOf = kde:
-
-[url "https://github.com/"]
-        insteadOf = github:
-
-[url "git@git.kde.org:"]
-        pushInsteadOf = kde:
+	editor = mvim -f
+[alias]
+        pr = pull --rebase
+        ls = log --graph --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cgreen\\ [%cn]" --decorate --abbrev-commit
+        ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cgreen\\ [%cn]" --decorate --numstat
+        lnc = log --pretty=format:"%h\\ %s\\ [%cn]"
+        lds = log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cgreen\\ [%cn]" --decorate --date=short
+[diff]
+	tool = vimdiff
+[mergetool]
+	keepBackup = false

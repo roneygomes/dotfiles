@@ -49,6 +49,8 @@ export WORKON_HOME=~/.envs
 #-------------------------------------------------------------------------------
 #                               ALIASES
 # ------------------------------------------------------------------------------
+
+alias alert-finished="osascript -e 'display notification \"Finished\" with title \"Alert\"'"
 alias zshconfig="vim ~/.zshrc"
 alias ohmyzsh="vim ~/.oh-my-zsh"
 
@@ -75,3 +77,6 @@ function ju() {
 source $ZSH/oh-my-zsh.sh
 source /usr/local/bin/virtualenvwrapper.sh
 
+export NVM_DIR="$HOME/.nvm"
+  . "/usr/local/opt/nvm/nvm.sh"
+eval $(/usr/libexec/path_helper -s)

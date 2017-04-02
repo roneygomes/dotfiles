@@ -33,6 +33,7 @@ syntax on
 set backupdir=~/.vim/backup//
 set directory=~/.vim/swap//
 set undodir=~/.vim/undo//
+set guifont=D2Coding\ for\ Powerline:h13
 
 if !isdirectory($HOME . "/.vim/backup")
     if has("win64") || has("win32") || has("win16")
@@ -71,12 +72,6 @@ if has("autocmd")
         \ endif
 endif
 
-" Windows.
-if has("win64") || has("win32") || has("win16")
-    set guifont=Consolas:h9
-else
-    set guifont=Monospace\ 9
-endif
 
 " ------------------------------------------------------------------------- }}}"
 
@@ -100,7 +95,7 @@ let NERDTreeCaseSensitiveSort   = 1 "case sensitive sorting is on
 let NERDTreeChDirMode           = 2 "set the CWD to the current root
 let NERDTreeSortOrder           = ['\.h$', '\.c$', '\.cpp$', '*', '\/$' ]
 
-" Supertab 
+" Supertab
 let g:SuperTabMappingForward    = '<s-tab>'
 let g:SuperTabMappingBackward   = '<tab>'
 
@@ -111,12 +106,24 @@ set statusline+=%*
 
 let g:syntastic_always_populate_loc_list    = 1
 let g:syntastic_auto_loc_list               = 1
-let g:syntastic_check_on_open               = 1
+let g:syntastic_check_on_open               = 0
 let g:syntastic_check_on_wq                 = 0
 
 " Rust
 let g:rustfmt_autosave                      = 1
 let g:rustfm_options                        = '--write-mode=overwrite'
+
+" Clojure
+let g:clojure_align_multiline_strings       = 0
+
+au VimEnter * RainbowParenthesesToggle
+au Syntax * RainbowParenthesesLoadRound
+au Syntax * RainbowParenthesesLoadSquare
+au Syntax * RainbowParenthesesLoadBraces
+
+" Powerline
+set laststatus=2
+let g:airline_powerline_fonts               = 1
 " -------------------------------------------------------------------------- }}}
 
 " Vundle: ------------------------------------------------------------------ {{{
@@ -146,6 +153,10 @@ Plugin 'elzr/vim-json'              " Improved syntax highlighting fro JSON file
 Plugin 'rust-lang/rust.vim'         " Rust file detection, syntax highlighting etc.
 Plugin 'scrooloose/syntastic'       " Syntax checker.
 Plugin 'bitc/vim-bad-whitespace'    " Highlights white space and the end of lines.
+Plugin 'tpope/vim-salve'            " Static Vim support for Leiningen and Boot.
+Plugin 'tpope/vim-fireplace'        " Clojure REPL.
+Plugin 'kien/rainbow_parentheses.vim'
+Plugin 'vim-airline/vim-airline'
 
 call vundle#end()
 
@@ -156,6 +167,6 @@ if is_vundle_installed == 1
     :qa
 endif
 
-colorscheme molokai 
+colorscheme molokai
 " --------------------------------------------------------------------------- }}}
 
