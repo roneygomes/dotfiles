@@ -61,7 +61,7 @@
 ;; below, Emacs knows where to look for the corresponding file.
 (add-to-list 'load-path "~/.emacs.d/customizations")
 
-;; Customizations for Emacs look-and-feel. 
+;; Customizations for Emacs look-and-feel.
 (load "ui.el")
 
 ;; General editing customizations.
@@ -72,6 +72,9 @@
 
 ;; Clojure configs.
 (load "clojure.el")
+
+(add-to-list 'exec-path "~/bin")
+(add-to-list 'exec-path "/usr/local/bin")
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.

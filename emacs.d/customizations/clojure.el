@@ -13,10 +13,10 @@
 (require 'clojure-mode-extra-font-locking)
 
 ;; provides minibuffer documentation for the code you're typing into the repl
-(add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
+(add-hook 'cider-repl-mode-hook #'eldoc-mode)
 
 ;; go right to the REPL buffer when it's finished connecting
-(setq cider-repl-pop-to-buffer-on-connect t)
+(setq cider-repl-pop-to-buffer-on-connect 'display-only)
 
 ;; When there's a cider error, show its buffer and switch to it
 (setq cider-show-error-buffer t)
