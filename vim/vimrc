@@ -33,7 +33,7 @@ syntax on
 set backupdir=~/.vim/backup//
 set directory=~/.vim/swap//
 set undodir=~/.vim/undo//
-set guifont=D2Coding\ for\ Powerline:h13
+set guifont=D2Coding\ for\ Powerline:h14
 
 if !isdirectory($HOME . "/.vim/backup")
     if has("win64") || has("win32") || has("win16")
@@ -78,7 +78,7 @@ endif
 " Mappings: ---------------------------------------------------------------- {{{
 
 " F2 for saving current buffer.
-inoremap <silent> <F2> <ESC> :write <CR> 
+inoremap <silent> <F2> <ESC> :write <CR>
 nnoremap <silent> <F2> :write <CR>
 
 " F3 for closing/opening NERDTree's panel.
@@ -116,14 +116,12 @@ let g:rustfm_options                        = '--write-mode=overwrite'
 " Clojure
 let g:clojure_align_multiline_strings       = 0
 
-au VimEnter * RainbowParenthesesToggle
-au Syntax * RainbowParenthesesLoadRound
-au Syntax * RainbowParenthesesLoadSquare
-au Syntax * RainbowParenthesesLoadBraces
-
 " Powerline
 set laststatus=2
 let g:airline_powerline_fonts               = 1
+
+" Javascript Libs Syntax
+let g:used_javascript_librs                 = 'jquery,angularjs,jasmine'
 " -------------------------------------------------------------------------- }}}
 
 " Vundle: ------------------------------------------------------------------ {{{
@@ -141,6 +139,7 @@ filetype off
 
 call vundle#begin()
 
+" Misc
 Plugin 'VundleVim/Vundle.vim'       " Plugin manager.
 Plugin 'scrooloose/nerdtree'        " File tree navigation.
 Plugin 'Raimondi/delimitMate'       " Automatically insert quotes, parentheses, braces etc.
@@ -153,10 +152,24 @@ Plugin 'elzr/vim-json'              " Improved syntax highlighting fro JSON file
 Plugin 'rust-lang/rust.vim'         " Rust file detection, syntax highlighting etc.
 Plugin 'scrooloose/syntastic'       " Syntax checker.
 Plugin 'bitc/vim-bad-whitespace'    " Highlights white space and the end of lines.
-Plugin 'tpope/vim-salve'            " Static Vim support for Leiningen and Boot.
-Plugin 'tpope/vim-fireplace'        " Clojure REPL.
-Plugin 'kien/rainbow_parentheses.vim'
 Plugin 'vim-airline/vim-airline'
+
+" Git
+Plugin 'tpope/vim-fugitive'
+
+" Clojure
+Plugin 'tpope/vim-salve'
+Plugin 'tpope/vim-fireplace'
+Plugin 'venantius/vim-eastwood'
+Plugin 'venantius/vim-cljfmt'
+Plugin 'vim-scripts/paredit.vim'
+
+" Frontend Stuff
+Plugin 'claco/jasmine.vim'
+Plugin 'burnettk/vim-angular'
+Plugin 'pangloss/vim-javascript'
+Plugin 'othree/javascript-libraries-syntax.vim'
+Plugin 'ctrlpvim/ctrlp.vim'
 
 call vundle#end()
 
