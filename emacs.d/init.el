@@ -34,6 +34,7 @@
         ;; Clojure
         cider
         clojure-mode
+        rainbow-delimiters
         clojure-mode-extra-font-locking
 
         ;; Smart completion.
@@ -69,28 +70,17 @@
 ;; Navigation configs, mostly helm and evil-leader.
 (load "navigation.el")
 
-; clojure
-;; Enter cider mode when entering the clojure major mode
-(add-hook 'clojure-mode-hook 'cider-mode)
-(add-hook 'cider-repl-mode-hook #'company-mode)
-(add-hook 'cider-mode-hook #'company-mode)
-(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
-
-;; Replace return key with newline-and-indent when in cider mode.
-(add-hook 'cider-mode-hook '(lambda () (local-set-key (kbd "RET") 'newline-and-indent)))
-
-; misc
+;; Clojure configs.
+(load "clojure.el")
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(helm-ag-base-command "/usr/local/bin/pt -e --nocolor --nogroup")
  '(package-selected-packages
    (quote
     (company relative-line-numbers evil-visual-mark-mode powerline-evil evil-leader use-package helm evil))))
-
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
