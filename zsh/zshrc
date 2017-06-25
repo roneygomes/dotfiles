@@ -81,6 +81,3 @@ function ju() {
 source $ZSH/oh-my-zsh.sh
 source /usr/local/bin/virtualenvwrapper.sh
 
-export NVM_DIR="$HOME/.nvm"
-  . "/usr/local/opt/nvm/nvm.sh"
-eval $(/usr/libexec/path_helper -s)
