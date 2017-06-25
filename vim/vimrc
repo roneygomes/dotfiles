@@ -33,7 +33,9 @@ syntax on
 set backupdir=~/.vim/backup//
 set directory=~/.vim/swap//
 set undodir=~/.vim/undo//
-set guifont=D2Coding\ for\ Powerline:h14
+set guifont=Liberation\ Mono\ for\ Powerline:h12
+
+let mapleader=","
 
 if !isdirectory($HOME . "/.vim/backup")
     if has("win64") || has("win32") || has("win16")
@@ -59,11 +61,6 @@ if !isdirectory($HOME . "/.vim/backup")
     endif
 endif
 
-" The current directory is the directory of the file in the current window.
-if has("autocmd")
-  autocmd BufEnter * :lchdir %:p:h
-endif
-
 " Always jump to the last known cursor position.
 if has("autocmd")
   autocmd BufReadPost *
@@ -72,8 +69,24 @@ if has("autocmd")
         \ endif
 endif
 
+" Toggle colored right border after 80 chars.
+let &colorcolumn=81
+let s:color_column_old = 0
 
-" ------------------------------------------------------------------------- }}}"
+
+function! s:ToggleColorColumn()
+    if s:color_column_old == 0
+        let s:color_column_old = &colorcolumn
+        windo let &colorcolumn = 0
+    else
+        windo let &colorcolumn=s:color_column_old
+        let s:color_column_old = 0
+    endif
+endfunction
+
+nnoremap <Leader>8 :call <SID>ToggleColorColumn()<CR>
+
+" -------------------------------------------------------------------------- }}}
 
 " Mappings: ---------------------------------------------------------------- {{{
 
@@ -90,10 +103,23 @@ map <F4> :TagbarToggle<cr>
 
 " Plugins Settings --------------------------------------------------------- {{{
 
+" NERDTree
 let NERDTreeAutoCenter          = 1 "auto center is on
 let NERDTreeCaseSensitiveSort   = 1 "case sensitive sorting is on
 let NERDTreeChDirMode           = 2 "set the CWD to the current root
 let NERDTreeSortOrder           = ['\.h$', '\.c$', '\.cpp$', '*', '\/$' ]
+
+" YCM
+let g:ycm_semantic_triggers = {'clojure': ['(', '.', '/']}
+let g:ycm_autoclose_preview_window_after_completion = 1
+
+" CtrlP
+nnoremap <leader>f :CtrlP<CR>
+nnoremap <leader>b :CtrlPBuffer<CR>
+nnoremap <leader>m :CtrlPMRUFiles<CR>
+nnoremap <leader>t :CtrlPTag<CR>
+
+let g:ctrlp_root_markers = ['project.clj']
 
 " Supertab
 let g:SuperTabMappingForward    = '<s-tab>'
@@ -118,13 +144,13 @@ let g:clojure_align_multiline_strings       = 0
 
 " Powerline
 set laststatus=2
-let g:airline_powerline_fonts               = 1
+let g:airline_powerline_fonts               = 0
 
 " Javascript Libs Syntax
 let g:used_javascript_librs                 = 'jquery,angularjs,jasmine'
 " -------------------------------------------------------------------------- }}}
 
-" Vundle: ------------------------------------------------------------------ {{{
+" Plugins: ----------------------------------------------------------------- {{{
 
 let is_vundle_installed = 0
 
@@ -140,36 +166,40 @@ filetype off
 call vundle#begin()
 
 " Misc
-Plugin 'VundleVim/Vundle.vim'       " Plugin manager.
-Plugin 'scrooloose/nerdtree'        " File tree navigation.
-Plugin 'Raimondi/delimitMate'       " Automatically insert quotes, parentheses, braces etc.
-Plugin 'tpope/vim-surround'         " Surrounds text blocks with tags, brackets etc.
-Plugin 'Yggdroot/indentLine'        " Displays identation levels with thin vertical lines.
-Plugin 'tomasr/molokai'             " Molokai colors cheme.
-Plugin 'davidhalter/jedi-vim'       " Python auto completion.
-Plugin 'ervandew/supertab'          " Insert completion with <TAB>.
-Plugin 'elzr/vim-json'              " Improved syntax highlighting fro JSON files.
-Plugin 'rust-lang/rust.vim'         " Rust file detection, syntax highlighting etc.
-Plugin 'scrooloose/syntastic'       " Syntax checker.
-Plugin 'bitc/vim-bad-whitespace'    " Highlights white space and the end of lines.
+Plugin 'VundleVim/Vundle.vim'
+
+Plugin 'scrooloose/nerdtree'
+Plugin 'ctrlpvim/ctrlp.vim'
+Plugin 'majutsushi/tagbar'
+
+Plugin 'Raimondi/delimitMate'
+Plugin 'tpope/vim-surround'
+Plugin 'Yggdroot/indentLine'
+Plugin 'flazz/vim-colorschemes'
+Plugin 'bitc/vim-bad-whitespace'
 Plugin 'vim-airline/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
 
-" Git
+" Programming
 Plugin 'tpope/vim-fugitive'
+Plugin 'scrooloose/syntastic'
 
-" Clojure
+Plugin 'rust-lang/rust.vim'
+
 Plugin 'tpope/vim-salve'
 Plugin 'tpope/vim-fireplace'
 Plugin 'venantius/vim-eastwood'
 Plugin 'venantius/vim-cljfmt'
 Plugin 'vim-scripts/paredit.vim'
+Plugin 'guns/vim-clojure-highlight'
 
-" Frontend Stuff
-Plugin 'claco/jasmine.vim'
-Plugin 'burnettk/vim-angular'
+Plugin 'elzr/vim-json'
 Plugin 'pangloss/vim-javascript'
 Plugin 'othree/javascript-libraries-syntax.vim'
-Plugin 'ctrlpvim/ctrlp.vim'
+
+" Autocomplete
+Plugin 'ervandew/supertab'
+Plugin 'Valloric/YouCompleteMe'
 
 call vundle#end()
 
@@ -180,6 +210,7 @@ if is_vundle_installed == 1
     :qa
 endif
 
-colorscheme molokai
-" --------------------------------------------------------------------------- }}}
+colorscheme candyman
+highlight ColorColumn ctermbg=gray guibg=#2d2d2d
+" -------------------------------------------------------------------------- }}}
 
