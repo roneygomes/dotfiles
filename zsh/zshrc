@@ -44,6 +44,10 @@ plugins=(git git git-extras)
 PATH=$PATH:~/bin
 PATH=$PATH:~/.cargo/bin
 
+if [[ `uname` == 'Darwin' ]] then;
+    PATH=$PATH:$HOME/Library/Android/sdk/platform-tools
+fi
+
 export WORKON_HOME=~/.envs
 
 #-------------------------------------------------------------------------------
