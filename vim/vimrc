@@ -122,34 +122,9 @@ let NERDTreeSortOrder           = ['\.h$', '\.c$', '\.cpp$', '*', '\/$' ]
 let g:ycm_semantic_triggers = {'clojure': ['(', '.', '/']}
 let g:ycm_autoclose_preview_window_after_completion = 1
 
-" CtrlP
-nnoremap <leader>f :CtrlP<CR>
-nnoremap <leader>b :CtrlPBuffer<CR>
-nnoremap <leader>m :CtrlPMRUFiles<CR>
-nnoremap <leader>t :CtrlPTag<CR>
-
-let g:ctrlp_root_markers = ['project.clj']
-
 " Supertab
 let g:SuperTabMappingForward    = '<s-tab>'
 let g:SuperTabMappingBackward   = '<tab>'
-
-" Syntastic
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-
-let g:syntastic_always_populate_loc_list    = 1
-let g:syntastic_auto_loc_list               = 1
-let g:syntastic_check_on_open               = 0
-let g:syntastic_check_on_wq                 = 0
-
-" Rust
-let g:rustfmt_autosave                      = 1
-let g:rustfm_options                        = '--write-mode=overwrite'
-
-" Clojure
-let g:clojure_align_multiline_strings       = 0
 
 " Powerline
 set laststatus=2
@@ -178,11 +153,9 @@ call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
 
 Plugin 'scrooloose/nerdtree'
-Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'majutsushi/tagbar'
 
 Plugin 'Raimondi/delimitMate'
-Plugin 'tpope/vim-surround'
 Plugin 'Yggdroot/indentLine'
 Plugin 'flazz/vim-colorschemes'
 Plugin 'bitc/vim-bad-whitespace'
@@ -191,21 +164,8 @@ Plugin 'vim-airline/vim-airline-themes'
 Plugin 'junegunn/fzf.vim'
 
 " Programming
-Plugin 'tpope/vim-fugitive'
-Plugin 'scrooloose/syntastic'
-
-Plugin 'rust-lang/rust.vim'
-
-Plugin 'tpope/vim-salve'
-Plugin 'tpope/vim-fireplace'
-Plugin 'venantius/vim-eastwood'
-Plugin 'venantius/vim-cljfmt'
-Plugin 'vim-scripts/paredit.vim'
 Plugin 'guns/vim-clojure-highlight'
-
 Plugin 'elzr/vim-json'
-Plugin 'pangloss/vim-javascript'
-Plugin 'othree/javascript-libraries-syntax.vim'
 
 " Autocomplete
 Plugin 'ervandew/supertab'
