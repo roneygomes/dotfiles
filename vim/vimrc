@@ -99,9 +99,18 @@ map <F3> :NERDTreeToggle<cr>
 
 " F4 for closing/opening Tagbar's panel.
 map <F4> :TagbarToggle<cr>
+
+" Fuzzy finder mappings for buffer, files and tags.
+nmap ; :Buffers<CR>
+nmap <Leader>t :Files<CR>
+nmap <Leader>r :Tags<CR>
+
 " -------------------------------------------------------------------------- }}}
 
 " Plugins Settings --------------------------------------------------------- {{{
+
+" fzf
+set rtp+=~/.fzf
 
 " NERDTree
 let NERDTreeAutoCenter          = 1 "auto center is on
@@ -179,6 +188,7 @@ Plugin 'flazz/vim-colorschemes'
 Plugin 'bitc/vim-bad-whitespace'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
+Plugin 'junegunn/fzf.vim'
 
 " Programming
 Plugin 'tpope/vim-fugitive'
