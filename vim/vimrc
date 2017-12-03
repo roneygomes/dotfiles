@@ -180,7 +180,7 @@ if is_vundle_installed == 1
     :qa
 endif
 
-colorscheme candyman
+colorscheme wombat256
 highlight ColorColumn ctermbg=gray guibg=#2d2d2d
 " -------------------------------------------------------------------------- }}}
 
