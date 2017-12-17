@@ -1,7 +1,11 @@
+;; Ui customizations.
 (setq inhibit-startup-message t)
 
 (tool-bar-mode -1)
 
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+
+;; Packages.
 (require 'package)
 
 (setq package-enable-at-startup nil)
