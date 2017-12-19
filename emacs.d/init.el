@@ -63,6 +63,9 @@
 (use-package counsel
   :ensure t)
 
+(use-package company
+  :ensure t
+  :config (global-company-mode))
 
 (setq ivy-use-virtual-buffers t)
 (setq enable-recursive-minibuffers t)
