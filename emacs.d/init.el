@@ -24,6 +24,8 @@
 
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
+(set-frame-font "D2 Coding Bold 12" nil t)
+
 ;; Packages.
 (require 'package)
 
