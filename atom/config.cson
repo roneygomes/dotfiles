@@ -1,0 +1,84 @@
+"*":
+  "base16-syntax":
+    scheme: "Tomorrow"
+  "bracket-matcher":
+    autocompleteCharacters: [
+      "()"
+      "[]"
+      "{}"
+      "\"\""
+      "“”"
+      "‘’"
+      "«»"
+      "‹›"
+    ]
+  core:
+    audioBeep: false
+    disabledPackages: [
+      "wrap-guide"
+      "tabs"
+    ]
+    packagesWithKeymapsDisabled: [
+      "lisp-paredit"
+    ]
+    telemetryConsent: "no"
+    themes: [
+      "one-dark-ui"
+      "base16-tomorrow-dark-theme"
+    ]
+  editor:
+    fontFamily: "Fira Code"
+    scrollPastEnd: true
+    tabType: "soft"
+  "exception-reporting":
+    userId: "65555d28-6918-4cea-9d54-3b7060f692fc"
+  "lisp-paredit":
+    indentationForms: [
+      "try"
+      "catch"
+      "finally"
+      "/^let/"
+      "are"
+      "/^def/"
+      "fn"
+      "cond"
+      "condp"
+      "/^if.*/"
+      "/.*\\/for/"
+      "for"
+      "for-all"
+      "/^when.*/"
+      "testing"
+      "doseq"
+      "dotimes"
+      "ns"
+      "routes"
+      "GET"
+      "POST"
+      "PUT"
+      "DELETE"
+      "extend-protocol"
+      "loop"
+      "do"
+      "case"
+      "with-bindings"
+      "checking"
+      "with-open"
+    ]
+    strict: false
+  parinfer:
+    "show-open-file-dialog?": false
+  "proto-repl":
+    autoPrettyPrint: true
+    autoScroll: false
+  "tool-bar":
+    position: "Right"
+    useTouchBar: false
+  welcome:
+    showOnStartup: false
+".clojure.source":
+  editor:
+    autoIndent: false
+    autoIndentOnPaste: false
+    nonWordCharacters: "()\"':,;~@#$%^&{}[]`"
+    scrollPastEnd: true
