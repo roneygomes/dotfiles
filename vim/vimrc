@@ -33,32 +33,20 @@ syntax on
 set backupdir=~/.vim/backup//
 set directory=~/.vim/swap//
 set undodir=~/.vim/undo//
-set guifont=Liberation\ Mono\ for\ Powerline:h12
 
-let mapleader=","
+let mapleader=" "
+nnoremap <SPACE> <Nop>
 
 if !isdirectory($HOME . "/.vim/backup")
-    if has("win64") || has("win32") || has("win16")
-        silent !mkdir $HOME/.vim/backup
-    else
-        silent !mkdir -p $HOME/.vim/backup
-    endif
+    silent !mkdir -p $HOME/.vim/backup
 endif
 
 if !isdirectory($HOME . "/.vim/swap")
-    if has("win64") || has("win32") || has("win16")
-        silent !mkdir $HOME/.vim/swap
-    else
-        silent !mkdir -p $HOME/.vim/swap
-    endif
+    silent !mkdir -p $HOME/.vim/swap
 endif
 
 if !isdirectory($HOME . "/.vim/backup")
-    if has("win64") || has("win32") || has("win16")
-        silent !mkdir $HOME/.vim/undo
-    else
-        silent !mkdir -p $HOME/.vim/undo
-    endif
+    silent !mkdir -p $HOME/.vim/undo
 endif
 
 " Always jump to the last known cursor position.
@@ -101,8 +89,8 @@ map <F3> :NERDTreeToggle<cr>
 map <F4> :TagbarToggle<cr>
 
 " Fuzzy finder mappings for buffer, files and tags.
-nmap ; :Buffers<CR>
-nmap <Leader>t :Files<CR>
+nmap <Leader>b :Buffers<CR>
+nmap <Leader>o :Files<CR>
 nmap <Leader>r :Tags<CR>
 
 " -------------------------------------------------------------------------- }}}
@@ -110,17 +98,26 @@ nmap <Leader>r :Tags<CR>
 " Plugins Settings --------------------------------------------------------- {{{
 
 " fzf
-set rtp+=~/.fzf
+set rtp+=/usr/local/opt/fzf
+
+" --column: Show column number
+" --line-number: Show line number
+" --no-heading: Do not show file headings in results
+" --fixed-strings: Search term as a literal string
+" --ignore-case: Case insensitive search
+" --no-ignore: Do not respect .gitignore, etc...
+" --hidden: Search hidden files and folders
+" --follow: Follow symlinks
+" --glob: Additional conditions for search (in this case ignore everything in the .git/ folder)
+" --color: Search color options
+command! -bang -nargs=* Find call fzf#vim#grep('rg --column --line-number --no-heading --fixed-strings --ignore-case --no-ignore --hidden --follow --glob "!.git/*" --color "always" '.shellescape(<q-args>), 1, <bang>0)
+
 
 " NERDTree
 let NERDTreeAutoCenter          = 1 "auto center is on
 let NERDTreeCaseSensitiveSort   = 1 "case sensitive sorting is on
 let NERDTreeChDirMode           = 2 "set the CWD to the current root
 let NERDTreeSortOrder           = ['\.h$', '\.c$', '\.cpp$', '*', '\/$' ]
-
-" YCM
-let g:ycm_semantic_triggers = {'clojure': ['(', '.', '/']}
-let g:ycm_autoclose_preview_window_after_completion = 1
 
 " Supertab
 let g:SuperTabMappingForward    = '<s-tab>'
@@ -130,8 +127,6 @@ let g:SuperTabMappingBackward   = '<tab>'
 set laststatus=2
 let g:airline_powerline_fonts               = 0
 
-" Javascript Libs Syntax
-let g:used_javascript_librs                 = 'jquery,angularjs,jasmine'
 " -------------------------------------------------------------------------- }}}
 
 " Plugins: ----------------------------------------------------------------- {{{
@@ -149,12 +144,8 @@ filetype off
 
 call vundle#begin()
 
-" Misc
 Plugin 'VundleVim/Vundle.vim'
-
 Plugin 'scrooloose/nerdtree'
-Plugin 'majutsushi/tagbar'
-
 Plugin 'Raimondi/delimitMate'
 Plugin 'Yggdroot/indentLine'
 Plugin 'flazz/vim-colorschemes'
@@ -162,14 +153,9 @@ Plugin 'bitc/vim-bad-whitespace'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'junegunn/fzf.vim'
-
-" Programming
 Plugin 'guns/vim-clojure-highlight'
 Plugin 'elzr/vim-json'
-
-" Autocomplete
 Plugin 'ervandew/supertab'
-Plugin 'Valloric/YouCompleteMe'
 
 call vundle#end()
 
