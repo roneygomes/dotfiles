@@ -5,5 +5,3 @@ vim/backup
 
 .DS_Store
 
-emacs.d/recentf
-emacs.d/network-security.data
