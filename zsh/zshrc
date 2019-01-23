@@ -43,6 +43,7 @@ plugins=(git git git-extras)
 # ------------------------------------------------------------------------------
 PATH=$PATH:~/bin
 PATH=$PATH:~/.cargo/bin
+FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden'
 
 if [[ `uname` == 'Darwin' ]] then;
     PATH=$PATH:$HOME/Library/Android/sdk/platform-tools
@@ -81,3 +82,5 @@ function ju() {
 source $ZSH/oh-my-zsh.sh
 source /usr/local/bin/virtualenvwrapper.sh
 
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
