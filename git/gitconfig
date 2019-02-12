@@ -1,7 +1,7 @@
 [user]
 	name = Roney Gomes
 [core]
-	editor = mvim -f
+	editor = vim
 [alias]
         pr = pull --rebase
         ls = log --graph --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cgreen\\ [%cn]" --decorate --abbrev-commit

@@ -78,9 +78,12 @@ nnoremap <Leader>8 :call <SID>ToggleColorColumn()<CR>
 
 " Mappings: ---------------------------------------------------------------- {{{
 
-" F2 for saving current buffer.
-inoremap <silent> <F2> <ESC> :write <CR>
-nnoremap <silent> <F2> :write <CR>
+" Remaps the Tab key to work like Esc.
+nnoremap <Tab> <Esc>
+vnoremap <Tab> <Esc>gV
+onoremap <Tab> <Esc>
+inoremap <Tab> <Esc>`^
+inoremap <Leader><Tab> <Tab>
 
 " F3 for closing/opening NERDTree's panel.
 map <F3> :NERDTreeToggle<cr>
@@ -105,10 +108,6 @@ let NERDTreeAutoCenter          = 1 "auto center is on
 let NERDTreeCaseSensitiveSort   = 1 "case sensitive sorting is on
 let NERDTreeChDirMode           = 2 "set the CWD to the current root
 let NERDTreeSortOrder           = ['\.h$', '\.c$', '\.cpp$', '*', '\/$' ]
-
-" Supertab
-let g:SuperTabMappingForward    = '<s-tab>'
-let g:SuperTabMappingBackward   = '<tab>'
 
 " Powerline
 set laststatus=2
@@ -140,9 +139,9 @@ Plugin 'bitc/vim-bad-whitespace'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'junegunn/fzf.vim'
+Plugin 'junegunn/fzf'
 Plugin 'guns/vim-clojure-highlight'
 Plugin 'elzr/vim-json'
-Plugin 'ervandew/supertab'
 
 call vundle#end()
 
@@ -153,7 +152,7 @@ if is_vundle_installed == 1
     :qa
 endif
 
-colorscheme wombat256
+colorscheme wombat
 highlight ColorColumn ctermbg=gray guibg=#2d2d2d
 " -------------------------------------------------------------------------- }}}
 
