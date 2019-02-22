@@ -3,5 +3,7 @@ vim/undo
 vim/swap
 vim/backup
 
+zsh/secret.sh
+
 .DS_Store
 
