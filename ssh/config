@@ -1,0 +1,5 @@
+Host *
+   AddKeysToAgents yes
+   UseKeychain yes
+   IdentityFile ~/.ssh/roney_rsa
+
