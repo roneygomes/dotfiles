@@ -11,7 +11,6 @@ export PROJECTS_DIR=$HOME/code/projects
 export TOOLS_DIR=$HOME/code/tools
 
 source $ZSH/oh-my-zsh.sh
-source $PROJECTS_DIR/dotfiles/zsh/java.sh
 source $PROJECTS_DIR/dotfiles/zsh/python.sh
 source $PROJECTS_DIR/dotfiles/zsh/system.sh
 source $PROJECTS_DIR/dotfiles/zsh/android.sh
@@ -21,3 +20,7 @@ source $PROJECTS_DIR/dotfiles/zsh/aws.sh
 source $PROJECTS_DIR/dotfiles/zsh/secret.sh
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# Must be at the end of the file.
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
