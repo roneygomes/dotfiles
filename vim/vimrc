@@ -78,13 +78,6 @@ nnoremap <Leader>8 :call <SID>ToggleColorColumn()<CR>
 
 " Mappings: ---------------------------------------------------------------- {{{
 
-" Remaps the Tab key to work like Esc.
-nnoremap <Tab> <Esc>
-vnoremap <Tab> <Esc>gV
-onoremap <Tab> <Esc>
-inoremap <Tab> <Esc>`^
-inoremap <Leader><Tab> <Tab>
-
 " F3 for closing/opening NERDTree's panel.
 map <F3> :NERDTreeToggle<cr>
 
