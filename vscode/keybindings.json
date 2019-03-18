@@ -11,12 +11,12 @@
     {
         "key": "a",
         "command": "explorer.newFile",
-        "when": "explorerViewletVisible && filesExplorerFocus"
+        "when": "explorerViewletVisible && filesExplorerFocus && !inputFocus"
     },
     {
         "key": "shift+a",
         "command": "explorer.newFolder",
-        "when": "explorerViewletVisible && filesExplorerFocus"
+        "when": "explorerViewletVisible && filesExplorerFocus && !inputFocus"
     },
     {
         "key": "cmd+b",
@@ -37,5 +37,5 @@
         "key": "cmd+f12",
         "command": "-editor.action.goToImplementation",
         "when": "editorHasImplementationProvider && editorTextFocus && !isInEmbeddedEditor"
-    }
+    },
 ]

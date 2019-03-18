@@ -4,6 +4,12 @@
     "workbench.iconTheme": "vscode-icons",
     "workbench.fontAliasing": "auto",
     "workbench.editor.showTabs": false,
+    "workbench.list.keyboardNavigation": "simple",
+    "workbench.colorCustomizations": {
+        "statusBar.background": "#005f5f",
+        "statusBar.noFolderBackground": "#005f5f",
+        "statusBar.debuggingBackground": "#005f5f"
+    },
 
     "editor.fontSize": 15,
     "editor.minimap.enabled": false,
@@ -24,4 +30,11 @@
     },
 
     "gitlens.currentLine.enabled": false,
+
+    "vim.camelCaseMotion.enable": true,
+    "vim.foldfix": true,
+    "vim.statusBarColorControl": true,
+    "vim.substituteGlobalFlag": true,
+
+    "terminal.integrated.fontSize": 14,
 }
