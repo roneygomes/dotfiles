@@ -1,0 +1,27 @@
+{
+    "window.zoomLevel": 0,
+
+    "workbench.iconTheme": "vscode-icons",
+    "workbench.fontAliasing": "auto",
+    "workbench.editor.showTabs": false,
+
+    "editor.fontSize": 15,
+    "editor.minimap.enabled": false,
+    "editor.renderWhitespace": "boundary",
+    "editor.fontFamily": "'Fira Code', Menlo, Monaco, 'Courier New', monospace",
+    "editor.codeLens": false,
+
+    "explorer.openEditors.visible": 0,
+
+    "extensions.ignoreRecommendations": true,
+    "files.trimTrailingWhitespace": true,
+
+    "terraform.format": {
+        "ignoreExtensionsOnSave": [
+            ".tfsmurf",
+            ".tf"
+        ]
+    },
+
+    "gitlens.currentLine.enabled": false,
+}
