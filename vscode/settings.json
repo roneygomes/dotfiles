@@ -18,6 +18,7 @@
     "editor.codeLens": false,
 
     "explorer.openEditors.visible": 0,
+    "explorer.confirmDragAndDrop": false,
 
     "extensions.ignoreRecommendations": true,
     "files.trimTrailingWhitespace": true,
@@ -37,4 +38,10 @@
     "vim.substituteGlobalFlag": true,
 
     "terminal.integrated.fontSize": 14,
+
+    "projectManager.git.baseFolders": [
+        "/Users/laroney/code/projects"
+    ],
+    "projectManager.sortList": "Recent",
+    "projectManager.git.maxDepthRecursion": 1
 }
