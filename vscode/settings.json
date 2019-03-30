@@ -1,16 +1,14 @@
 {
-    "window.zoomLevel": 0,
-
     "workbench.colorTheme": "acme",
     "workbench.fontAliasing": "auto",
     "workbench.editor.showTabs": false,
     "workbench.list.keyboardNavigation": "simple",
-    "workbench.iconTheme": "verdandi",
+    "workbench.iconTheme": "vs-minimal",
+    "workbench.sideBar.location": "right",
 
     "editor.fontSize": 15,
     "editor.minimap.enabled": false,
     "editor.renderWhitespace": "boundary",
-    "editor.fontFamily": "'Fira Code', Menlo, Monaco, 'Courier New', monospace",
     "editor.codeLens": false,
     "editor.lineNumbers": "relative",
 
