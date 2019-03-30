@@ -7,7 +7,7 @@ plugins=(git git git-extras)
 PATH=$PATH:~/bin
 PATH=$PATH:~/.cargo/bin
 
-export PROJECTS_DIR=$HOME/code/projects
+export PROJECTS_DIR=$HOME/code/projects/personal
 export TOOLS_DIR=$HOME/code/tools
 
 source $ZSH/oh-my-zsh.sh

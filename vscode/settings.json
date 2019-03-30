@@ -34,7 +34,9 @@
     "terminal.integrated.fontSize": 14,
 
     "projectManager.git.baseFolders": [
-        "/Users/laroney/code/projects"
+        "/Users/laroney/code/projects/work",
+        "/Users/laroney/code/projects/personal",
+        "/Users/laroney/code/projects/misc"
     ],
     "projectManager.sortList": "Recent",
     "projectManager.git.maxDepthRecursion": 1,
