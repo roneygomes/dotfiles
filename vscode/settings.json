@@ -5,8 +5,17 @@
     "workbench.list.keyboardNavigation": "simple",
     "workbench.iconTheme": "vscode-icons",
     "workbench.sideBar.location": "right",
+    "workbench.colorCustomizations": {
+        "[One Dark Pro Bold]": {
+            "sideBar.background": "#171A1E",
+            "editor.background": "#171A1E",
+            "editorCursor.foreground": "#C7C7C7",
+            "editorCursor.background": "#000000"
+        }
+    },
 
-    "editor.fontSize": 15,
+    "editor.fontSize": 14,
+    "editor.fontFamily": "'Fira Code', Menlo, Monaco, 'Courier New', monospace",
     "editor.minimap.enabled": false,
     "editor.renderWhitespace": "boundary",
     "editor.codeLens": false,
