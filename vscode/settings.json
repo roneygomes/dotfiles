@@ -3,7 +3,7 @@
     "workbench.fontAliasing": "auto",
     "workbench.editor.showTabs": false,
     "workbench.list.keyboardNavigation": "simple",
-    "workbench.iconTheme": "vs-minimal",
+    "workbench.iconTheme": "vscode-icons",
     "workbench.sideBar.location": "right",
 
     "editor.fontSize": 15,
