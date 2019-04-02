@@ -1,8 +1,8 @@
 [user]
-	name = Roney Gomes
-	email = roney477@gmail.com
+        name = Roney Gomes
+        email = roney477@gmail.com
 [core]
-	editor = vim
+        editor = vim
 [alias]
         pr = pull --rebase
         ls = log --graph --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cgreen\\ [%cn]" --decorate --abbrev-commit
@@ -10,6 +10,6 @@
         lnc = log --pretty=format:"%h\\ %s\\ [%cn]"
         lds = log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cgreen\\ [%cn]" --decorate --date=short
 [diff]
-	tool = vimdiff
+        tool = vimdiff
 [mergetool]
-	keepBackup = false
+        keepBackup = false
