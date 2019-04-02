@@ -16,6 +16,7 @@ source $PROJECTS_DIR/dotfiles/zsh/system.sh
 source $PROJECTS_DIR/dotfiles/zsh/android.sh
 source $PROJECTS_DIR/dotfiles/zsh/nodejs.sh
 source $PROJECTS_DIR/dotfiles/zsh/aws.sh
+source $PROJECTS_DIR/dotfiles/zsh/postgres.sh
 
 source $PROJECTS_DIR/dotfiles/zsh/secret.sh
 
