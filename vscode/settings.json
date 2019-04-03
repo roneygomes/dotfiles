@@ -14,8 +14,8 @@
         }
     },
 
-    "editor.fontSize": 14,
-    "editor.fontFamily": "'Fira Code', Menlo, Monaco, 'Courier New', monospace",
+    "editor.fontSize": 16,
+    "editor.fontFamily": "Inconsolata, 'Fira Code', Menlo, Monaco, 'Courier New', monospace",
     "editor.minimap.enabled": false,
     "editor.renderWhitespace": "boundary",
     "editor.codeLens": false,
@@ -40,7 +40,7 @@
     "vim.foldfix": true,
     "vim.substituteGlobalFlag": true,
 
-    "terminal.integrated.fontSize": 14,
+    "terminal.integrated.fontSize": 16,
 
     "projectManager.git.baseFolders": [
         "/Users/laroney/code/projects/work",
