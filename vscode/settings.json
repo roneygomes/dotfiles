@@ -3,7 +3,6 @@
     "workbench.fontAliasing": "auto",
     "workbench.editor.showTabs": false,
     "workbench.list.keyboardNavigation": "simple",
-    "workbench.iconTheme": "vscode-icons",
     "workbench.sideBar.location": "right",
     "workbench.colorCustomizations": {
         "[One Dark Pro Bold]": {
@@ -20,6 +19,11 @@
     "editor.renderWhitespace": "boundary",
     "editor.codeLens": false,
     "editor.lineNumbers": "relative",
+    "[markdown]": {
+        "editor.wordWrap": "on",
+        "editor.wordWrapColumn": 80,
+        "editor.quickSuggestions": false
+    },
 
     "explorer.openEditors.visible": 0,
     "explorer.confirmDragAndDrop": false,
@@ -49,4 +53,10 @@
     ],
     "projectManager.sortList": "Recent",
     "projectManager.git.maxDepthRecursion": 1,
+    "window.zoomLevel": 0,
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/*.egg-info": true
+    },
+    "workbench.iconTheme": "vscode-icons"
 }
