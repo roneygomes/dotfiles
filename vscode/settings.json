@@ -1,5 +1,4 @@
 {
-    "workbench.colorTheme": "One Dark Pro Bold",
     "workbench.fontAliasing": "auto",
     "workbench.editor.showTabs": false,
     "workbench.list.keyboardNavigation": "simple",
@@ -13,8 +12,8 @@
         }
     },
 
-    "editor.fontSize": 16,
-    "editor.fontFamily": "Inconsolata, 'Fira Code', Menlo, Monaco, 'Courier New', monospace",
+    "editor.fontSize": 14,
+    "editor.fontFamily": "Monaco, 'Courier New', monospace",
     "editor.minimap.enabled": false,
     "editor.renderWhitespace": "boundary",
     "editor.codeLens": false,
@@ -44,7 +43,7 @@
     "vim.foldfix": true,
     "vim.substituteGlobalFlag": true,
 
-    "terminal.integrated.fontSize": 16,
+    "terminal.integrated.fontSize": 14,
 
     "projectManager.git.baseFolders": [
         "/Users/laroney/code/projects/work",
@@ -58,5 +57,14 @@
         "**/__pycache__": true,
         "**/*.egg-info": true
     },
-    "workbench.iconTheme": "vscode-icons"
+    "workbench.iconTheme": "vscode-icons",
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript"
+    ],
+    "vsicons.dontShowNewVersionMessage": true,
+    "diffEditor.renderSideBySide": false,
+    "explorer.confirmDelete": false,
+    "workbench.colorTheme": "One Dark Pro Bold"
 }
