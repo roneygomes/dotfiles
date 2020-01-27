@@ -7,5 +7,6 @@ function pgadmin {
         -v $HOME/.pgadmin:/var/lib/pgadmin \
         -d dpage/pgadmin4;
 
+    sleep 1
     open http://localhost:9999
 }

@@ -29,7 +29,6 @@ set guioptions-=r                   " remove right-hand scroll bar
 set guioptions-=L                   " remove left-hand scroll bar
 
 syntax on
-colorscheme default
 
 set backupdir=~/.vim/backup//
 set directory=~/.vim/swap//
@@ -147,5 +146,10 @@ if is_vundle_installed == 1
 endif
 
 highlight ColorColumn ctermbg=gray guibg=#2d2d2d
+colorscheme peachpuff
 " -------------------------------------------------------------------------- }}}
 
+" Abbreviations: ----------------------------------------------------------- {{{
+abbr mari Co-authored-by: marianahqs <marianahqs@users.noreply.github.com>
+abbr roni Co-authored-by: joseronierison <joseronierison@users.noreply.github.com>
+" -------------------------------------------------------------------------- }}}
