@@ -19,8 +19,6 @@ source $PROJECTS_DIR/dotfiles/zsh/aws.sh
 source $PROJECTS_DIR/dotfiles/zsh/postgres.sh
 source $PROJECTS_DIR/dotfiles/zsh/ruby.sh
 
-source $PROJECTS_DIR/dotfiles/zsh/secret.sh
-
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # Must be at the end of the file.
