@@ -2,17 +2,7 @@
     "workbench.fontAliasing": "auto",
     "workbench.editor.showTabs": false,
     "workbench.list.keyboardNavigation": "simple",
-    "workbench.sideBar.location": "right",
-    "workbench.colorCustomizations": {
-        "[One Dark Pro Bold]": {
-            "sideBar.background": "#171A1E",
-            "editor.background": "#171A1E",
-            "editorCursor.foreground": "#C7C7C7",
-            "editorCursor.background": "#000000"
-        }
-    },
-
-    "editor.fontSize": 14,
+    "editor.fontSize": 13,
     "editor.fontFamily": "Monaco, 'Courier New', monospace",
     "editor.minimap.enabled": false,
     "editor.renderWhitespace": "boundary",
@@ -37,11 +27,9 @@
         ]
     },
 
-    "gitlens.currentLine.enabled": false,
-
     "vim.camelCaseMotion.enable": true,
     "vim.foldfix": true,
-    "vim.substituteGlobalFlag": true,
+    "vim.gdefault": true,
 
     "terminal.integrated.fontSize": 14,
 
@@ -52,12 +40,11 @@
     ],
     "projectManager.sortList": "Recent",
     "projectManager.git.maxDepthRecursion": 1,
-    "window.zoomLevel": 0,
+    "window.zoomLevel": 1,
     "files.exclude": {
         "**/__pycache__": true,
         "**/*.egg-info": true
     },
-    "workbench.iconTheme": "vscode-icons",
     "eslint.validate": [
         "javascript",
         "javascriptreact",
@@ -66,5 +53,13 @@
     "vsicons.dontShowNewVersionMessage": true,
     "diffEditor.renderSideBySide": false,
     "explorer.confirmDelete": false,
-    "workbench.colorTheme": "One Dark Pro Bold"
+    "workbench.colorTheme": "Visual Studio 2019 Light",
+    "workbench.tips.enabled": false,
+    "workbench.tree.indent": 4,
+    "breadcrumbs.enabled": false,
+    "workbench.iconTheme": "vscode-icons",
+    "editor.cursorStyle": "block-outline",
+    "editor.wordWrapColumn": 120,
+    "omnisharp.disableMSBuildDiagnosticWarning": true,
+    "omnisharp.useEditorFormattingSettings": false
 }

@@ -9,6 +9,7 @@
         ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cgreen\\ [%cn]" --decorate --numstat
         lnc = log --pretty=format:"%h\\ %s\\ [%cn]"
         lds = log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cgreen\\ [%cn]" --decorate --date=short
+	clean-branches = !git branch | grep -v \" master$\" | xargs git branch -D
 [diff]
         tool = vimdiff
 [mergetool]
