@@ -1,4 +1,3 @@
-if [[ `uname` == 'Darwin' ]] then;
-    PATH=$PATH:$HOME/Library/Android/sdk/platform-tools
+if [[ -d "$HOME/code/tools/android-platform-tools/" ]]; then
+  PATH=$PATH:$HOME/code/tools/android-platform-tools
 fi
-

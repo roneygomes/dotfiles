@@ -1,6 +1,6 @@
 [user]
         name = Roney Gomes
-	email = roneygomes@users.noreply.github.com
+	email = roney.gomes@ifood.com.br
 [core]
         editor = vim
 [alias]
@@ -9,7 +9,9 @@
         ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cgreen\\ [%cn]" --decorate --numstat
         lnc = log --pretty=format:"%h\\ %s\\ [%cn]"
         lds = log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cgreen\\ [%cn]" --decorate --date=short
-	clean-branches = !git branch | grep -v \" master$\" | xargs git branch -D
+	clean-branches = !git branch | grep -v \" master$\"  | xargs git branch -D
+        checkpoint = commit -am 'checkpoint'
+        last-message = log -n 1 --pretty=format:'%n%n%b'
 [diff]
         tool = vimdiff
 [mergetool]

@@ -1,11 +1,7 @@
-PATH=$PATH:~/Library/Python/3.7/bin
-
-alias python=python3
-alias pip=pip3
-
 export WORKON_HOME=~/.venv
-export VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python3
+export PYTHON_CONFIGURE_OPTS="--enable-framework"
 
 mkdir -p ${WORKON_HOME}
 
-source /usr/local/bin/virtualenvwrapper.sh
+eval "$(pyenv init -)"
+source ~/.pyenv/versions/$(cat ~/.pyenv/version)/bin/virtualenvwrapper.sh
