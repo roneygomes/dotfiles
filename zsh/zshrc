@@ -10,6 +10,7 @@ PATH=$PATH:~/.cargo/bin
 
 export PROJECTS_DIR=$HOME/code/projects/personal
 export TOOLS_DIR=$HOME/code/tools
+export NVM_DIR="$HOME/.nvm"
 
 autoload -U colors; colors
 
@@ -25,8 +26,11 @@ source $PROJECTS_DIR/dotfiles/zsh/rust.sh
 source $PROJECTS_DIR/dotfiles/zsh/k8s.sh
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 
 # Must be at the end of the file.
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+autoload -U +X bashcompinit && bashcompinit
+complete -o nospace -C /usr/local/bin/terraform terraform
