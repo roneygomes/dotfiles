@@ -8,4 +8,7 @@ export WORKON_HOME=~/.venv
 mkdir -p ${WORKON_HOME}
 
 eval "$(pyenv init -)"
-source "$HOME"/.pyenv/versions/"$(cat ~/.pyenv/version)"/bin/virtualenvwrapper.sh
+
+PYTHON_VERSION=$(cat "$HOME"/.pyenv/version)
+# shellcheck disable=SC1090
+source "$HOME"/.pyenv/versions/"$PYTHON_VERSION"/bin/virtualenvwrapper.sh

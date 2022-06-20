@@ -1,6 +1,6 @@
 function uuid() {
   uuid_string=$(uuidgen | awk '{print tolower($0)}')
-  printf $uuid_string | pbcopy
+  printf "%s" "$uuid_string" | pbcopy
   echo "$uuid_string"
 }
 
