@@ -1,3 +1,9 @@
+Host *.ifoodcorp.com.br
+   IgnoreUnknown UseKeychain
+   AddKeysToAgent yes
+   UseKeychain yes
+   IdentityFile ~/.ssh/ifood
+
 Host *
    IgnoreUnknown UseKeychain
    AddKeysToAgent yes
