@@ -1,11 +1,2 @@
-vim/bundle
-vim/undo
-vim/swap
-vim/backup
-
-zsh/secret.sh
-
 .idea/
-
 .DS_Store
-

@@ -1,6 +1,7 @@
 [user]
-        name = Roney Gomes
+	name = Roney Gomes
 	email = roney.gomes@ifood.com.br
+	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDhhE+sPTX/F+J+FwI1a184ecvW/pIIrAq7RC31+u0K8
 [core]
         editor = vim
 [alias]
@@ -9,9 +10,12 @@
         ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cgreen\\ [%cn]" --decorate --numstat
         lnc = log --pretty=format:"%h\\ %s\\ [%cn]"
         lds = log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cgreen\\ [%cn]" --decorate --date=short
-	clean-branches = !git branch | grep -v \"main\\|master$\" | xargs git branch -D
         checkpoint = commit -am 'checkpoint'
-        last-message = log -n 1 --pretty=format:'%n%n%b'
+        lm = log -n 1 --pretty=format:'%n%n%b'
+        ane = commit -a --amend --no-edit
+        pfl = push -u --force-with-lease
+	clean-branches = !git branch | grep -v \"main\\|master$\" | xargs git branch -D
+
 [diff]
         tool = vimdiff
 [mergetool]
@@ -20,3 +24,11 @@
 	defaultBranch = main
 [pull]
 	rebase = true
+[push]
+	autoSetupRemote = true
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+[commit]
+	gpgsign = true

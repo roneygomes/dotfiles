@@ -1,6 +1,0 @@
-alefragnani.project-manager
-dbaeumer.vscode-eslint
-eamodio.gitlens
-mauve.terraform
-vscode-icons-team.vscode-icons
-vscodevim.vim
