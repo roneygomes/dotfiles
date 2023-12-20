@@ -1,27 +1,17 @@
-# pyenv is used for managing multiple python versions in the system
-# it allows us to install and switch between different python versions when required
-export PYENV_ROOT=$HOME/.pyenv
+alias python="python3"
+alias pip="pip3"
 
-export PATH=$PYENV_ROOT/shims:$PATH
-export PYTHON_CONFIGURE_OPTS="--enable-framework"
-
-eval "$(pyenv init -)"
-
-# virtualenvwrapper is a tool used for managing python virtual environments, which is a mechanism for
-# isolating project dependencies. that said, we can have multiple python versions each containing
-# many virtual environments
 export WORKON_HOME=~/.venv
+export VIRTUALENVWRAPPER_PYTHON=$(which python3)
+
 mkdir -p ${WORKON_HOME}
 
-PYTHON_VERSION=$(cat "$HOME"/.pyenv/version)
+VIRTUAL_ENV_WRAPPER_PATH=$(which virtualenvwrapper.sh)
 
-if [ -n "$PYTHON_VERSION" ]; then
-  export PATH=$PYENV_ROOT/versions/$PYTHON_VERSION/bin:$PATH
+if [ -f "$VIRTUAL_ENV_WRAPPER_PATH" ]; then
+  source "$VIRTUAL_ENV_WRAPPER_PATH"
 fi
 
-VIRTUAL_ENV_WRAPPER="$HOME"/.pyenv/versions/"$PYTHON_VERSION"/bin/virtualenvwrapper.sh
+PYTHON_VERSION=$(python3 --version | awk '{print $2}' | cut -d. -f1,2)
+PATH=$PATH:~/Library/Python/$PYTHON_VERSION/bin
 
-if [ -f "$VIRTUAL_ENV_WRAPPER" ]; then
-  # shellcheck disable=SC1090
-  source "$VIRTUAL_ENV_WRAPPER"
-fi

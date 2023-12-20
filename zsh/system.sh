@@ -4,6 +4,31 @@ function uuid() {
   echo "$uuid_string"
 }
 
+function vpn() {
+  eval $(op signin)
+
+  user=$(op item get iFood --fields username)
+  pass=$(op item get iFood --fields password)
+  otp=$(op item get --otp iFood)
+
+  ifood-vpn-login -u $user -p $pass -o --otp-code $otp
+}
+
+function token() {
+  eval $(op signin)
+
+  user=$(op item get iFood --fields username)
+  pass=$(op item get iFood --fields password)
+  otp=$(op item get --otp iFood)
+
+  ifood-req-token -u $user -p $pass -o --otp-code $otp -j {value}
+}
+
+function token-var() {
+  export REQ_TOKEN=$(req-token)
+  echo '~*~ jwt token set to $REQ_TOKEN var ~*~'
+}
+
 alias reload="source ~/.zshrc"
 alias zshconfig="vim ~/.zshrc"
 alias ohmyzsh="vim ~/.oh-my-zsh"
