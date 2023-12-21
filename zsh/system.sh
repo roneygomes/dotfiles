@@ -25,7 +25,7 @@ function token() {
 }
 
 function token-var() {
-  export REQ_TOKEN=$(req-token)
+  export REQ_TOKEN=$(token)
   echo '~*~ jwt token set to $REQ_TOKEN var ~*~'
 }
 
