@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# usage
+usage() {
+    echo "Usage: quote [-s|--single] [-d|--double]"
+    echo "  -s, --single  Use single quotes (default)"
+    echo "  -d, --double  Use double quotes"
+    exit 1
+}
+
+# read quote type parameter from the flags --single --double
+quote_type="single"
+
+while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+        -s|--single) quote_type="single"; shift ;;
+        -d|--double) quote_type="double"; shift ;;
+        *) usage ;;
+    esac
+done
+
+# Determine the quote character
+if [[ "$quote_type" == "double" ]]; then
+  quote_char="\""
+else
+  quote_char="'"
+fi
+
+# read input from stdin
+IFS=$'\n' read -d '' -r -a lines
+
+# Get the number of lines
+num_lines=${#lines[@]}
+
+# Loop through each line
+for (( i=0; i<num_lines; i++ )); do
+    # Surround line with quotes and add a comma except for the last line
+    if [[ $i -lt $((num_lines - 1)) ]]; then
+        echo "${quote_char}${lines[$i]}${quote_char},"
+    else
+        echo "${quote_char}${lines[$i]}${quote_char}"
+    fi
+done
