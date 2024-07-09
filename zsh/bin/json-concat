@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# Exit script on error
+set -e
+
+# Initialize variables
+input_dir=""
+
+# Function to display usage
+usage() {
+    echo "Usage: json-concat -i <input_dir>"
+    echo "  -i, --in   Directory containing JSON files"
+    exit 1
+}
+
+# Parse command-line options
+while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+        -i|--in)
+            input_dir="$2"
+            shift 2
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+
+# Check if required options were provided
+if [ -z "$input_dir" ]; then
+    echo "Error: Missing required argument."
+    usage
+fi
+
+# Initialize JSON list variable
+json_list="["
+
+# Initialize a flag to handle commas between JSON entries
+first=1
+
+# Loop through each JSON file in the directory
+for json_file in "$input_dir"/*.json; do
+    if [[ $first -eq 1 ]]; then
+        first=0
+    else
+        json_list+=","
+    fi
+    # Append JSON file content to the json_list variable
+    json_list+=$(cat "$json_file")
+done
+
+# Close JSON list
+json_list+="]"
+
+# Print the complete JSON list
+echo "$json_list" | jq

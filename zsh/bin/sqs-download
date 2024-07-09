@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# Construct the queue URL
+QUEUE_URL=$(fzf < "$HOME"/.config/roney/queues.txt)
+
+NUMBER=10
+output_file=""
+
+# usage instructions
+usage() {
+    echo "Usage: sqs-download -n <number> [-o <output_file>]"
+    echo "  -n, --number   Number of messages to download"
+    echo "  -o, --out      Output file (optional)"
+    exit 1
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --out | -o)
+      shift
+      output_file=$1
+      ;;
+    *)
+      usage
+      ;;
+  esac
+  shift
+done
+
+# Receive messages from the queue and handle output redirection
+if [[ -z "$output_file" ]]; then
+  aws sqs receive-message               \
+    --queue-url "$QUEUE_URL"            \
+    --profile "$AWS_PROFILE"            \
+    --max-number-of-messages "$NUMBER"  \
+    --no-cli-pager                      \
+    --wait-time-seconds 20
+else
+  aws sqs receive-message                    \
+    --queue-url "$QUEUE_URL"                 \
+    --profile "$AWS_PROFILE"                 \
+    --max-number-of-messages "$NUMBER"       \
+    --no-cli-pager                           \
+    --wait-time-seconds 20 > "$output_file"
+fi

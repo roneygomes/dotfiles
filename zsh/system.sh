@@ -5,7 +5,7 @@ function uuid() {
 }
 
 function vpn() {
-  eval $(op signin)
+  eval "$(op signin)"
 
   user=$(op item get iFood --fields username)
   pass=$(op item get iFood --fields password)
@@ -15,7 +15,7 @@ function vpn() {
 }
 
 function token() {
-  eval $(op signin)
+  eval "$(op signin)"
 
   user=$(op item get iFood --fields username)
   pass=$(op item get iFood --fields password)
@@ -25,8 +25,9 @@ function token() {
 }
 
 function token-var() {
-  export REQ_TOKEN=$(token)
-  echo '~*~ jwt token set to $REQ_TOKEN var ~*~'
+  REQ_TOKEN=$(token)
+  export REQ_TOKEN
+  echo "JWT token set to $REQ_TOKEN"
 }
 
 alias reload="source ~/.zshrc"
@@ -40,5 +41,9 @@ export LC_ALL=en_US.UTF-8
 export PATH="/usr/local/opt/openssl@3/bin:$PATH"
 export LDFLAGS="-L/usr/local/opt/openssl@3/lib"
 export CPPFLAGS="-I/usr/local/opt/openssl@3/include"
-export PKG_CONFIG_PATH="$(brew --prefix)/opt/cyrus-sasl/lib/pkgconfig"
-export OPENSSL_ROOT_DIR="$(brew --prefix)/opt/openssl@3"
+
+PKG_CONFIG_PATH="$(brew --prefix)/opt/cyrus-sasl/lib/pkgconfig"
+OPENSSL_ROOT_DIR="$(brew --prefix)/opt/openssl@3"
+
+export PKG_CONFIG_PATH
+export OPENSSL_ROOT_DIR
