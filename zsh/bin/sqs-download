@@ -1,45 +1,56 @@
 #!/bin/bash
 
-# Construct the queue URL
-QUEUE_URL=$(fzf < "$HOME"/.config/roney/queues.txt)
-
-NUMBER=10
-output_file=""
-
-# usage instructions
-usage() {
-    echo "Usage: sqs-download -n <number> [-o <output_file>]"
-    echo "  -n, --number   Number of messages to download"
-    echo "  -o, --out      Output file (optional)"
-    exit 1
-}
-
-while [[ $# -gt 0 ]]; do
-  case "$1" in
-    --out | -o)
-      shift
-      output_file=$1
-      ;;
-    *)
-      usage
-      ;;
-  esac
-  shift
-done
-
-# Receive messages from the queue and handle output redirection
-if [[ -z "$output_file" ]]; then
-  aws sqs receive-message               \
-    --queue-url "$QUEUE_URL"            \
-    --profile "$AWS_PROFILE"            \
-    --max-number-of-messages "$NUMBER"  \
-    --no-cli-pager                      \
-    --wait-time-seconds 20
-else
-  aws sqs receive-message                    \
-    --queue-url "$QUEUE_URL"                 \
-    --profile "$AWS_PROFILE"                 \
-    --max-number-of-messages "$NUMBER"       \
-    --no-cli-pager                           \
-    --wait-time-seconds 20 > "$output_file"
+# exit if $INFRA_DIR is not set
+if [ -z "$INFRA_DIR" ]; then
+  echo "Error: INFRA_DIR is not set."
+  exit 1
 fi
+
+# interactively grab queue URL from queues index file
+queue_url=$(fzf < "$HOME"/.config/roney/queues.txt)
+
+# exit if no queue URL is selected
+if [ -z "$queue_url" ]; then
+  echo "Error: No queue URL selected."
+  exit 1
+fi
+
+queue_name=$(echo "$queue_url" | awk -F'/' '{print $NF}')
+
+# if it doesn't exist, create the output directory at $INFRA_DIR/dlq/<year-month-day>
+output_dir="$INFRA_DIR/dlq/$(date +'%Y-%m-%d')"
+
+if [ ! -d "$output_dir" ]; then
+  mkdir -p "$output_dir"
+fi
+
+# output file path is $output_dir/<queue-name>-<human-readable-timestamp>.json
+output_file="$output_dir/$queue_name-$(date +'%Y-%m-%d-%H-%M-%S').json"
+
+# create an empty JSON file
+echo "{}" > "$output_file"
+
+# get number of messages in the queue
+num_messages=$(aws sqs get-queue-attributes         \
+  --queue-url "$queue_url"                          \
+  --attribute-names ApproximateNumberOfMessages     \
+  --query 'Attributes.ApproximateNumberOfMessages'  \
+  --output text)
+
+total_messages="$num_messages"
+
+# poll the queue until num_messages are received
+while [ "$num_messages" -gt 0 ]; do
+  echo "Downloading $num_messages messages from $queue_name. $((total_messages - num_messages)) messages downloaded."
+  current=$(aws sqs receive-message --queue-url "$queue_url" --output json)
+
+  current=$(echo "$current" | jq '.Messages')
+  previous=$(jq '.Messages' "$output_file")
+
+  # merge json files
+  merged=$(echo "$previous $current" | jq -s add)
+  jq ".Messages = $merged" "$output_file" > "$output_file.tmp"
+  mv "$output_file.tmp" "$output_file"
+
+  num_messages=$((num_messages - 1))
+done

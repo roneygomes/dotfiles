@@ -1,3 +1,5 @@
+#!/bin/zsh
+
 # oh-my-zsh
 export ZSH_DISABLE_COMPFIX=true
 export ZSH_THEME="lambda"
@@ -6,8 +8,10 @@ export plugins=(git git-extras vi-mode fzf-zsh-plugin z)
 
 ZSH=$HOME/.oh-my-zsh
 
-# my stuff
+# personal projects
 export PROJECTS_DIR=$HOME/Projects/Personal
+# where to save daily infra management files (e.g. dead letters)
+export INFRA_DIR=$HOME/Projects/Infra
 
 PATH=$PATH:~/bin
 PATH=$PATH:~/.cargo/bin
@@ -22,7 +26,7 @@ source "$PROJECTS_DIR"/dotfiles/zsh/python.sh
 source "$PROJECTS_DIR"/dotfiles/zsh/system.sh
 
 # load 1Password plugins
-source ~/.config/op/plugins.sh
+source "$HOME"/.config/op/plugins.sh
 
 ### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
 export PATH="/Users/roney.gomes/.rd/bin:$PATH"
