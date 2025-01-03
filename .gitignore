@@ -1,0 +1,28 @@
+.idea/
+.DS_Store
+
+# private configs
+.private
+.ssh/config
+.config/git/config
+
+# emacs backup and auto-save files
+**/*~
+**/#*#
+**/.#*
+**/*.elc
+
+# emacs dirs
+emacs/.cache
+emacs/auto-save-list
+emacs/backups
+emacs/custom.el
+emacs/eln-cache
+emacs/elpa/
+emacs/history
+emacs/projects
+emacs/recentf
+emacs/tramp
+emacs/transient
+emacs/tree-sitter
+emacs/eshell
