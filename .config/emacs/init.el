@@ -6,36 +6,22 @@
 (setopt make-backup-files nil)
 (setopt create-lockfiles nil)
 
-(setopt auto-revert-avoid-polling t)			; automatically reread from disk if the underlying file changes
-(setopt auto-revert-interval 5)				; some systems don't do file notifications well
+(setopt auto-revert-avoid-polling t)                    ; automatically reread from disk if the underlying file changes
+(setopt auto-revert-interval 5)                         ; some systems don't do file notifications well
 (setopt auto-revert-check-vc-info t)
 
-(setopt initial-major-mode 'fundamental-mode)		; default mode for the *scratch* buffer
-(setopt display-time-default-load-average nil)		; this information is useless for most
+(setopt initial-major-mode 'fundamental-mode)           ; default mode for the *scratch* buffer
+(setopt display-time-default-load-average nil)          ; this information is useless for most
 
-(setq ring-bell-function #'ignore)			; no bell sound, no flashing screen
+(setq ring-bell-function #'ignore)                      ; no bell sound, no flashing screen
 
-(setq switch-to-prev-buffer-skip-regexp "\*[^*]+\*")	; ignore special buffers when cycling back
-(setq switch-to-next-buffer-skip-regexp "\*[^*]+\*")	; ignore special buffers when cycling forward
+(setq switch-to-prev-buffer-skip-regexp "\*[^*]+\*")    ; ignore special buffers when cycling back
+(setq switch-to-next-buffer-skip-regexp "\*[^*]+\*")    ; ignore special buffers when cycling forward
 
-(setq display-line-numbers-type 'relative)		; relative line numbers
-(setopt display-line-numbers-width 3)			; set a minimum width
+(setq display-line-numbers-type 'relative)              ; relative line numbers
+(setopt display-line-numbers-width 3)                   ; set a minimum width
 
-(setq whitespace-style '(face
-			 tabs
-			 trailing
-			 spaces
-			 space-before-tab
-			 space-after-tab
-			 indentation
-			 indentation::tab
-			 indentation::space))
-
-(add-hook 'prog-mode-hook 'display-line-numbers-mode)	; display line numbers in programming mode
-
-;; highlight current line in the following modes
-(let ((hl-line-hooks '(text-mode-hook prog-mode-hook)))
-  (mapc (lambda (hook) (add-hook hook 'hl-line-mode)) hl-line-hooks))
+(setq whitespace-style '(face tabs trailing tab-mark))  ; use a face for displaying trailing whitespace and hard tabs
 
 (setq-default line-spacing 0.1)
 
@@ -51,10 +37,19 @@
   :config
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
-(global-auto-revert-mode)
+;; for anything text editing we should have these essential modes
+(defun my-essential-modes ()
+  (whitespace-mode 1)
+  (hl-line-mode 1)
+  (display-line-numbers-mode 1))
+
+(add-hook 'text-mode-hook 'my-essential-modes)
+(add-hook 'prog-mode-hook 'my-essential-modes)
+
+;; it's ok to enable these for all buffers
+(global-auto-revert-mode 1)
 (savehist-mode 1)
 (recentf-mode 1)
-(whitespace-mode 1)
 
 ;; fix archaic defaults
 (setopt sentence-end-double-space nil)
@@ -107,8 +102,8 @@
                '("^\\*vterm.*\\*$"               ; match buffer names starting with *vterm
                  (display-buffer-reuse-window    ; reuse existing window if available
                   display-buffer-in-side-window) ; otherwise, create a side window
-                 (side . bottom)	         ; place it at the bottom
-                 (slot . 0)		         ; use the first slot
+                 (side . bottom)                 ; place it at the bottom
+                 (slot . 0)                      ; use the first slot
                  (window-height . 0.33))))       ; take up 1/3 of frame height
 
 (use-package sudo-edit

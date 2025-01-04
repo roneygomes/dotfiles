@@ -20,7 +20,7 @@
 
   :custom
   (eglot-send-changes-idle-time 0.1)
-  (eglot-extend-to-xref t)		; activate eglot in referenced non-project files
+  (eglot-extend-to-xref t)              ; activate eglot in referenced non-project files
 
   :config
   (setq eglot-ignored-server-capabilities '(:inlayHintProvider)))
