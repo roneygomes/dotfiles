@@ -64,6 +64,7 @@
   (enable-recursive-minibuffers t)                              ; use the minibuffer whilst in the minibuffer
   (completion-cycle-threshold 1)                                ; tab cycles candidates
   (tab-always-indent 'complete)                                 ; when I hit tab, try to complete, otherwise, indent
+  (tab-first-completion 'eol)
 
   (completion-auto-help 'always)                                ; open completion always; `lazy' another option
   (completions-detailed t)
