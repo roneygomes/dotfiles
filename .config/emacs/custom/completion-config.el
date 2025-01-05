@@ -1,6 +1,6 @@
 ;; completions ui layout
-(use-package vertico 
-  :ensure t 
+(use-package vertico
+  :ensure t
   :config
   (setq vertico-cycle t)
   (setq vertico-resize nil)
@@ -61,16 +61,16 @@
 (use-package emacs
   :ensure nil
   :custom
-  (enable-recursive-minibuffers t)				; use the minibuffer whilst in the minibuffer
-  (completion-cycle-threshold 1)				; tab cycles candidates
-  (tab-always-indent 'complete)					; when I hit tab, try to complete, otherwise, indent
+  (enable-recursive-minibuffers t)                              ; use the minibuffer whilst in the minibuffer
+  (completion-cycle-threshold 1)                                ; tab cycles candidates
+  (tab-always-indent 'complete)                                 ; when I hit tab, try to complete, otherwise, indent
 
-  (completion-auto-help 'always)				; open completion always; `lazy' another option
+  (completion-auto-help 'always)                                ; open completion always; `lazy' another option
   (completions-detailed t)
   (completions-format 'one-column)
   (completions-group t)
 
-  (keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete)	; TAB acts more like how it does in the shell
+  (keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete)   ; TAB acts more like how it does in the shell
 
   ;; Hide commands in M-x which do not apply to the current mode.  Corfu
   ;; commands are hidden, since they are not used via M-x. This setting is
