@@ -44,13 +44,18 @@
   (define-key corfu-map (kbd "<tab>") 'corfu-complete))
 
 (with-eval-after-load 'eglot
+  (define-key eglot-mode-map (kbd "s-0") 'consult-flymake)
+
   (define-key eglot-mode-map (kbd "s-j") 'eldoc-box-help-at-point)
   (define-key eglot-mode-map (kbd "s-J") 'eldoc)
+
   (define-key eglot-mode-map (kbd "s-b") 'evil-goto-definition)
+  (define-key eglot-mode-map (kbd "s-B") 'eglot-find-implementation)
+
   (define-key eglot-mode-map (kbd "s-<f12>") 'consult-imenu)
   (define-key eglot-mode-map (kbd "s-M-l") 'eglot-format-buffer)
 
-  (define-key eglot-mode-map (kbd "<shift>-<f6>") 'eglot-rename)
+  (define-key eglot-mode-map (kbd "S-<f6>") 'eglot-rename)
 
   (define-key eglot-mode-map (kbd "M-<return>") 'eglot-code-actions)
   (define-key eglot-mode-map (kbd "M-<f7>") 'xref-find-references))
