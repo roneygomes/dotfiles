@@ -40,6 +40,9 @@
 (define-key emacs-lisp-mode-map (kbd "s-<return>") 'eval-last-sexp)
 (define-key lisp-mode-map (kbd "s-<return>") 'eval-last-sexp)
 
+(with-eval-after-load 'corfu
+  (define-key corfu-map (kbd "<tab>") 'corfu-complete))
+
 (with-eval-after-load 'eglot
   (define-key eglot-mode-map (kbd "s-j") 'eldoc-box-help-at-point)
   (define-key eglot-mode-map (kbd "s-J") 'eldoc)
