@@ -43,7 +43,8 @@
 (defun my-essential-modes ()
   (whitespace-mode 1)
   (hl-line-mode 1)
-  (display-line-numbers-mode 1))
+  (column-number-mode 1)
+  (electric-pair-mode 1))
 
 (add-hook 'text-mode-hook 'my-essential-modes)
 (add-hook 'prog-mode-hook 'my-essential-modes)
@@ -51,6 +52,7 @@
 ;; it's ok to enable these for all buffers
 (global-auto-revert-mode 1)
 (savehist-mode 1)
+(save-place-mode 1)
 (recentf-mode 1)
 
 ;; fix archaic defaults
