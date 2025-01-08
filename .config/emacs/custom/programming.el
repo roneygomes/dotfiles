@@ -36,7 +36,10 @@
   :ensure t)
 
 (use-package markdown-mode
-  :ensure t)
+  :ensure t
+  :config
+  (setq markdown-command "pandoc"))
+
 
 (use-package go-ts-mode
   :config
