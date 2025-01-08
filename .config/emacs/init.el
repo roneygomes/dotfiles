@@ -22,6 +22,8 @@
 (setopt display-line-numbers-width 3)                   ; set a minimum width
 
 (setq whitespace-style '(face tabs trailing tab-mark))  ; use a face for displaying trailing whitespace and hard tabs
+(setq use-short-answers t)
+(setq custom-safe-themes t)
 
 (setq-default line-spacing 0.2)
 
