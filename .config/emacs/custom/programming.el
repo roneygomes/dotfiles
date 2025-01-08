@@ -40,7 +40,6 @@
   :config
   (setq markdown-command "pandoc"))
 
-
 (use-package go-ts-mode
   :config
   (reformatter-define go-format

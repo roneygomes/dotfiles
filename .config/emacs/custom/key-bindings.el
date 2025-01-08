@@ -27,16 +27,7 @@
 (global-set-key (kbd "s-1") 'treemacs-select-window)
 
 ;; terminal
-(defun my/toggle-vterm ()
-  (interactive)
-  (let ((vterm-buffer (get-buffer "*vterm*")))
-    (if vterm-buffer
-        (if (get-buffer-window vterm-buffer)
-            (delete-window (get-buffer-window vterm-buffer))
-          (pop-to-buffer vterm-buffer))
-      (vterm))))
-
-(global-set-key (kbd "M-<f12>") 'my/toggle-vterm)
+(global-set-key (kbd "M-<f12>") 'vterm-toggle)
 
 ;; programming
 (define-key emacs-lisp-mode-map (kbd "s-<return>") 'eval-last-sexp)

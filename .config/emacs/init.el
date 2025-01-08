@@ -96,12 +96,11 @@
 
 (use-package vterm
   :ensure t
-  :hook
-  ((vterm-mode . (lambda ()
-                   (turn-off-evil-mode))))
-
   :config
   (setq vterm-term-environment-variable "xterm-256color"))
+
+(use-package vterm-toggle
+  :ensure t)
 
 (use-package sudo-edit
   :ensure t)
