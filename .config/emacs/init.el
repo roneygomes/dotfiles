@@ -106,6 +106,15 @@
 (use-package sudo-edit
   :ensure t)
 
+(use-package spacious-padding
+  :config
+  (spacious-padding-mode 1))
+
+(use-package mood-line
+  :ensure t
+  :config
+  (mood-line-mode 1))
+
 ;; my custom configs
 (add-to-list 'load-path (expand-file-name "custom" user-emacs-directory) t)
 
