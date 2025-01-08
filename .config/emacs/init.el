@@ -97,14 +97,7 @@
                    (turn-off-evil-mode))))
 
   :config
-  (setq vterm-term-environment-variable "xterm-256color")
-  (add-to-list 'display-buffer-alist
-               '("^\\*vterm.*\\*$"               ; match buffer names starting with *vterm
-                 (display-buffer-reuse-window    ; reuse existing window if available
-                  display-buffer-in-side-window) ; otherwise, create a side window
-                 (side . bottom)                 ; place it at the bottom
-                 (slot . 0)                      ; use the first slot
-                 (window-height . 0.33))))       ; take up 1/3 of frame height
+  (setq vterm-term-environment-variable "xterm-256color"))
 
 (use-package sudo-edit
   :ensure t)
