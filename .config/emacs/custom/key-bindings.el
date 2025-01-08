@@ -16,6 +16,7 @@
 
 ;; editing
 (global-set-key (kbd "s-/") 'comment-line)
+(global-set-key (kbd "s-l") 'consult-goto-line)
 
 ;; projects
 (global-set-key (kbd "s-o") 'project-find-file)
