@@ -71,6 +71,9 @@
 
   :config
   (evil-set-undo-system 'undo-redo)
+  (evil-set-initial-state 'vterm-mode 'emacs)
+  (evil-set-initial-state 'flymake-diagnostics-buffer-mode 'emacs)
+  (evil-set-initial-state 'flymake-project-diagnostics-mode 'emacs)
   (evil-mode)
 
   (with-eval-after-load 'evil
@@ -89,9 +92,9 @@
     (define-key my-evil-window-map (kbd "v") 'split-window-right)               ; ⌘-w v
     (define-key my-evil-window-map (kbd "w") 'other-window)                     ; ⌘-w w
     (define-key my-evil-window-map (kbd "c") 'delete-window)                    ; ⌘-w c
-    (define-key my-evil-window-map (kbd "h") 'evil-window-left)                         ; ⌘-w h
+    (define-key my-evil-window-map (kbd "h") 'evil-window-left)                 ; ⌘-w h
     (define-key my-evil-window-map (kbd "l") 'evil-window-right)                ; ⌘-w l
-    (define-key my-evil-window-map (kbd "j") 'evil-window-down)                         ; ⌘-w j
+    (define-key my-evil-window-map (kbd "j") 'evil-window-down)                 ; ⌘-w j
     (define-key my-evil-window-map (kbd "k") 'evil-window-up)                   ; ⌘-w k
     (define-key my-evil-window-map (kbd "d") 'evil-window-delete)               ; ⌘-w d
 
