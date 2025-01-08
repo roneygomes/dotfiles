@@ -23,11 +23,11 @@
 
 (setq whitespace-style '(face tabs trailing tab-mark))  ; use a face for displaying trailing whitespace and hard tabs
 
-(setq-default line-spacing 0.1)
+(setq-default line-spacing 0.2)
 
 (set-face-attribute 'default nil
-  :font "Iosevka Comfy"
-  :height 160
+  :font "Monaco"
+  :height 140
   :weight 'regular)
 
 ;; icons on the completion menu
