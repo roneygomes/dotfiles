@@ -40,6 +40,8 @@
 (define-key emacs-lisp-mode-map (kbd "s-<return>") 'eval-last-sexp)
 (define-key lisp-mode-map (kbd "s-<return>") 'eval-last-sexp)
 
+(global-set-key (kbd "s-<f12>") 'consult-imenu)
+
 (with-eval-after-load 'corfu
   (define-key corfu-map (kbd "<tab>") 'corfu-complete))
 
@@ -52,7 +54,6 @@
   (define-key eglot-mode-map (kbd "s-b") 'evil-goto-definition)
   (define-key eglot-mode-map (kbd "s-B") 'eglot-find-implementation)
 
-  (define-key eglot-mode-map (kbd "s-<f12>") 'consult-imenu)
   (define-key eglot-mode-map (kbd "s-M-l") 'eglot-format-buffer)
 
   (define-key eglot-mode-map (kbd "S-<f6>") 'eglot-rename)
