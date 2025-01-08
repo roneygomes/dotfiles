@@ -47,17 +47,9 @@
     (corfu-history-mode 1)
     (add-to-list 'savehist-additional-variables 'corfu-history)))
 
-(defun my-eglot-capf ()
-  (setq-local completion-at-point-functions
-              (list (cape-capf-super
-                     #'eglot-completion-at-point
-                     #'cape-dabbrev
-                     #'cape-file))))
-
 (use-package cape
   :ensure t
   :init
-  (add-hook 'eglot-managed-mode-hook #'my-eglot-capf)
   (add-hook 'completion-at-point-functions #'cape-dabbrev)
   (add-hook 'completion-at-point-functions #'cape-file))
 
