@@ -3,7 +3,7 @@
 # oh-my-zsh
 export ZSH_DISABLE_COMPFIX=true
 export ZSH_THEME="lambda"
-export plugins=(helpers git git-extras fzf-zsh-plugin z rust)
+export plugins=(helpers vi-mode git git-extras fzf-zsh-plugin z rust asdf)
 
 ZSH=$HOME/.oh-my-zsh
 
