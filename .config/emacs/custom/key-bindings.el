@@ -17,9 +17,13 @@
 ;; editing
 (global-set-key (kbd "s-/") 'comment-line)
 (global-set-key (kbd "s-l") 'consult-goto-line)
+
+;; search
 (global-set-key (kbd "s-f") 'consult-line)
+(global-set-key (kbd "s-F") #'deadgrep)
 
 ;; projects
+(global-set-key (kbd "s-O") 'find-file)
 (global-set-key (kbd "s-o") 'project-find-file)
 (global-set-key (kbd "s-P") 'project-switch-project)
 
@@ -27,7 +31,13 @@
 (global-set-key (kbd "s-1") 'treemacs-select-window)
 
 ;; terminal
+(defun my/new-vterm ()
+  (interactive)
+  (let ((vterm-buffer-name (generate-new-buffer-name "*vterm*")))
+    (vterm vterm-buffer-name)))
+
 (global-set-key (kbd "M-<f12>") 'vterm-toggle)
+(global-set-key (kbd "M-S-<f12>") 'my/new-vterm)
 
 ;; programming
 (define-key emacs-lisp-mode-map (kbd "s-<return>") 'eval-last-sexp)
@@ -68,6 +78,7 @@
   (evil-set-initial-state 'vterm-mode 'emacs)
   (evil-set-initial-state 'flymake-diagnostics-buffer-mode 'emacs)
   (evil-set-initial-state 'flymake-project-diagnostics-mode 'emacs)
+  (evil-set-initial-state 'deadgrep-mode 'emacs)
   (evil-mode)
 
   (with-eval-after-load 'evil

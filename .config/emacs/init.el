@@ -2,16 +2,19 @@
 (setq custom-file "~/.config/emacs/custom.el")
 (load custom-file t)
 
-(setopt inhibit-splash-screen t)
-(setopt make-backup-files nil)
-(setopt create-lockfiles nil)
+(setq inhibit-splash-screen t)
+(setq initial-major-mode 'fundamental-mode)           ; default mode for the *scratch* buffer
 
-(setopt auto-revert-avoid-polling t)                    ; automatically reread from disk if the underlying file changes
-(setopt auto-revert-interval 5)                         ; some systems don't do file notifications well
-(setopt auto-revert-check-vc-info t)
+(setq make-backup-files nil)
+(setq create-lockfiles nil)
 
-(setopt initial-major-mode 'fundamental-mode)           ; default mode for the *scratch* buffer
-(setopt display-time-default-load-average nil)          ; this information is useless for most
+(setq auto-revert-avoid-polling t)                    ; automatically reread from disk if the underlying file changes
+(setq auto-revert-interval 5)                         ; some systems don't do file notifications well
+(setq auto-revert-check-vc-info t)
+
+(setq display-time-default-load-average nil)
+(setq display-time-day-and-date t)
+(setq display-time-format "%F %R")
 
 (setq ring-bell-function #'ignore)                      ; no bell sound, no flashing screen
 
@@ -19,18 +22,49 @@
 (setq switch-to-next-buffer-skip-regexp "\*[^*]+\*")    ; ignore special buffers when cycling forward
 
 (setq display-line-numbers-type 'relative)              ; relative line numbers
-(setopt display-line-numbers-width 3)                   ; set a minimum width
+(setq display-line-numbers-width 3)                     ; set a minimum width
 
 (setq whitespace-style '(face tabs trailing tab-mark))  ; use a face for displaying trailing whitespace and hard tabs
+
 (setq use-short-answers t)
 (setq custom-safe-themes t)
+(setq require-final-newline t)
+(setq truncate-lines t)
+(setq truncate-partial-width-windows nil)
+
+(set-charset-priority 'unicode)
+(prefer-coding-system 'utf-8-unix)
 
 (setq-default line-spacing 0.2)
+
+(setq modus-themes-italic-constructs t)
+(setq modus-themes-bold-constructs t)
+(setq modus-themes-mixed-fonts t)
+
+(load-theme 'modus-operandi-tinted)
+
+(set-face-attribute 'fixed-pitch nil
+  :font "Monaco"
+  :height 140
+  :weight 'regular)
 
 (set-face-attribute 'default nil
   :font "Monaco"
   :height 140
   :weight 'regular)
+
+(set-face-attribute 'variable-pitch nil
+  :font "Geneva"
+  :height 150
+  :weight 'regular)
+
+(use-package mixed-pitch
+  :ensure t
+  :hook
+  (org-mode . mixed-pitch-mode)
+  (markdown-mode . mixed-pitch-mode)
+  :config
+  (setq mixed-pitch-set-height t))
 
 ;; icons on the completion menu
 (use-package kind-icon
@@ -54,6 +88,7 @@
 (savehist-mode 1)
 (save-place-mode 1)
 (recentf-mode 1)
+(display-time-mode 1)
 
 ;; fix archaic defaults
 (setopt sentence-end-double-space nil)
@@ -67,10 +102,6 @@
       `(("." . "~/.config/emacs/backups"))
       auto-save-file-name-transforms
       `((".*" "~/.config/emacs/auto-save-list/" t)))
-
-(use-package emacs
-  :config
-  (load-theme 'modus-operandi-tinted))
 
 (use-package which-key
   :ensure t
@@ -113,6 +144,9 @@
   :ensure t
   :config
   (mood-line-mode 1))
+
+(use-package deadgrep
+  :ensure t)
 
 ;; my custom configs
 (add-to-list 'load-path (expand-file-name "custom" user-emacs-directory) t)
