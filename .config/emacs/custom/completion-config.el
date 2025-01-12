@@ -27,31 +27,31 @@
   (setq completion-styles '(hotfuzz)))
 
 ;; loads completions
-(use-package corfu
-  :ensure t
-  :if (display-graphic-p)
-  :hook
-  (after-init . global-corfu-mode)
-  (after-init . corfu-popupinfo-mode)
+;; (use-package corfu
+;;   :ensure t
+;;   :if (display-graphic-p)
+;;   :hook
+;;   (after-init . global-corfu-mode)
+;;   (after-init . corfu-popupinfo-mode)
 
-  :config
-  (setq corfu-preview-current nil)
-  (setq corfu-preselect 'first)
-  (setq corfu-min-width 20)
+;;   :config
+;;   (setq corfu-preview-current nil)
+;;   (setq corfu-preselect 'first)
+;;   (setq corfu-min-width 20)
 
-  (setq corfu-popupinfo-delay '(0.25 . 0.25))
-  (setq corfu-popupinfo-hide nil)
+;;   (setq corfu-popupinfo-delay '(0.25 . 0.25))
+;;   (setq corfu-popupinfo-hide nil)
 
-  ;; sort by input history
-  (with-eval-after-load 'savehist
-    (corfu-history-mode 1)
-    (add-to-list 'savehist-additional-variables 'corfu-history)))
+;;   ;; sort by input history
+;;   (with-eval-after-load 'savehist
+;;     (corfu-history-mode 1)
+;;     (add-to-list 'savehist-additional-variables 'corfu-history)))
 
-(use-package cape
-  :ensure t
-  :init
-  (add-hook 'completion-at-point-functions #'cape-dabbrev)
-  (add-hook 'completion-at-point-functions #'cape-file))
+;; ;; (use-package cape
+;;   :ensure t
+;;   :init
+;;   (add-hook 'completion-at-point-functions #'cape-dabbrev)
+;;   (add-hook 'completion-at-point-functions #'cape-file))
 
 (use-package emacs
   :ensure nil
@@ -66,11 +66,7 @@
   (completions-format 'one-column)
   (completions-group t)
 
-  (keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete)   ; TAB acts more like how it does in the shell
-
-  ;; Hide commands in M-x which do not apply to the current mode.  Corfu
-  ;; commands are hidden, since they are not used via M-x. This setting is
-  ;; useful beyond Corfu.
-  (read-extended-command-predicate #'command-completion-default-include-p))
+  (keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete))  ; TAB acts more like how it does in the shell
 
 (provide 'completion-config)
+;;; completion-config.el ends here

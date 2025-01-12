@@ -16,7 +16,6 @@
 
 ;; editing
 (global-set-key (kbd "s-/") 'comment-line)
-(global-set-key (kbd "s-l") 'consult-goto-line)
 
 ;; search
 (global-set-key (kbd "s-f") 'consult-line)
@@ -43,26 +42,30 @@
 (define-key emacs-lisp-mode-map (kbd "s-<return>") 'eval-last-sexp)
 (define-key lisp-mode-map (kbd "s-<return>") 'eval-last-sexp)
 
-(global-set-key (kbd "s-<f12>") 'consult-imenu)
+(global-set-key (kbd "s-<f12>") 'consult-outline)
+(global-set-key (kbd "M-<f7>") 'xref-find-references)
 
-(with-eval-after-load 'corfu
-  (define-key corfu-map (kbd "<tab>") 'corfu-complete))
+(with-eval-after-load 'lsp-mode
+  (define-key lsp-mode-map (kbd "s-0") 'consult-lsp-diagnostics)
 
-(with-eval-after-load 'eglot
-  (define-key eglot-mode-map (kbd "s-0") 'consult-flymake)
+  (define-key lsp-mode-map (kbd "s-)") 'lsp-treemacs-errors-list)
+  (define-key lsp-mode-map (kbd "s-2") 'lsp-treemacs-symbols)
+  (define-key lsp-mode-map (kbd "C-M-h") 'lsp-treemacs-call-hierarchy)
 
-  (define-key eglot-mode-map (kbd "s-j") 'eldoc-box-help-at-point)
-  (define-key eglot-mode-map (kbd "s-J") 'eldoc)
+  (define-key lsp-mode-map (kbd "s-S-<f12>") 'consult-lsp-symbols)
+  (define-key lsp-mode-map (kbd "s-<f12>") 'consult-lsp-file-symbols)
 
-  (define-key eglot-mode-map (kbd "s-b") 'evil-goto-definition)
-  (define-key eglot-mode-map (kbd "s-B") 'eglot-find-implementation)
+  (define-key lsp-mode-map (kbd "s-j") 'eldoc-box-help-at-point)
+  (define-key lsp-mode-map (kbd "s-J") 'eldoc)
 
-  (define-key eglot-mode-map (kbd "s-M-l") 'eglot-format-buffer)
+  (define-key lsp-mode-map (kbd "s-b") 'lsp-find-definition)
+  (define-key lsp-mode-map (kbd "s-B") 'lsp-find-implementation)
+  (define-key lsp-mode-map (kbd "M-<f7>") 'lsp-find-references)
+  (define-key lsp-mode-map (kbd "s-M-l") 'lsp-format-buffer)
+  (define-key lsp-mode-map (kbd "S-<f6>") 'lsp-rename)
+  (define-key lsp-mode-map (kbd "M-<return>") 'lsp-execute-code-action)
 
-  (define-key eglot-mode-map (kbd "S-<f6>") 'eglot-rename)
-
-  (define-key eglot-mode-map (kbd "M-<return>") 'eglot-code-actions)
-  (define-key eglot-mode-map (kbd "M-<f7>") 'xref-find-references))
+  )
 
 (use-package evil
   :ensure t
@@ -74,16 +77,18 @@
   (setq evil-want-fine-undo t)
 
   :config
-  (evil-set-undo-system 'undo-redo)
   (evil-set-initial-state 'vterm-mode 'emacs)
-  (evil-set-initial-state 'flymake-diagnostics-buffer-mode 'emacs)
-  (evil-set-initial-state 'flymake-project-diagnostics-mode 'emacs)
   (evil-set-initial-state 'deadgrep-mode 'emacs)
+  (evil-set-initial-state 'treemacs-mode 'emacs)
+  (evil-set-initial-state 'dired-mode 'emacs)
+  (evil-set-initial-state 'special-mode 'emacs)
+
+  (evil-set-undo-system 'undo-redo)
+
   (evil-mode)
 
   (with-eval-after-load 'evil
-    (define-key evil-insert-state-map (kbd "C-n") 'next-line)
-    (define-key evil-insert-state-map (kbd "C-p") 'previous-line)
+    (define-key evil-normal-state-map (kbd "s-b") 'evil-goto-definition)
 
     ;; unbind the default C-w prefix key
     (define-key evil-motion-state-map (kbd "C-w") nil)
@@ -96,7 +101,7 @@
     (define-key my-evil-window-map (kbd "s") 'split-window-below)               ; ⌘-w s
     (define-key my-evil-window-map (kbd "v") 'split-window-right)               ; ⌘-w v
     (define-key my-evil-window-map (kbd "w") 'other-window)                     ; ⌘-w w
-    (define-key my-evil-window-map (kbd "c") 'delete-window)                    ; ⌘-w c
+    (define-key my-evil-window-map (kbd "q") 'delete-window)                    ; ⌘-w c
     (define-key my-evil-window-map (kbd "h") 'evil-window-left)                 ; ⌘-w h
     (define-key my-evil-window-map (kbd "l") 'evil-window-right)                ; ⌘-w l
     (define-key my-evil-window-map (kbd "j") 'evil-window-down)                 ; ⌘-w j
