@@ -1,9 +1,4 @@
 (setq read-process-output-max (* 1024 1024))
-(setq help-window-select t)
-
-(use-package all-the-icons
-  :ensure t
-  :if (display-graphic-p))
 
 (use-package treesit-auto
   :ensure t
@@ -64,31 +59,13 @@
 
   (add-hook 'after-init-hook 'global-company-mode))
 
-(use-package lsp-treemacs
-  :ensure t
-  :config
-  :commands lsp-treemacs-errors-list)
-
 (use-package markdown-mode
   :ensure t
   :config
   (setq markdown-command "pandoc"))
 
-(use-package go-ts-mode
-  :config
-  (reformatter-define go-format
-    :program "goimports"
-    :args '("/dev/stdin")))
-
-(defun my/hide-treemacs-cursor ()
-  (when (eq major-mode 'treemacs-mode)
-    (internal-show-cursor nil nil)))
-
 (use-package treemacs
   :ensure t
-  :hook
-  ((treemacs-mode . my/hide-treemacs-cursor))
-
   :config
   (setq treemacs-width 45)
   (setq treemacs-select-when-already-in-treemacs 'close)
@@ -97,19 +74,11 @@
   (treemacs-hide-gitignored-files-mode t)
   (treemacs-project-follow-mode))
 
-(use-package all-the-icons
+(use-package treemacs-evil
   :ensure t)
 
-(use-package treemacs-all-the-icons
-  :ensure t
-  :config
-  (treemacs-load-theme "all-the-icons"))
-
-(use-package all-the-icons-completion
-  :ensure t
-  :config
-  (all-the-icons-completion-mode)
-  (add-hook 'marginalia-mode-hook #'all-the-icons-completion-marginalia-setup))
+(use-package lsp-treemacs
+  :ensure t)
 
 (provide 'programming)
 ;;; programming.el ends here

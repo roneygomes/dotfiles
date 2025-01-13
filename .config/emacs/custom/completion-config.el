@@ -26,33 +26,6 @@
   :config
   (setq completion-styles '(hotfuzz)))
 
-;; loads completions
-;; (use-package corfu
-;;   :ensure t
-;;   :if (display-graphic-p)
-;;   :hook
-;;   (after-init . global-corfu-mode)
-;;   (after-init . corfu-popupinfo-mode)
-
-;;   :config
-;;   (setq corfu-preview-current nil)
-;;   (setq corfu-preselect 'first)
-;;   (setq corfu-min-width 20)
-
-;;   (setq corfu-popupinfo-delay '(0.25 . 0.25))
-;;   (setq corfu-popupinfo-hide nil)
-
-;;   ;; sort by input history
-;;   (with-eval-after-load 'savehist
-;;     (corfu-history-mode 1)
-;;     (add-to-list 'savehist-additional-variables 'corfu-history)))
-
-;; ;; (use-package cape
-;;   :ensure t
-;;   :init
-;;   (add-hook 'completion-at-point-functions #'cape-dabbrev)
-;;   (add-hook 'completion-at-point-functions #'cape-file))
-
 (use-package emacs
   :ensure nil
   :custom

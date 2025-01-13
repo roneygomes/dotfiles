@@ -2,6 +2,7 @@
 (load custom-file t)
 
 (setq initial-major-mode 'fundamental-mode)             ; default mode for the *scratch* buffer
+(setq help-window-select t)
 
 (setq make-backup-files nil)
 (setq create-lockfiles nil)
