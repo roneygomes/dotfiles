@@ -80,8 +80,15 @@
     :program "goimports"
     :args '("/dev/stdin")))
 
+(defun my/hide-treemacs-cursor ()
+  (when (eq major-mode 'treemacs-mode)
+    (internal-show-cursor nil nil)))
+
 (use-package treemacs
   :ensure t
+  :hook
+  ((treemacs-mode . my/hide-treemacs-cursor))
+
   :config
   (setq treemacs-width 45)
   (setq treemacs-select-when-already-in-treemacs 'close)

@@ -24,6 +24,8 @@
 (add-hook 'text-mode-hook 'my-essential-modes)
 (add-hook 'prog-mode-hook 'my-essential-modes)
 
+(blink-cursor-mode -1)
+
 (use-package almost-mono-themes
   :ensure t
   :config
