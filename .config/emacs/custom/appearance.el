@@ -6,8 +6,9 @@
 (setq display-time-day-and-date t)
 (setq display-time-format "%F %R")
 
-(setq truncate-lines t)
-(setq truncate-partial-width-windows t)
+(setq-default truncate-lines t)
+(setq-default truncate-partial-width-windows t)
+
 (setq display-line-numbers-type 'relative)
 
 ;; use a face for displaying trailing whitespace and hard tabs
@@ -17,7 +18,6 @@
 (defun my-essential-modes ()
   (display-line-numbers-mode 1)
   (whitespace-mode 1)
-  (hl-line-mode 1)
   (column-number-mode 1)
   (electric-pair-mode 1))
 
@@ -34,17 +34,23 @@
   :config
   (mood-line-mode 1))
 
+(use-package spacious-padding
+  :ensure t
+  :config
+  (spacious-padding-mode 1))
+
 (custom-set-faces
  '(font-lock-comment-face ((t (:italic nil))))
  '(whitespace-tab ((t (:foreground "#BDBDBD" :background nil)))))
 
 (set-face-attribute 'default nil
-  :font "Iosevka Comfy"
-  :height 150
+  :font "Monaco"
+  :height 140
   :weight 'regular)
 
 (set-face-attribute 'fixed-pitch nil
-  :height 140)
+  :font "Monaco"
+  :height 130)
 
 (set-face-attribute 'variable-pitch nil
   :font "Geneva"

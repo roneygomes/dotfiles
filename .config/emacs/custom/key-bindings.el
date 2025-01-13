@@ -45,6 +45,9 @@
 (global-set-key (kbd "s-<f12>") 'consult-outline)
 (global-set-key (kbd "M-<f7>") 'xref-find-references)
 
+(with-eval-after-load 'company-mode
+  (define-key company-active-map (kbd "<tab>") 'company-complete-selection))
+
 (with-eval-after-load 'lsp-mode
   (define-key lsp-mode-map (kbd "s-0") 'consult-lsp-diagnostics)
 
@@ -55,8 +58,7 @@
   (define-key lsp-mode-map (kbd "s-S-<f12>") 'consult-lsp-symbols)
   (define-key lsp-mode-map (kbd "s-<f12>") 'consult-lsp-file-symbols)
 
-  (define-key lsp-mode-map (kbd "s-j") 'eldoc-box-help-at-point)
-  (define-key lsp-mode-map (kbd "s-J") 'eldoc)
+  (define-key lsp-mode-map (kbd "s-j") 'lsp-ui-doc-glance)
 
   (define-key lsp-mode-map (kbd "s-b") 'lsp-find-definition)
   (define-key lsp-mode-map (kbd "s-B") 'lsp-find-implementation)

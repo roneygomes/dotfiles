@@ -19,8 +19,6 @@
   :init
   (setq lsp-keymap-prefix "s-l")
   (setq lsp-modeline-diagnostics-scope :workspace)
-  (setq lsp-ui-doc-show-with-cursor nil)
-  (setq lsp-ui-doc-show-with-mouse nil)
   (setq lsp-headerline-breadcrumb-enable nil)
 
   :hook
@@ -37,6 +35,10 @@
   :ensure t
   :config
   (setq lsp-ui-doc-border "black")
+  (setq lsp-ui-doc-position 'at-point)
+  (setq lsp-ui-doc-delay 0)
+  (setq lsp-ui-doc-show-with-cursor nil)
+  (setq lsp-ui-doc-show-with-mouse nil)
 
   (custom-set-faces
    '(lsp-ui-doc-background ((t (:background nil :inherit default)))))
@@ -54,6 +56,11 @@
   :config
   (setq company-minimum-prefix-length 1)
   (setq company-idle-delay 0.0)
+  (setq company-selection-wrap-around t)
+  (setq company-tooltip-align-annotations t)
+  (setq company-format-margin-function 'company-text-icons-margin)
+  (setq company-icon-margin 3)
+  (setq company-search-regexp-function 'company-search-flex-regexp)
 
   (add-hook 'after-init-hook 'global-company-mode))
 
