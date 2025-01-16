@@ -45,6 +45,8 @@
 (global-set-key (kbd "s-<f12>") 'consult-outline)
 (global-set-key (kbd "M-<f7>") 'xref-find-references)
 
+(global-set-key (kbd "s-9") 'magit-status)
+
 (with-eval-after-load 'company-mode
   (define-key company-active-map (kbd "<tab>") 'company-complete-selection))
 
@@ -65,9 +67,7 @@
   (define-key lsp-mode-map (kbd "M-<f7>") 'lsp-find-references)
   (define-key lsp-mode-map (kbd "s-M-l") 'lsp-format-buffer)
   (define-key lsp-mode-map (kbd "S-<f6>") 'lsp-rename)
-  (define-key lsp-mode-map (kbd "M-<return>") 'lsp-execute-code-action)
-
-  )
+  (define-key lsp-mode-map (kbd "M-<return>") 'lsp-execute-code-action))
 
 (use-package evil
   :ensure t
@@ -84,6 +84,7 @@
   (evil-set-initial-state 'treemacs-mode 'emacs)
   (evil-set-initial-state 'dired-mode 'emacs)
   (evil-set-initial-state 'special-mode 'emacs)
+  (evil-set-initial-state 'magit-mode 'emacs)
 
   (evil-set-undo-system 'undo-redo)
 

@@ -80,5 +80,14 @@
 (use-package lsp-treemacs
   :ensure t)
 
+(use-package magit
+  :ensure t)
+
+(use-package diff-hl
+  :ensure t
+  :config
+  (diff-hl-show-hunk-mouse-mode)
+  (global-diff-hl-mode))
+
 (provide 'programming)
 ;;; programming.el ends here

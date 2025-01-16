@@ -1,3 +1,5 @@
+(load-theme 'modus-operandi-tinted t)
+
 (setq custom-file "~/.config/emacs/custom.el")          ; file managed by custom
 (load custom-file t)
 
@@ -16,6 +18,8 @@
 (setq use-short-answers t)
 (setq custom-safe-themes t)
 (setq require-final-newline t)
+
+(setq-default with-editor-emacsclient-executable "emacsclient")
 
 ;; backups and auto-saves
 (setq backup-directory-alist
@@ -60,7 +64,19 @@
   (setq vterm-term-environment-variable "xterm-256color"))
 
 (use-package vterm-toggle
-  :ensure t)
+  :ensure t
+  :config
+  (setq vterm-toggle-fullscreen-p nil)
+
+  (add-to-list 'display-buffer-alist
+              '((lambda (buffer-or-name _)
+                    (let ((buffer (get-buffer buffer-or-name)))
+                      (with-current-buffer buffer
+                        (or (equal major-mode 'vterm-mode)
+                            (string-prefix-p vterm-buffer-name (buffer-name buffer))))))
+                 (display-buffer-reuse-window display-buffer-at-bottom)
+                 (reusable-frames . visible)
+                 (window-height . 0.4))))
 
 (use-package sudo-edit
   :ensure t)

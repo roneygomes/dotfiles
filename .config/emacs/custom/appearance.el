@@ -17,6 +17,7 @@
 ;; for anything text editing we should have these essential modes
 (defun my-essential-modes ()
   (display-line-numbers-mode 1)
+  (hl-line-mode 1)
   (whitespace-mode 1)
   (column-number-mode 1)
   (electric-pair-mode 1))
@@ -25,11 +26,6 @@
 (add-hook 'prog-mode-hook 'my-essential-modes)
 
 (blink-cursor-mode -1)
-
-(use-package almost-mono-themes
-  :ensure t
-  :config
-  (load-theme 'almost-mono-white))
 
 (use-package mood-line
   :ensure t
@@ -43,7 +39,7 @@
 
 (custom-set-faces
  '(font-lock-comment-face ((t (:italic nil))))
- '(whitespace-tab ((t (:foreground "#BDBDBD" :background nil)))))
+ '(whitespace-tab ((t (:foreground "#BDBDBD" :background "unspecified")))))
 
 (set-face-attribute 'default nil
   :font "Monaco"
