@@ -16,8 +16,6 @@
 
 ;; for anything text editing we should have these essential modes
 (defun my-essential-modes ()
-  (display-line-numbers-mode 1)
-  (hl-line-mode 1)
   (whitespace-mode 1)
   (column-number-mode 1)
   (electric-pair-mode 1))

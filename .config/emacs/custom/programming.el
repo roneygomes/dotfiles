@@ -87,7 +87,13 @@
   :ensure t
   :config
   (diff-hl-show-hunk-mouse-mode)
+  (diff-hl-margin-mode)
   (global-diff-hl-mode))
+
+(use-package lsp-origami
+  :ensure t
+  :config
+  (add-hook 'lsp-after-open-hook #'lsp-origami-try-enable))
 
 (provide 'programming)
 ;;; programming.el ends here
