@@ -97,6 +97,7 @@
   :config
   (diff-hl-show-hunk-mouse-mode)
   (diff-hl-margin-mode)
+  (diff-hl-flydiff-mode)
   (global-diff-hl-mode))
 
 (use-package eldoc-box
