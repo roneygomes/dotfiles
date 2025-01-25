@@ -35,6 +35,7 @@
 
 (use-package lsp-ui
   :ensure t
+  :after (lsp-mode)
   :config
   (setq lsp-ui-doc-show-with-cursor nil)
   (setq lsp-ui-doc-show-with-mouse nil)
@@ -42,7 +43,8 @@
   :commands lsp-ui-mode)
 
 (use-package consult-lsp
-  :ensure t)
+  :ensure t
+  :after (consult lsp-mode))
 
 (use-package flycheck
   :ensure t)
@@ -84,10 +86,12 @@
   (treemacs-project-follow-mode))
 
 (use-package treemacs-evil
-  :ensure t)
+  :ensure t
+  :after (treemacs))
 
 (use-package lsp-treemacs
-  :ensure t)
+  :ensure t
+  :after (lsp-mode treemacs))
 
 (use-package magit
   :ensure t)
