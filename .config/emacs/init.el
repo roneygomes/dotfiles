@@ -1,8 +1,5 @@
 (load-theme 'modus-operandi-tinted t)
 
-(setq custom-file "~/.config/emacs/custom.el")          ; file managed by custom
-(load custom-file t)
-
 (setq initial-major-mode 'fundamental-mode)             ; default mode for the *scratch* buffer
 (setq help-window-select t)
 
@@ -51,13 +48,6 @@
   :config
   (which-key-mode))
 
-;; load the system's PATH
-(use-package exec-path-from-shell
-  :ensure t
-  :config
-  (setq exec-path-from-shell-arguments nil)
-  (exec-path-from-shell-initialize))
-
 (use-package vterm
   :ensure t
   :config
@@ -76,7 +66,7 @@
                             (string-prefix-p vterm-buffer-name (buffer-name buffer))))))
                  (display-buffer-reuse-window display-buffer-at-bottom)
                  (reusable-frames . visible)
-                 (window-height . 0.4))))
+                 (window-height . 0.25))))
 
 (use-package sudo-edit
   :ensure t)
@@ -84,11 +74,21 @@
 (use-package deadgrep
   :ensure t)
 
+;; load the system's PATH
+(use-package exec-path-from-shell
+  :ensure t
+  :config
+  (setq exec-path-from-shell-arguments nil)
+  (exec-path-from-shell-initialize))
+
 (global-auto-revert-mode 1)
 (savehist-mode 1)
 (save-place-mode 1)
 (recentf-mode 1)
 (display-time-mode 1)
+
+(setq custom-file "~/.config/emacs/custom.el")          ; file managed by custom
+(load custom-file t)
 
 (provide 'init)
 ;;; init.el ends here

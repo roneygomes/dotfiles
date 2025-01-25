@@ -35,18 +35,14 @@
   :config
   (spacious-padding-mode 1))
 
-(custom-set-faces
- '(font-lock-comment-face ((t (:italic nil))))
- '(whitespace-tab ((t (:foreground "#BDBDBD" :background "unspecified")))))
-
 (set-face-attribute 'default nil
-  :font "Monaco"
-  :height 140
+  :font "Iosevka Comfy"
+  :height 160
   :weight 'regular)
 
 (set-face-attribute 'fixed-pitch nil
-  :font "Monaco"
-  :height 130)
+  :font "Iosevka Comfy"
+  :height 150)
 
 (set-face-attribute 'variable-pitch nil
   :font "Geneva"

@@ -38,7 +38,6 @@
 (global-set-key (kbd "M-<f12>") 'vterm-toggle)
 (global-set-key (kbd "M-S-<f12>") 'my/new-vterm)
 
-;; programming
 (define-key emacs-lisp-mode-map (kbd "s-<return>") 'eval-last-sexp)
 (define-key lisp-mode-map (kbd "s-<return>") 'eval-last-sexp)
 
@@ -47,26 +46,29 @@
 
 (global-set-key (kbd "s-9") 'magit-status)
 
+(with-eval-after-load 'restclient-mode
+  (define-key restclient-mode-map (kbd "s-<return>") 'restclient-http-send-current-stay-in-window))
+
 (with-eval-after-load 'company-mode
   (define-key company-active-map (kbd "<tab>") 'company-complete-selection))
 
 (with-eval-after-load 'lsp-mode
-  (define-key lsp-mode-map (kbd "s-0") 'consult-lsp-diagnostics)
-
-  (define-key lsp-mode-map (kbd "s-)") 'lsp-treemacs-errors-list)
+  (define-key lsp-mode-map (kbd "s-0") 'lsp-treemacs-errors-list)
   (define-key lsp-mode-map (kbd "s-2") 'lsp-treemacs-symbols)
   (define-key lsp-mode-map (kbd "C-M-h") 'lsp-treemacs-call-hierarchy)
 
   (define-key lsp-mode-map (kbd "s-S-<f12>") 'consult-lsp-symbols)
   (define-key lsp-mode-map (kbd "s-<f12>") 'consult-lsp-file-symbols)
 
-  (define-key lsp-mode-map (kbd "s-j") 'lsp-ui-doc-glance)
+  (define-key lsp-mode-map (kbd "s-j") 'eldoc-box-help-at-point)
 
   (define-key lsp-mode-map (kbd "s-b") 'lsp-find-definition)
   (define-key lsp-mode-map (kbd "s-B") 'lsp-find-implementation)
   (define-key lsp-mode-map (kbd "M-<f7>") 'lsp-find-references)
+
   (define-key lsp-mode-map (kbd "s-M-l") 'lsp-format-buffer)
   (define-key lsp-mode-map (kbd "S-<f6>") 'lsp-rename)
+
   (define-key lsp-mode-map (kbd "M-<return>") 'lsp-execute-code-action))
 
 (use-package evil

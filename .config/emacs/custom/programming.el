@@ -1,4 +1,10 @@
 (setq read-process-output-max (* 1024 1024))
+(setq eldoc-echo-area-use-multiline-p nil)
+
+(setq ediff-diff-options "")
+(setq ediff-custom-diff-options "-u")
+(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+(setq ediff-split-window-function 'split-window-vertically)
 
 (use-package treesit-auto
   :ensure t
@@ -15,6 +21,7 @@
   (setq lsp-keymap-prefix "s-l")
   (setq lsp-modeline-diagnostics-scope :workspace)
   (setq lsp-headerline-breadcrumb-enable nil)
+  (setq lsp-eldoc-render-all t)
 
   :hook
   ((go-ts-mode . lsp)
@@ -29,14 +36,8 @@
 (use-package lsp-ui
   :ensure t
   :config
-  (setq lsp-ui-doc-border "black")
-  (setq lsp-ui-doc-position 'at-point)
-  (setq lsp-ui-doc-delay 0)
   (setq lsp-ui-doc-show-with-cursor nil)
   (setq lsp-ui-doc-show-with-mouse nil)
-
-  (custom-set-faces
-   '(lsp-ui-doc-background ((t (:background nil :inherit default)))))
 
   :commands lsp-ui-mode)
 
@@ -57,7 +58,15 @@
   (setq company-icon-margin 3)
   (setq company-search-regexp-function 'company-search-flex-regexp)
 
+  (add-to-list 'company-backends 'company-restclient)
   (add-hook 'after-init-hook 'global-company-mode))
+
+(use-package restclient
+  :ensure t)
+
+(use-package company-restclient
+  :ensure t
+  :after (restclient company))
 
 (use-package markdown-mode
   :ensure t
@@ -90,10 +99,11 @@
   (diff-hl-margin-mode)
   (global-diff-hl-mode))
 
-(use-package lsp-origami
+(use-package eldoc-box
   :ensure t
   :config
-  (add-hook 'lsp-after-open-hook #'lsp-origami-try-enable))
+  (setq eldoc-box-max-pixel-width 1280)
+  (setq eldoc-box-max-pixel-height 720))
 
 (provide 'programming)
 ;;; programming.el ends here
