@@ -94,10 +94,11 @@
 
 (use-package diff-hl
   :ensure t
+  :after (magit)
+  :hook ('magit-post-refresh-hook . 'diff-hl-magit-post-refresh)
   :config
   (diff-hl-show-hunk-mouse-mode)
   (diff-hl-margin-mode)
-  (diff-hl-flydiff-mode)
   (global-diff-hl-mode))
 
 (use-package eldoc-box
