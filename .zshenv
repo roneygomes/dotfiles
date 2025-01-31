@@ -10,6 +10,7 @@ export PATH=$PATH:$PROJECTS_DIR/dotfiles/zsh/bin
 
 # go
 export PATH=$PATH:$HOME/go/bin
+export PATH=$PATH:$HOME/.asdf/shims
 
 if [[ "$(uname)" == "Darwin" ]]; then
     # homebrew
@@ -26,7 +27,7 @@ if [[ "$(uname)" == "Darwin" ]]; then
 
     # find python
     for dir in ~/Library/Python/*/bin; do
-	[ -d "$dir" ] && PATH="$dir:$PATH"
+        [ -d "$dir" ] && PATH="$dir:$PATH"
     done
-    export PATH 
+    export PATH
 fi
