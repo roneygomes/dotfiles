@@ -24,12 +24,12 @@
   (setq lsp-eldoc-render-all t)
 
   :hook
-  ((go-ts-mode . lsp)
-   (rust-ts-mode . lsp))
+  ((go-ts-mode . lsp-deferred)
+   (rust-ts-mode . lsp-deferred))
 
   :config
-  (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
-  (add-hook 'lsp-mode-hook #'flycheck-mode)
+  (add-hook 'before-save-hook #'lsp-format-buffer)
+  (add-hook 'before-save-hook #'lsp-organize-imports)
 
   :commands lsp)
 
@@ -47,7 +47,13 @@
   :after (consult lsp-mode))
 
 (use-package flycheck
-  :ensure t)
+  :ensure t
+  :hook (lsp-mode . flycheck-mode))
+
+(use-package flycheck-golangci-lint
+  :ensure t
+  :hook (go-ts-mode . flycheck-golangci-lint-setup)
+  :after (flycheck))
 
 (use-package company
   :ensure t
