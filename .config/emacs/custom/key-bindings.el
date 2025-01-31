@@ -8,11 +8,24 @@
 (global-set-key (kbd "s--") 'text-scale-decrease)
 
 ;; buffer management
+(defvar my/consult-source-beframe-buffers
+  `(:name     "Frame Buffers"
+    :narrow   ?b
+    :category buffer
+    :items    ,(lambda () (mapcar #'buffer-name (beframe-buffer-list)))
+    :action   consult--buffer-action
+    :state    consult--buffer-state))
+
+(defun my/consult-buffer-beframe ()
+  "Consult-buffer showing only frame-local buffer names."
+  (interactive)
+  (let ((consult-buffer-sources '(my/consult-source-beframe-buffers)))
+    (consult-buffer)))
+
 (global-set-key (kbd "s-s") 'save-buffer)
 (global-set-key (kbd "s-[") 'previous-buffer)
 (global-set-key (kbd "s-]") 'next-buffer)
-(global-set-key (kbd "s-e") 'consult-buffer)         ; show all buffers
-(global-set-key (kbd "s-E") 'consult-project-buffer) ; show only project buffers
+(global-set-key (kbd "s-e") 'my/consult-buffer-beframe)
 
 ;; editing
 (global-set-key (kbd "s-/") 'comment-line)
@@ -22,9 +35,29 @@
 (global-set-key (kbd "s-F") #'deadgrep)
 
 ;; projects
+(defun my/project-switch ()
+  "Switch to project in a new dedicated frame."
+  (interactive)
+  (let* ((dir (project-prompt-project-dir))
+         ;; get project name from the last directory component
+         (proj-name (file-name-nondirectory (directory-file-name dir)))
+         (new-frame (make-frame `((title . ,proj-name)))))
+    (with-selected-frame new-frame
+      (project-switch-project dir)
+      ;; update the title when switching projects within this frame
+      (add-hook 'project-switch-hook
+                (lambda ()
+                  ;; recompute the project name here to get the current project
+                  (let ((new-name (file-name-nondirectory
+                                   (directory-file-name (car (project-roots (project-current)))))))
+                    (modify-frame-parameters (selected-frame)
+                                             `((title . ,new-name)))))
+                ;; t makes the hook buffer-local
+                nil t))))
+
 (global-set-key (kbd "s-O") 'find-file)
 (global-set-key (kbd "s-o") 'project-find-file)
-(global-set-key (kbd "s-P") 'project-switch-project)
+(global-set-key (kbd "s-P") 'my/project-switch)
 
 ;; file tree
 (global-set-key (kbd "s-1") 'treemacs-select-window)

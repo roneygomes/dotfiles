@@ -117,5 +117,10 @@
   (setq eldoc-box-max-pixel-width 1280)
   (setq eldoc-box-max-pixel-height 720))
 
+(use-package beframe
+  :ensure t
+  :config
+  (beframe-mode 1))
+
 (provide 'programming)
 ;;; programming.el ends here
