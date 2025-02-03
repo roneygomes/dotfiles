@@ -33,6 +33,14 @@
 (use-package spacious-padding
   :ensure t
   :config
+  (setq spacious-padding-widths
+      '( :internal-border-width 6
+         :header-line-width 2
+         :mode-line-width 3
+         :tab-width 2
+         :right-divider-width 6
+         :fringe-width 8))
+
   (spacious-padding-mode 1))
 
 (set-face-attribute 'default nil
