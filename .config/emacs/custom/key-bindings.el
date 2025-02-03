@@ -167,4 +167,10 @@
     (define-key evil-insert-state-map (kbd "M-.") nil)
     (define-key evil-visual-state-map (kbd "M-.") nil)))
 
+(use-package evil-collection
+  :ensure t
+  :after evil
+  :config
+  (evil-collection-init))
+
 (provide 'key-bindings)
