@@ -60,7 +60,15 @@
 (global-set-key (kbd "s-P") 'my/project-switch)
 
 ;; file tree
-(global-set-key (kbd "s-1") 'treemacs-select-window)
+(defun my/neotree ()
+  "Toggle neotree at the project's root directory"
+  (interactive)
+  (let ((dir (project-root (project-current))))
+    (if (neo-global--window-exists-p)
+      (neotree-hide)
+    (neotree-dir dir))))
+
+(global-set-key (kbd "s-1") 'my/neotree)
 
 ;; terminal
 (defun my/new-vterm ()
@@ -116,10 +124,10 @@
   :config
   (evil-set-initial-state 'vterm-mode 'emacs)
   (evil-set-initial-state 'deadgrep-mode 'emacs)
-  (evil-set-initial-state 'treemacs-mode 'emacs)
   (evil-set-initial-state 'dired-mode 'emacs)
   (evil-set-initial-state 'special-mode 'emacs)
   (evil-set-initial-state 'magit-mode 'emacs)
+  (evil-set-initial-state 'neotree-mode 'emacs)
 
   (evil-set-undo-system 'undo-redo)
 
