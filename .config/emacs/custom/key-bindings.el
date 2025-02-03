@@ -36,24 +36,29 @@
 
 ;; projects
 (defun my/project-switch ()
-  "Switch to project in a new dedicated frame."
+  "Switch to project in current frame if empty, else new frame."
   (interactive)
   (let* ((dir (project-prompt-project-dir))
-         ;; get project name from the last directory component
          (proj-name (file-name-nondirectory (directory-file-name dir)))
-         (new-frame (make-frame `((title . ,proj-name)))))
-    (with-selected-frame new-frame
+         (current-project (project-current)))
+    ;; check if there's no project associated to this frame
+    (if (or current-project
+            (not (string= (buffer-name) "*scratch*")))
+        ;; if this frame already has a project: use new frame
+        (let ((new-frame (make-frame `((title . ,proj-name)))))
+          (with-selected-frame new-frame
+            (project-switch-project dir)
+            (add-hook 'project-switch-hook
+                      (lambda ()
+                        (let ((new-name (file-name-nondirectory
+                                        (directory-file-name
+                                         (car (project-roots (project-current)))))))
+                          (modify-frame-parameters (selected-frame)
+                                                   `((title . ,new-name)))))
+                      nil t)))
+      ;; else: the frame is empty so reuse it
       (project-switch-project dir)
-      ;; update the title when switching projects within this frame
-      (add-hook 'project-switch-hook
-                (lambda ()
-                  ;; recompute the project name here to get the current project
-                  (let ((new-name (file-name-nondirectory
-                                   (directory-file-name (car (project-roots (project-current)))))))
-                    (modify-frame-parameters (selected-frame)
-                                             `((title . ,new-name)))))
-                ;; t makes the hook buffer-local
-                nil t))))
+      (modify-frame-parameters nil `((title . ,proj-name))))))
 
 (global-set-key (kbd "s-O") 'find-file)
 (global-set-key (kbd "s-o") 'project-find-file)
