@@ -176,6 +176,8 @@
   :ensure t
   :after evil
   :config
+  (remove 'vterm evil-collection-mode-list)
+
   (evil-collection-init))
 
 (provide 'key-bindings)
