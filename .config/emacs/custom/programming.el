@@ -94,8 +94,8 @@
   :config
   (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
 
-  (diff-hl-margin-mode nil)
-  (global-diff-hl-mode))
+  (diff-hl-flydiff-mode 1)
+  (global-diff-hl-mode 1))
 
 (use-package eldoc-box
   :ensure t
