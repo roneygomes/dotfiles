@@ -134,50 +134,74 @@
   (evil-set-initial-state 'magit-mode 'emacs)
   (evil-set-initial-state 'neotree-mode 'emacs)
 
+  ;; remap evil's window management commands
+  (define-key evil-normal-state-map (kbd "s-b") 'evil-goto-definition)
+  (define-key evil-motion-state-map (kbd "C-w") nil)
+
+  (define-prefix-command 'my-evil-window-map)
+  (global-set-key (kbd "s-w") 'my-evil-window-map)
+
+  (define-key my-evil-window-map (kbd "s") 'split-window-below)               ; ⌘-w s
+  (define-key my-evil-window-map (kbd "v") 'split-window-right)               ; ⌘-w v
+  (define-key my-evil-window-map (kbd "w") 'other-window)                     ; ⌘-w w
+  (define-key my-evil-window-map (kbd "q") 'delete-window)                    ; ⌘-w c
+  (define-key my-evil-window-map (kbd "h") 'evil-window-left)                 ; ⌘-w h
+  (define-key my-evil-window-map (kbd "l") 'evil-window-right)                ; ⌘-w l
+  (define-key my-evil-window-map (kbd "j") 'evil-window-down)                 ; ⌘-w j
+  (define-key my-evil-window-map (kbd "k") 'evil-window-up)                   ; ⌘-w k
+  (define-key my-evil-window-map (kbd "d") 'evil-window-delete)               ; ⌘-w d
+
+  (define-key my-evil-window-map (kbd "r") 'evil-window-rotate-downwards)     ; ⌘-w r
+  (define-key my-evil-window-map (kbd "R") 'evil-window-rotate-upwards)       ; ⌘-w R
+  (define-key my-evil-window-map (kbd "H") 'evil-window-move-far-left)        ; ⌘-w H
+  (define-key my-evil-window-map (kbd "L") 'evil-window-move-far-right)       ; ⌘-w L
+  (define-key my-evil-window-map (kbd "J") 'evil-window-move-very-bottom)     ; ⌘-w J
+  (define-key my-evil-window-map (kbd "K") 'evil-window-move-very-top)        ; ⌘-w K
+  (define-key my-evil-window-map (kbd "o") 'delete-other-windows)             ; ⌘-w o
+
+  (define-key evil-motion-state-map (kbd "M-.") nil)
+  (define-key evil-normal-state-map (kbd "M-.") nil)
+  (define-key evil-insert-state-map (kbd "M-.") nil)
+  (define-key evil-visual-state-map (kbd "M-.") nil)
+
   (evil-set-undo-system 'undo-redo)
 
-  (evil-mode)
-
-  (with-eval-after-load 'evil
-    (define-key evil-normal-state-map (kbd "s-b") 'evil-goto-definition)
-
-    ;; unbind the default C-w prefix key
-    (define-key evil-motion-state-map (kbd "C-w") nil)
-
-    ;; define the ⌘-w prefix key
-    (define-prefix-command 'my-evil-window-map)
-    (global-set-key (kbd "s-w") 'my-evil-window-map)
-
-    ;; remap evil's window management commands
-    (define-key my-evil-window-map (kbd "s") 'split-window-below)               ; ⌘-w s
-    (define-key my-evil-window-map (kbd "v") 'split-window-right)               ; ⌘-w v
-    (define-key my-evil-window-map (kbd "w") 'other-window)                     ; ⌘-w w
-    (define-key my-evil-window-map (kbd "q") 'delete-window)                    ; ⌘-w c
-    (define-key my-evil-window-map (kbd "h") 'evil-window-left)                 ; ⌘-w h
-    (define-key my-evil-window-map (kbd "l") 'evil-window-right)                ; ⌘-w l
-    (define-key my-evil-window-map (kbd "j") 'evil-window-down)                 ; ⌘-w j
-    (define-key my-evil-window-map (kbd "k") 'evil-window-up)                   ; ⌘-w k
-    (define-key my-evil-window-map (kbd "d") 'evil-window-delete)               ; ⌘-w d
-
-    (define-key my-evil-window-map (kbd "r") 'evil-window-rotate-downwards)     ; ⌘-w r
-    (define-key my-evil-window-map (kbd "R") 'evil-window-rotate-upwards)       ; ⌘-w R
-    (define-key my-evil-window-map (kbd "H") 'evil-window-move-far-left)        ; ⌘-w H
-    (define-key my-evil-window-map (kbd "L") 'evil-window-move-far-right)       ; ⌘-w L
-    (define-key my-evil-window-map (kbd "J") 'evil-window-move-very-bottom)     ; ⌘-w J
-    (define-key my-evil-window-map (kbd "K") 'evil-window-move-very-top)        ; ⌘-w K
-    (define-key my-evil-window-map (kbd "o") 'delete-other-windows)             ; ⌘-w o
-
-    (define-key evil-motion-state-map (kbd "M-.") nil)
-    (define-key evil-normal-state-map (kbd "M-.") nil)
-    (define-key evil-insert-state-map (kbd "M-.") nil)
-    (define-key evil-visual-state-map (kbd "M-.") nil)))
+  (evil-mode))
 
 (use-package evil-collection
   :ensure t
   :after evil
   :config
   (remove 'vterm evil-collection-mode-list)
-
   (evil-collection-init))
+
+(use-package evil-multiedit
+  :ensure t
+  :after evil
+  :config
+  ;; Highlights all matches of the selection in the buffer.
+  (define-key evil-visual-state-map "R" 'evil-multiedit-match-all)
+
+  ;; Match with ⌘-d.
+  (define-key evil-normal-state-map (kbd "s-d") 'evil-multiedit-match-and-next)
+  (define-key evil-visual-state-map (kbd "s-d") 'evil-multiedit-match-and-next)
+  (define-key evil-insert-state-map (kbd "s-d") 'evil-multiedit-toggle-marker-here)
+
+  ;; Same as ⌘-d but in reverse.
+  (define-key evil-normal-state-map (kbd "s-D") 'evil-multiedit-match-and-prev)
+  (define-key evil-visual-state-map (kbd "s-D") 'evil-multiedit-match-and-prev)
+
+  ;; Restore last selection in visual mode.
+  (define-key evil-visual-state-map (kbd "M-s-d") 'evil-multiedit-restore)
+
+  ;; RET will toggle the region under the cursor.
+  (define-key evil-multiedit-mode-map (kbd "RET") 'evil-multiedit-toggle-or-restrict-region)
+
+  ;; ...and in visual mode, RET will disable all fields outside the selected region
+  (define-key evil-motion-state-map (kbd "RET") 'evil-multiedit-toggle-or-restrict-region)
+
+  ;; Move between matches.
+  (define-key evil-multiedit-mode-map (kbd "C-n") 'evil-multiedit-next)
+  (define-key evil-multiedit-mode-map (kbd "C-p") 'evil-multiedit-prev))
 
 (provide 'key-bindings)
