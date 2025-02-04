@@ -32,7 +32,7 @@
 
 ;; search
 (global-set-key (kbd "s-f") 'consult-line)
-(global-set-key (kbd "s-F") #'deadgrep)
+(global-set-key (kbd "s-F") 'consult-git-grep)
 
 ;; projects
 (defun my/project-switch ()

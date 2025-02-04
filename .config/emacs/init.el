@@ -59,9 +59,6 @@
 (use-package sudo-edit
   :ensure t)
 
-(use-package deadgrep
-  :ensure t)
-
 (use-package exec-path-from-shell
   :ensure t
   :config

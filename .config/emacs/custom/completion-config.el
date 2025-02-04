@@ -8,7 +8,6 @@
   (vertico-multiform-mode 1)
   (vertico-mode 1))
 
-;; displays additional info for completions on the minibuffer
 (use-package marginalia
   :ensure t
   :config
