@@ -48,13 +48,22 @@
   :config
   (which-key-mode))
 
+(defun my/vterm-project-root ()
+  "Get project root or default to current directory."
+  (if-let ((proj (project-current)))
+      (project-root proj)
+    default-directory))
+
 (use-package vterm
   :ensure t
   :config
+  (setq vterm-starting-directory #'my/vterm-project-root)
   (setq vterm-term-environment-variable "xterm-256color"))
 
 (use-package vterm-toggle
-  :ensure t)
+  :ensure t
+  :config
+  (setq vterm-toggle-scope 'project))
 
 (use-package sudo-edit
   :ensure t)
