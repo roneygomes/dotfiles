@@ -172,7 +172,8 @@
   :ensure t
   :after evil
   :config
-  (remove 'vterm evil-collection-mode-list)
+  (setq evil-collection-mode-list '(magit))
+
   (evil-collection-init))
 
 (use-package evil-multiedit
