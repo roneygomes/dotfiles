@@ -74,25 +74,6 @@
   (setq exec-path-from-shell-arguments nil)
   (exec-path-from-shell-initialize))
 
-(use-package neotree
-  :ensure t
-  :config
-  (setq neo-show-slash-for-folder nil)
-  (setq neo-show-hidden-files t)
-  (setq neo-show-updir-line nil)
-  (setq neo-hide-cursor t)
-  (setq neo-smart-open t)
-  (setq neo-autorefresh t)
-  (setq neo-window-width 40)
-
-  (add-hook 'neo-after-create-hook
-          (lambda (&optional _)
-            (setq-local evil-normal-state-cursor '(nil)
-                        evil-emacs-state-cursor  '(nil))))
-
-  (setq neo-theme (if (display-graphic-p) 'icons 'arrow)))
-
-;; global modes
 (global-auto-revert-mode 1)
 (savehist-mode 1)
 (save-place-mode 1)

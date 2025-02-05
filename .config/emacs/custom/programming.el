@@ -81,9 +81,23 @@
   :config
   (setq markdown-command "pandoc"))
 
+(use-package treemacs
+  :ensure t
+  :config
+  (setq treemacs-width 45)
+  (setq treemacs-select-when-already-in-treemacs 'close)
+  (setq treemacs-no-delete-other-windows nil)
+
+  (treemacs-hide-gitignored-files-mode t)
+  (treemacs-project-follow-mode))
+
+(use-package treemacs-evil
+  :ensure t
+  :after (treemacs))
+
 (use-package lsp-treemacs
   :ensure t
-  :after lsp-mode)
+  :after (lsp-mode treemacs))
 
 (use-package magit
   :ensure t)
