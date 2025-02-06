@@ -84,9 +84,24 @@
 (use-package treemacs
   :ensure t
   :config
-  (setq treemacs-width 45)
+  (setq treemacs-width 40)
   (setq treemacs-select-when-already-in-treemacs 'close)
   (setq treemacs-no-delete-other-windows nil)
+  (setq treemacs-follow-mode -1)
+  (setq treemacs-sorting 'alphabetic-case-insensitive-asc)
+
+  (set-face-attribute 'treemacs-root-face nil :height 1.0 :font "Avenir Next-18" :weight 'bold)
+  (set-face-attribute 'treemacs-file-face nil :height 1.0 :font "Avenir Next-15")
+
+  (set-face-attribute 'treemacs-directory-face nil :height 1.0 :font "Avenir Next-15")
+  (set-face-attribute 'treemacs-directory-collapsed-face nil :height 1.0 :font "Avenir Next-15" )
+
+  (set-face-attribute 'treemacs-git-modified-face nil :height 1.0 :font "Avenir Next-15")
+  (set-face-attribute 'treemacs-git-ignored-face nil :height 1.0 :font "Avenir Next-15")
+  (set-face-attribute 'treemacs-git-added-face nil :height 1.0 :font "Avenir Next-15")
+  (set-face-attribute 'treemacs-git-renamed-face nil :height 1.0 :font "Avenir Next-15")
+  (set-face-attribute 'treemacs-git-conflict-face nil :height 1.0 :font "Avenir Next-15")
+  (set-face-attribute 'treemacs-git-untracked-face nil :height 1.0 :font "Avenir Next-15")
 
   (treemacs-hide-gitignored-files-mode t)
   (treemacs-project-follow-mode))
