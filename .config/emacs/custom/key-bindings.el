@@ -160,14 +160,6 @@
 
   (evil-mode))
 
-(use-package evil-collection
-  :ensure t
-  :after evil
-  :config
-  (setq evil-collection-mode-list '(magit))
-
-  (evil-collection-init))
-
 (use-package evil-multiedit
   :ensure t
   :after evil

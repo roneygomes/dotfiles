@@ -63,7 +63,20 @@
 (use-package vterm-toggle
   :ensure t
   :config
-  (setq vterm-toggle-scope 'project))
+  (setq vterm-toggle-scope 'project)
+  (setq vterm-toggle-fullscreen-p nil)
+
+  (add-to-list 'display-buffer-alist
+             '((lambda (buffer-or-name _)
+                   (let ((buffer (get-buffer buffer-or-name)))
+                     (with-current-buffer buffer
+                       (or (equal major-mode 'vterm-mode)
+                           (string-prefix-p vterm-buffer-name (buffer-name buffer))))))
+                (display-buffer-reuse-window display-buffer-in-direction)
+                (direction . bottom)
+                (dedicated . t)
+                (reusable-frames . visible)
+                (window-height . 0.4))))
 
 (use-package sudo-edit
   :ensure t)

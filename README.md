@@ -5,5 +5,5 @@ install the dotfiles run the following command line at this project's root
 directory.
 
 ```sh
-stow --verbose 1 --target $HOME . 
+stow --verbose 1 --target $HOME .
 ```
