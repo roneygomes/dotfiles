@@ -8,24 +8,11 @@
 (global-set-key (kbd "s--") 'text-scale-decrease)
 
 ;; buffer management
-(defvar my/consult-source-beframe-buffers
-  `(:name     "Frame Buffers"
-    :narrow   ?b
-    :category buffer
-    :items    ,(lambda () (mapcar #'buffer-name (beframe-buffer-list)))
-    :action   consult--buffer-action
-    :state    consult--buffer-state))
-
-(defun my/consult-buffer-beframe ()
-  "Consult-buffer showing only frame-local buffer names."
-  (interactive)
-  (let ((consult-buffer-sources '(my/consult-source-beframe-buffers)))
-    (consult-buffer)))
-
 (global-set-key (kbd "s-s") 'save-buffer)
 (global-set-key (kbd "s-[") 'previous-buffer)
 (global-set-key (kbd "s-]") 'next-buffer)
-(global-set-key (kbd "s-e") 'my/consult-buffer-beframe)
+(global-set-key (kbd "s-e") 'consult-project-buffer)
+(global-set-key (kbd "s-E") 'consult-buffer)
 
 ;; editing
 (global-set-key (kbd "s-/") 'comment-line)
@@ -35,34 +22,9 @@
 (global-set-key (kbd "s-F") 'consult-git-grep)
 
 ;; projects
-(defun my/project-switch ()
-  "Switch to project in current frame if empty, else new frame."
-  (interactive)
-  (let* ((dir (project-prompt-project-dir))
-         (proj-name (file-name-nondirectory (directory-file-name dir)))
-         (current-project (project-current)))
-    ;; check if there's no project associated to this frame
-    (if (or current-project
-            (not (string= (buffer-name) "*scratch*")))
-        ;; if this frame already has a project: use new frame
-        (let ((new-frame (make-frame `((title . ,proj-name)))))
-          (with-selected-frame new-frame
-            (project-switch-project dir)
-            (add-hook 'project-switch-hook
-                      (lambda ()
-                        (let ((new-name (file-name-nondirectory
-                                        (directory-file-name
-                                         (car (project-roots (project-current)))))))
-                          (modify-frame-parameters (selected-frame)
-                                                   `((title . ,new-name)))))
-                      nil t)))
-      ;; else: the frame is empty so reuse it
-      (project-switch-project dir)
-      (modify-frame-parameters nil `((title . ,proj-name))))))
-
 (global-set-key (kbd "s-O") 'find-file)
 (global-set-key (kbd "s-o") 'project-find-file)
-(global-set-key (kbd "s-P") 'my/project-switch)
+(global-set-key (kbd "s-P") 'project-switch-project)
 
 ;; file tree
 (global-set-key (kbd "s-1") 'treemacs-select-window)

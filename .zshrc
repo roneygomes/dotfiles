@@ -1,10 +1,5 @@
 #!/bin/zsh
 
-# oh-my-zsh
-export ZSH_DISABLE_COMPFIX=true
-export ZSH_THEME="lambda"
-export plugins=(helpers vi-mode git git-extras fzf-zsh-plugin z rust asdf)
-
 ZSH=$HOME/.oh-my-zsh
 
 source "$ZSH"/oh-my-zsh.sh
@@ -44,6 +39,12 @@ vterm_printf() {
 if [[ "$INSIDE_EMACS" = 'vterm' ]]; then
     alias clear='vterm_printf "51;Evterm-clear-scrollback";tput clear'
 fi
+
+# append completions to fpath
+fpath=(${ASDF_DATA_DIR:-$HOME/.asdf}/completions $fpath)
+
+# initialise completions with ZSH's compinit
+autoload -Uz compinit && compinit
 
 ### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
 export PATH="/Users/roney.gomes/.rd/bin:$PATH"

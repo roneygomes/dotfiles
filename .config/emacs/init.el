@@ -16,8 +16,6 @@
 (setq custom-safe-themes t)
 (setq require-final-newline t)
 
-(setq-default with-editor-emacsclient-executable "emacsclient")
-
 ;; backups and auto-saves
 (setq backup-directory-alist
       `(("." . "~/.config/emacs/backups"))
@@ -27,10 +25,16 @@
 (set-charset-priority 'unicode)
 (prefer-coding-system 'utf-8-unix)
 
-(use-package package
+(use-package exec-path-from-shell
   :ensure t
   :config
-  (package-initialize)
+  (setq exec-path-from-shell-arguments nil)
+  (exec-path-from-shell-initialize))
+
+(use-package package
+  :ensure t
+  ;; :config
+  ;; (package-initialize)
   :custom
   (package-native-compile t)
   (package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
@@ -80,12 +84,6 @@
 
 (use-package sudo-edit
   :ensure t)
-
-(use-package exec-path-from-shell
-  :ensure t
-  :config
-  (setq exec-path-from-shell-arguments nil)
-  (exec-path-from-shell-initialize))
 
 (global-auto-revert-mode 1)
 (savehist-mode 1)

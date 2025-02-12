@@ -1,4 +1,4 @@
-(setq-default line-spacing 0.2)
+(setq-default line-spacing 0.25)
 
 (setq inhibit-splash-screen t)
 
@@ -44,13 +44,13 @@
   (spacious-padding-mode 1))
 
 (set-face-attribute 'default nil
-  :font "Iosevka Comfy"
-  :height 160
+  :font "Gitlab Mono"
+  :height 140
   :weight 'regular)
 
 (set-face-attribute 'fixed-pitch nil
-  :font "Iosevka Comfy"
-  :height 150)
+  :font "Gitlab Mono"
+  :height 130)
 
 (set-face-attribute 'variable-pitch nil
   :font "Geneva"
@@ -66,20 +66,20 @@
   :config
   (setq mixed-pitch-set-height t))
 
-(use-package all-the-icons
-  :ensure t
-  :if (display-graphic-p))
+;; (use-package all-the-icons
+;;   :ensure t
+;;   :if (display-graphic-p))
 
-(use-package treemacs-all-the-icons
-  :ensure t
-  :config
-  (treemacs-load-theme "all-the-icons"))
+;; (use-package treemacs-all-the-icons
+;;   :ensure t
+;;   :config
+;;   (treemacs-load-theme "all-the-icons"))
 
-(use-package all-the-icons-completion
-  :ensure t
-  :config
-  (all-the-icons-completion-mode)
-  (add-hook 'marginalia-mode-hook #'all-the-icons-completion-marginalia-setup))
+;; (use-package all-the-icons-completion
+;;   :ensure t
+;;   :config
+;;   (all-the-icons-completion-mode)
+;;   (add-hook 'marginalia-mode-hook #'all-the-icons-completion-marginalia-setup))
 
 ;; better right-click
 (when (display-graphic-p)

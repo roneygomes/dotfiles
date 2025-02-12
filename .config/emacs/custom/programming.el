@@ -25,11 +25,8 @@
 
   :hook
   ((go-ts-mode . lsp-deferred)
-   (rust-ts-mode . lsp-deferred))
-
-  :config
-  (add-hook 'before-save-hook #'lsp-format-buffer)
-  (add-hook 'before-save-hook #'lsp-organize-imports)
+   (rust-ts-mode . lsp-deferred)
+   (typescript-ts-mode . lsp-deferred))
 
   :commands lsp)
 
@@ -87,16 +84,22 @@
   (setq treemacs-width 40)
   (setq treemacs-select-when-already-in-treemacs 'move-back)
   (setq treemacs-no-delete-other-windows nil)
-
   (setq treemacs-sorting 'alphabetic-case-insensitive-asc)
+  (setq treemacs-no-png-images t)
 
-  (set-face-attribute 'treemacs-root-face nil :height 1.0 :font "Avenir Next-18" :weight 'bold)
-  (set-face-attribute 'treemacs-file-face nil :height 1.0 :font "Avenir Next-15")
+  (set-face-attribute 'treemacs-root-face nil :height 1.0 :font "Geneva-18" :weight 'bold)
+  (set-face-attribute 'treemacs-file-face nil :height 1.0 :font "Geneva-14")
 
-  (set-face-attribute 'treemacs-directory-face nil :height 1.0 :font "Avenir Next-15" :weight 'medium)
-  (set-face-attribute 'treemacs-directory-collapsed-face nil :height 1.0 :font "Avenir Next-15" :weight 'medium)
+  (set-face-attribute 'treemacs-directory-face nil :height 1.0 :font "Geneva-14")
+  (set-face-attribute 'treemacs-directory-collapsed-face nil :height 1.0 :font "Geneva-14" )
 
-  (treemacs-git-mode -1)
+  (set-face-attribute 'treemacs-git-modified-face nil :height 1.0 :font "Geneva-14")
+  (set-face-attribute 'treemacs-git-ignored-face nil :height 1.0 :font "Geneva-14")
+  (set-face-attribute 'treemacs-git-added-face nil :height 1.0 :font "Geneva-14")
+  (set-face-attribute 'treemacs-git-renamed-face nil :height 1.0 :font "Geneva-14")
+  (set-face-attribute 'treemacs-git-conflict-face nil :height 1.0 :font "Geneva-14")
+  (set-face-attribute 'treemacs-git-untracked-face nil :height 1.0 :font "Geneva-14")
+
   (treemacs-follow-mode t)
   (treemacs-hide-gitignored-files-mode t)
   (treemacs-project-follow-mode))
@@ -112,25 +115,11 @@
 (use-package magit
   :ensure t)
 
-(use-package diff-hl
-  :ensure t
-  :after magit
-  :config
-  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
-
-  (diff-hl-margin-mode 1)
-  (global-diff-hl-mode 1))
-
 (use-package eldoc-box
   :ensure t
   :config
   (setq eldoc-box-max-pixel-width 1280)
   (setq eldoc-box-max-pixel-height 720))
-
-(use-package beframe
-  :ensure t
-  :config
-  (beframe-mode 1))
 
 (use-package terraform-mode
   :ensure t
@@ -140,6 +129,13 @@
     (outline-minor-mode 1))
 
   (add-hook 'terraform-mode-hook 'my/terraform-mode-init))
+
+(use-package apheleia
+  :ensure t
+  :config
+  (setq apheleia-formatters-respect-indent-level nil)
+
+  (apheleia-global-mode 1))
 
 (provide 'programming)
 ;;; programming.el ends here

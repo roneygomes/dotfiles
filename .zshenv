@@ -1,33 +1,38 @@
 export LC_ALL=en_US.UTF-8
-export PROJECTS_DIR=$HOME/Projects/Personal
-export INFRA_DIR=$HOME/Projects/Infra
 
-export PATH=$PATH:~/bin
-export PATH=$PATH:$PROJECTS_DIR/dotfiles/zsh/bin
+# oh-my-zsh
+export ZSH_DISABLE_COMPFIX=true
+export ZSH_THEME="lambda"
+export plugins=(helpers vi-mode git git-extras fzf-zsh-plugin z)
 
-# rust
-. "$HOME/.cargo/env"
-
-# go
-export PATH=$PATH:$HOME/go/bin
-export PATH=$PATH:$HOME/.asdf/shims
-
+# macOS
 if [[ "$(uname)" == "Darwin" ]]; then
     # homebrew
-    export PATH=$PATH:/opt/homebrew/bin
+    PATH=$PATH:/opt/homebrew/bin
     export HOMEBREW_NO_ENV_HINTS=true
 
     # openssl shenanigans
-    export PATH="/usr/local/opt/openssl@3/bin:$PATH"
     export LDFLAGS="-L/usr/local/opt/openssl@3/lib"
     export CPPFLAGS="-I/usr/local/opt/openssl@3/include"
 
     export PKG_CONFIG_PATH="$(brew --prefix)/opt/cyrus-sasl/lib/pkgconfig"
     export OPENSSL_ROOT_DIR="$(brew --prefix)/opt/openssl@3"
 
-    # find python
-    for dir in ~/Library/Python/*/bin; do
-        [ -d "$dir" ] && PATH="$dir:$PATH"
-    done
-    export PATH
+    PATH=$PATH:/usr/local/opt/openssl@3/bin
 fi
+
+# bins
+PATH=$PATH:~/bin
+PATH=$PATH:$HOME/.local/bin
+
+# asdf
+PATH=$PATH:$HOME/.asdf/shims
+
+# go
+PATH=$PATH:$(asdf where golang)/packages/bin
+
+# rust
+. $HOME/.cargo/env
+
+
+export PATH=$PATH
