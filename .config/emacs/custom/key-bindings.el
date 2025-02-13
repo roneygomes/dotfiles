@@ -9,10 +9,8 @@
 
 ;; buffer management
 (global-set-key (kbd "s-s") 'save-buffer)
-(global-set-key (kbd "s-[") 'previous-buffer)
-(global-set-key (kbd "s-]") 'next-buffer)
-(global-set-key (kbd "s-e") 'consult-project-buffer)
-(global-set-key (kbd "s-E") 'consult-buffer)
+(global-set-key (kbd "s-e") 'persp-switch-to-buffer*)
+(global-set-key (kbd "s-E") 'persp-switch-to-buffer)
 
 ;; editing
 (global-set-key (kbd "s-/") 'comment-line)
@@ -24,7 +22,21 @@
 ;; projects
 (global-set-key (kbd "s-O") 'find-file)
 (global-set-key (kbd "s-o") 'project-find-file)
-(global-set-key (kbd "s-P") 'project-switch-project)
+
+(defun my/persp-switch-to-project (project-root)
+  (interactive
+   (list (project-prompt-project-dir)))
+  (let ((project-name (file-name-nondirectory (directory-file-name project-root))))
+    (if (gethash project-name (perspectives-hash))
+        ;; switch to existing perspective
+        (persp-switch project-name)
+      ;; create a new perspective and switch project
+      (progn
+        (persp-switch project-name)
+        (project-switch-project project-root)))))
+
+(global-set-key (kbd "s-P") 'persp-switch)
+(global-set-key (kbd "C-M-p") 'my/persp-switch-to-project)
 
 ;; file tree
 (global-set-key (kbd "s-1") 'treemacs-select-window)

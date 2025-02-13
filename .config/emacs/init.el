@@ -71,19 +71,35 @@
   (setq vterm-toggle-fullscreen-p nil)
 
   (add-to-list 'display-buffer-alist
-             '((lambda (buffer-or-name _)
+               '((lambda (buffer-or-name _)
                    (let ((buffer (get-buffer buffer-or-name)))
                      (with-current-buffer buffer
                        (or (equal major-mode 'vterm-mode)
                            (string-prefix-p vterm-buffer-name (buffer-name buffer))))))
-                (display-buffer-reuse-window display-buffer-in-direction)
-                (direction . bottom)
-                (dedicated . t)
-                (reusable-frames . visible)
-                (window-height . 0.4))))
+                 (display-buffer-reuse-window display-buffer-in-direction)
+                 (direction . bottom)
+                 (dedicated . t)
+                 (reusable-frames . visible)
+                 (window-height . 0.4))))
 
 (use-package sudo-edit
   :ensure t)
+
+(use-package perspective
+  :ensure t
+  :custom
+  (persp-mode-prefix-key (kbd "s-M-p"))
+
+  :config
+  (setq persp-state-default-file "~/.config/emacs/perspective-state")
+  (setq persp-show-modestring nil)
+
+  (add-hook 'kill-emacs-hook #'persp-state-save)
+  (add-hook 'after-init-hook
+            (lambda ()
+              (persp-state-load persp-state-default-file)))
+
+  (persp-mode))
 
 (global-auto-revert-mode 1)
 (savehist-mode 1)

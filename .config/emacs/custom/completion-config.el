@@ -15,9 +15,13 @@
 
 (use-package consult
   :ensure t
+  :after perspective
   :config
   (setq xref-show-xrefs-function #'consult-xref)
-  (setq xref-show-definitions-function #'consult-xref))
+  (setq xref-show-definitions-function #'consult-xref)
+
+  (consult-customize consult--source-buffer :hidden t :default nil)
+  (add-to-list 'consult-buffer-sources persp-consult-source))
 
 ;; fuzzy matching
 (use-package hotfuzz
