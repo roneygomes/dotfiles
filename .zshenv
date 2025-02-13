@@ -2,7 +2,6 @@ export LC_ALL=en_US.UTF-8
 
 # oh-my-zsh
 export ZSH_DISABLE_COMPFIX=true
-export ZSH_THEME="lambda"
 export plugins=(helpers vi-mode git git-extras fzf-zsh-plugin z)
 
 # macOS
@@ -33,6 +32,5 @@ PATH=$PATH:$(asdf where golang)/packages/bin
 
 # rust
 . $HOME/.cargo/env
-
 
 export PATH=$PATH
