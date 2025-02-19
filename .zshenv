@@ -33,4 +33,7 @@ PATH=$(asdf where golang)/packages/bin:$PATH:
 # rust
 . $HOME/.cargo/env
 
+# java
+export JAVA_HOME=$(asdf where java)
+
 export PATH=$PATH
