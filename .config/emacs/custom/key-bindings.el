@@ -86,6 +86,12 @@
 
   (define-key lsp-mode-map (kbd "M-<return>") 'lsp-execute-code-action))
 
+(use-package evil-collection
+  :after (evil)
+  :ensure t
+  :config
+  (evil-collection-init '(magit)))
+
 (use-package evil
   :ensure t
   :demand t
