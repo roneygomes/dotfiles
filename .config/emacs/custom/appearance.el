@@ -25,10 +25,21 @@
 
 (blink-cursor-mode -1)
 
-(use-package mood-line
+(use-package doom-modeline
   :ensure t
   :config
-  (mood-line-mode 1))
+  (setq doom-modeline-buffer-file-name-style 'file-name)
+  (setq doom-modeline-icon nil)
+  (setq doom-modeline-time-analogue-clock nil)
+  (setq doom-modeline-modal nil)
+  (setq doom-modeline-display-misc-in-all-mode-lines nil)
+  (setq doom-modeline-env-version nil)
+  (setq doom-modeline-percent-position nil)
+  (setq doom-modeline-persp-name nil)
+  (setq doom-modeline-buffer-encoding nil)
+  (setq doom-modeline-minor-modes nil)
+
+  (doom-modeline-mode 1))
 
 (use-package spacious-padding
   :ensure t
