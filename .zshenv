@@ -7,7 +7,7 @@ export plugins=(helpers vi-mode git git-extras fzf-zsh-plugin z)
 # macOS
 if [[ "$(uname)" == "Darwin" ]]; then
     # homebrew
-    PATH=$PATH:/opt/homebrew/bin
+    PATH=/opt/homebrew/bin:$PATH
     export HOMEBREW_NO_ENV_HINTS=true
 
     # openssl shenanigans
@@ -17,18 +17,18 @@ if [[ "$(uname)" == "Darwin" ]]; then
     export PKG_CONFIG_PATH="$(brew --prefix)/opt/cyrus-sasl/lib/pkgconfig"
     export OPENSSL_ROOT_DIR="$(brew --prefix)/opt/openssl@3"
 
-    PATH=$PATH:/usr/local/opt/openssl@3/bin
+    PATH=/usr/local/opt/openssl@3/bin:$PATH
 fi
 
 # bins
-PATH=$PATH:~/bin
-PATH=$PATH:$HOME/.local/bin
+PATH=~/bin:$PATH:
+PATH=$HOME/.local/bin:$PATH:
 
 # asdf
-PATH=$PATH:$HOME/.asdf/shims
+PATH=$HOME/.asdf/shims:$PATH:
 
 # go
-PATH=$PATH:$(asdf where golang)/packages/bin
+PATH=$(asdf where golang)/packages/bin:$PATH:
 
 # rust
 . $HOME/.cargo/env
