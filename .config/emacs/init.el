@@ -103,6 +103,7 @@
 (save-place-mode 1)
 (recentf-mode 1)
 (display-time-mode 1)
+(delete-selection-mode 1)
 
 (setq custom-file "~/.config/emacs/custom.el")
 (load custom-file t)
