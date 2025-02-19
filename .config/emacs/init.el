@@ -1,17 +1,17 @@
 (load-theme 'modus-operandi-tinted t)
 
-(setq initial-major-mode 'fundamental-mode)             ; default mode for the *scratch* buffer
+(setq initial-major-mode 'fundamental-mode)
 (setq help-window-select t)
 
 (setq make-backup-files nil)
 (setq create-lockfiles nil)
 
-(setq auto-revert-avoid-polling t)                      ; automatically reread from disk if the underlying file changes
+(setq auto-revert-avoid-polling t)
 (setq auto-revert-check-vc-info t)
 (setq auto-revert-interval 1)
 (setq auto-save-visited-interval 1)
 
-(setq ring-bell-function #'ignore)                      ; no bell sound, no flashing screen
+(setq ring-bell-function #'ignore)
 
 (setq use-short-answers t)
 (setq custom-safe-themes t)
@@ -34,8 +34,6 @@
 
 (use-package package
   :ensure t
-  ;; :config
-  ;; (package-initialize)
   :custom
   (package-native-compile t)
   (package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
