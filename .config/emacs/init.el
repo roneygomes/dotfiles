@@ -96,10 +96,6 @@
   (setq persp-show-modestring nil)
 
   (add-hook 'kill-emacs-hook #'persp-state-save)
-  (add-hook 'after-init-hook
-            (lambda ()
-              (persp-state-load persp-state-default-file)))
-
   (persp-mode))
 
 (global-auto-revert-mode 1)
