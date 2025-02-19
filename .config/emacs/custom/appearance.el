@@ -45,28 +45,28 @@
   :ensure t
   :config
   (setq spacious-padding-widths
-      '( :internal-border-width 6
-         :header-line-width 2
-         :mode-line-width 3
-         :tab-width 2
-         :right-divider-width 6
-         :fringe-width 8))
+        '( :internal-border-width 6
+           :header-line-width 2
+           :mode-line-width 3
+           :tab-width 2
+           :right-divider-width 6
+           :fringe-width 8))
 
   (spacious-padding-mode 1))
 
 (set-face-attribute 'default nil
-  :font "Gitlab Mono"
-  :height 140
-  :weight 'regular)
+                    :font "Gitlab Mono"
+                    :height 140
+                    :weight 'regular)
 
 (set-face-attribute 'fixed-pitch nil
-  :font "Gitlab Mono"
-  :height 130)
+                    :font "Gitlab Mono"
+                    :height 130)
 
 (set-face-attribute 'variable-pitch nil
-  :font "Geneva"
-  :height 150
-  :weight 'regular)
+                    :font "Geneva"
+                    :height 150
+                    :weight 'regular)
 
 (use-package mixed-pitch
   :ensure t
