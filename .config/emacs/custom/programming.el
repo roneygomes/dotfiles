@@ -86,6 +86,7 @@
   (setq treemacs-no-delete-other-windows nil)
   (setq treemacs-sorting 'alphabetic-case-insensitive-asc)
   (setq treemacs-no-png-images t)
+  (setq treemacs--project-follow-delay 0.1)
 
   (set-face-attribute 'treemacs-root-face nil :height 1.0 :font "Geneva-18" :weight 'bold)
   (set-face-attribute 'treemacs-file-face nil :height 1.0 :font "Geneva-14")
