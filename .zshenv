@@ -36,4 +36,11 @@ PATH=$(asdf where golang)/packages/bin:$PATH:
 # java
 export JAVA_HOME=$(asdf where java)
 
+# android
+export ANDROID_HOME=/opt/android
+PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
+PATH=$ANDROID_HOME/build-tools/35.0.0:$PATH
+PATH=$ANDROID_HOME/platform-tools:$PATH
+PATH=$ANDROID_HOME/emulator:$PATH
+
 export PATH=$PATH
