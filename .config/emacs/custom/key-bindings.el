@@ -50,9 +50,6 @@
 (global-set-key (kbd "M-<f12>") 'vterm-toggle)
 (global-set-key (kbd "M-S-<f12>") 'my/new-vterm)
 
-(with-eval-after-load 'vterm-mode
-  (define-key vterm-mode-map (kbd "C-l") 'vterm-clear-scrollback))
-
 (define-key emacs-lisp-mode-map (kbd "s-<return>") 'eval-last-sexp)
 (define-key lisp-mode-map (kbd "s-<return>") 'eval-last-sexp)
 
