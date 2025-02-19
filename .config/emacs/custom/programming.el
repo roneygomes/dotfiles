@@ -47,11 +47,6 @@
   :ensure t
   :hook (lsp-mode . flycheck-mode))
 
-(use-package flycheck-golangci-lint
-  :ensure t
-  :hook (go-ts-mode . flycheck-golangci-lint-setup)
-  :after (flycheck))
-
 (use-package company
   :ensure t
   :config
