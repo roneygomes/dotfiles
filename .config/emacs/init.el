@@ -69,6 +69,7 @@
   :config
   (setq vterm-toggle-scope 'project)
   (setq vterm-toggle-fullscreen-p nil)
+  (setq vterm-max-scrollback 100000)
 
   (add-to-list 'display-buffer-alist
                '((lambda (buffer-or-name _)
