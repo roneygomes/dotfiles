@@ -7,8 +7,9 @@
 (setq create-lockfiles nil)
 
 (setq auto-revert-avoid-polling t)                      ; automatically reread from disk if the underlying file changes
-(setq auto-revert-interval 5)                           ; some systems don't do file notifications well
 (setq auto-revert-check-vc-info t)
+(setq auto-revert-interval 1)
+(setq auto-save-visited-interval 1)
 
 (setq ring-bell-function #'ignore)                      ; no bell sound, no flashing screen
 
@@ -104,6 +105,7 @@
 (recentf-mode 1)
 (display-time-mode 1)
 (delete-selection-mode 1)
+(auto-save-visited-mode 1)
 
 (setq custom-file "~/.config/emacs/custom.el")
 (load custom-file t)
