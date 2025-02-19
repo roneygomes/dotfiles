@@ -77,21 +77,6 @@
   :config
   (setq mixed-pitch-set-height t))
 
-;; (use-package all-the-icons
-;;   :ensure t
-;;   :if (display-graphic-p))
-
-;; (use-package treemacs-all-the-icons
-;;   :ensure t
-;;   :config
-;;   (treemacs-load-theme "all-the-icons"))
-
-;; (use-package all-the-icons-completion
-;;   :ensure t
-;;   :config
-;;   (all-the-icons-completion-mode)
-;;   (add-hook 'marginalia-mode-hook #'all-the-icons-completion-marginalia-setup))
-
 ;; better right-click
 (when (display-graphic-p)
   (context-menu-mode))
