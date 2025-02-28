@@ -28,7 +28,7 @@
 (use-package doom-modeline
   :ensure t
   :config
-  (setq doom-modeline-buffer-file-name-style 'file-name)
+  (setq doom-modeline-buffer-file-name-style 'file-name-with-project)
   (setq doom-modeline-icon nil)
   (setq doom-modeline-time-analogue-clock nil)
   (setq doom-modeline-modal nil)
@@ -38,6 +38,8 @@
   (setq doom-modeline-persp-name nil)
   (setq doom-modeline-buffer-encoding nil)
   (setq doom-modeline-minor-modes nil)
+  (setq doom-modeline-check-simple-format t)
+  (setq doom-modeline-lsp nil)
 
   (doom-modeline-mode 1))
 

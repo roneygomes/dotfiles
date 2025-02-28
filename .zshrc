@@ -5,7 +5,7 @@ ZSH=$HOME/.oh-my-zsh
 source "$ZSH"/oh-my-zsh.sh
 source "$HOME"/.config/op/plugins.sh
 
-export PS1='λ '
+export PS1='λ %1~: '
 
 if [[ -f "$HOME"/.private ]]; then
     source "$HOME"/.private
