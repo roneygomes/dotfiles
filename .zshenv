@@ -3,6 +3,7 @@ export LC_ALL=en_US.UTF-8
 # oh-my-zsh
 export ZSH_DISABLE_COMPFIX=true
 export plugins=(helpers vi-mode git git-extras fzf-zsh-plugin z)
+export ZSH_THEME=refined
 
 # macOS
 if [[ "$(uname)" == "Darwin" ]]; then
