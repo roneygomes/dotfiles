@@ -3,8 +3,13 @@
 ZSH=$HOME/.oh-my-zsh
 
 source "$ZSH"/oh-my-zsh.sh
-source "$HOME"/.config/op/plugins.sh
 
+# 1Password plugins
+if [[ -f "$HOME"/.config/op/plugins.sh ]]; then
+    source "$HOME"/.config/op/plugins.sh
+fi
+
+# secret stuff that can't be versioned
 if [[ -f "$HOME"/.private ]]; then
     source "$HOME"/.private
 fi
