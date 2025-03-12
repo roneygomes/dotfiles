@@ -23,3 +23,6 @@
 .config/emacs/transient/
 .config/emacs/tree-sitter/
 
+# 1Password
+.config/op/
+
