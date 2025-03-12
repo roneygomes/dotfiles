@@ -32,7 +32,7 @@ PATH=$HOME/.asdf/shims:$PATH:
 PATH=$(asdf where golang)/packages/bin:$PATH:
 
 # rust
-. $HOME/.cargo/env
+. $(asdf where rust)/env
 
 # java
 export JAVA_HOME=$(asdf where java)
