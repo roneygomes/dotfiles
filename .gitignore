@@ -4,7 +4,6 @@
 # private configs
 .private
 .ssh/config
-.config/git/config
 
 # emacs
 **/*~
