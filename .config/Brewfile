@@ -1,0 +1,11 @@
+# brew install
+brew "asdf"
+brew "stow"
+brew "fzf"
+brew "gh"
+brew "colima"
+brew "docker"
+brew "docker-compose"
+
+# brew install --cask
+cask "alt-tab"
