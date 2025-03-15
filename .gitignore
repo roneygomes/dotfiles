@@ -24,3 +24,8 @@
 
 # 1Password
 .config/op/
+
+# docker
+.config/docker/buildx/
+.config/docker/contexts/
+.config/docker/.token_seed*

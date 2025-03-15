@@ -8,7 +8,7 @@ export ZSH_THEME=refined
 # macOS
 if [[ "$(uname)" == "Darwin" ]]; then
     # homebrew
-    PATH=/opt/homebrew/bin:$PATH
+    PATH=/opt/homebrew/bin:$PATH:
     export HOMEBREW_NO_ENV_HINTS=true
 
     # openssl shenanigans
@@ -18,7 +18,7 @@ if [[ "$(uname)" == "Darwin" ]]; then
     export PKG_CONFIG_PATH="$(brew --prefix)/opt/cyrus-sasl/lib/pkgconfig"
     export OPENSSL_ROOT_DIR="$(brew --prefix)/opt/openssl@3"
 
-    PATH=/usr/local/opt/openssl@3/bin:$PATH
+    PATH=/usr/local/opt/openssl@3/bin:$PATH:
 fi
 
 # bins
@@ -37,11 +37,17 @@ PATH=$(asdf where golang)/packages/bin:$PATH:
 # java
 export JAVA_HOME=$(asdf where java)
 
+# nodejs
+PATH=$(asdf where nodejs)/bin:$PATH:
+
+# docker
+export DOCKER_CONFIG=$HOME/.config/docker
+
 # android
 export ANDROID_HOME=/opt/android
-PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
-PATH=$ANDROID_HOME/build-tools/35.0.0:$PATH
-PATH=$ANDROID_HOME/platform-tools:$PATH
-PATH=$ANDROID_HOME/emulator:$PATH
+PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH:
+PATH=$ANDROID_HOME/build-tools/35.0.0:$PATH:
+PATH=$ANDROID_HOME/platform-tools:$PATH:
+PATH=$ANDROID_HOME/emulator:$PATH:
 
 export PATH=$PATH
