@@ -2,7 +2,7 @@ export LC_ALL=en_US.UTF-8
 
 # oh-my-zsh
 export ZSH_DISABLE_COMPFIX=true
-export plugins=(cp vi-mode git git-extras git-commit fzf autojump)
+export plugins=(cp vi-mode git git-extras git-commit fzf z)
 export ZSH_THEME=refined
 
 # macOS
