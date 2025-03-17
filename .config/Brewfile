@@ -9,3 +9,4 @@ brew "docker-compose"
 
 # brew install --cask
 cask "alt-tab"
+cask "logseq"
