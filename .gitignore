@@ -29,3 +29,6 @@
 .config/docker/buildx/
 .config/docker/contexts/
 .config/docker/.token_seed*
+
+# gcloud
+.config/gcloud/
