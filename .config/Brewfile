@@ -3,8 +3,6 @@ brew "asdf"
 brew "stow"
 brew "fzf"
 brew "gh"
-brew "colima"
-brew "docker"
 brew "docker-compose"
 brew "libpq"
 

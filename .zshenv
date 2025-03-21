@@ -29,6 +29,9 @@ fi
 PATH=~/bin:$PATH:
 PATH=$HOME/.local/bin:$PATH:
 
+# rancher desktop
+PATH=$HOME/.rd/bin:$PATH:
+
 # asdf
 PATH=$HOME/.asdf/shims:$PATH:
 
