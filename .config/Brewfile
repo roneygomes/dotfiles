@@ -6,6 +6,7 @@ brew "gh"
 brew "colima"
 brew "docker"
 brew "docker-compose"
+brew "libpq"
 
 # brew install --cask
 cask "alt-tab"

@@ -9,6 +9,10 @@ export ZSH_THEME=refined
 if [[ "$(uname)" == "Darwin" ]]; then
     # homebrew
     PATH=/opt/homebrew/bin:$PATH:
+
+    # psql
+    PATH="/opt/homebrew/opt/libpq/bin:$PATH"
+
     export HOMEBREW_NO_ENV_HINTS=true
 
     # openssl shenanigans
