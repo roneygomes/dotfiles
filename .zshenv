@@ -49,6 +49,7 @@ PATH=$(asdf where nodejs)/bin:$PATH:
 
 # docker
 export DOCKER_CONFIG=$HOME/.config/docker
+export COMPOSE_BAKE=true
 
 # android
 export ANDROID_HOME=/opt/android

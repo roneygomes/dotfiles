@@ -4,6 +4,7 @@ brew "stow"
 brew "fzf"
 brew "gh"
 brew "docker-compose"
+brew "docker-buildx"
 brew "libpq"
 
 # brew install --cask
