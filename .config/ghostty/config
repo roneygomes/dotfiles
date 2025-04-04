@@ -1,0 +1,26 @@
+theme = alabaster 
+minimum-contrast = 4
+
+background = #fbf7f0
+foreground = #000000
+
+font-family = Monaco
+font-thicken = false
+font-size = 14
+
+macos-titlebar-proxy-icon = hidden
+window-padding-balance = true
+shell-integration = zsh
+shell-integration-features = cursor,sudo,title
+scrollback-limit = 9999
+
+keybind = cmd+w>s=new_split:down
+keybind = cmd+w>v=new_split:right
+
+keybind = cmd+w>k=goto_split:up
+keybind = cmd+w>j=goto_split:down
+keybind = cmd+w>h=goto_split:left
+keybind = cmd+w>l=goto_split:right
+
+keybind = cmd+w>e=equalize_splits
+

@@ -1,4 +1,5 @@
 export LC_ALL=en_US.UTF-8
+export DISABLE_AUTO_TITLE=true
 
 # oh-my-zsh
 export ZSH_DISABLE_COMPFIX=true
