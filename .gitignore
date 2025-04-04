@@ -1,7 +1,17 @@
 .idea/
 .DS_Store
 
-# private configs
+.config/op/
+.config/gcloud/
+.config/raycast/
+.config/github-copilot
+.config/jgit
+
+.config/docker/buildx/
+.config/docker/contexts/
+.config/docker/.token_seed*
+
+# private
 .private
 .ssh/config
 
@@ -21,14 +31,3 @@
 .config/emacs/recentf
 .config/emacs/transient/
 .config/emacs/tree-sitter/
-
-# 1Password
-.config/op/
-
-# docker
-.config/docker/buildx/
-.config/docker/contexts/
-.config/docker/.token_seed*
-
-# gcloud
-.config/gcloud/
