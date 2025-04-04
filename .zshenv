@@ -20,8 +20,11 @@ if [[ "$(uname)" == "Darwin" ]]; then
     export LDFLAGS="-L/usr/local/opt/openssl@3/lib"
     export CPPFLAGS="-I/usr/local/opt/openssl@3/include"
 
-    export PKG_CONFIG_PATH="$(brew --prefix)/opt/cyrus-sasl/lib/pkgconfig"
-    export OPENSSL_ROOT_DIR="$(brew --prefix)/opt/openssl@3"
+    PKG_CONFIG_PATH="$(brew --prefix)/opt/cyrus-sasl/lib/pkgconfig"
+    export PKG_CONFIG_PATH
+
+    OPENSSL_ROOT_DIR="$(brew --prefix)/opt/openssl@3"
+    export OPENSSL_ROOT_DIR
 
     PATH=/usr/local/opt/openssl@3/bin:$PATH:
 fi
@@ -39,10 +42,11 @@ PATH=$HOME/.asdf/shims:$PATH:
 PATH=$(asdf where golang)/packages/bin:$PATH:
 
 # rust
-. $(asdf where rust)/env
+. "$(asdf where rust)"/env
 
 # java
-export JAVA_HOME=$(asdf where java)
+JAVA_HOME=$(asdf where java)
+export JAVA_HOME
 
 # nodejs
 PATH=$(asdf where nodejs)/bin:$PATH:
