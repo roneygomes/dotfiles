@@ -27,7 +27,6 @@ if [[ "$(uname)" == "Darwin" ]]; then
 fi
 
 # bins
-PATH=~/bin:$PATH:
 PATH=$HOME/.local/bin:$PATH:
 
 # rancher desktop
