@@ -63,7 +63,7 @@ PATH=$ANDROID_HOME/platform-tools:$PATH:
 PATH=$ANDROID_HOME/emulator:$PATH:
 
 # nx
-export NX_PARALLEL=4
+export NX_PARALLEL=6
 export NX_CACHE_DIRECTORY=$HOME/.local/nx/cache
 
 export PATH=$PATH
