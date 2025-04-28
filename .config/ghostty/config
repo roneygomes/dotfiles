@@ -1,26 +1,33 @@
 theme = alabaster 
-minimum-contrast = 4
 
 background = #fbf7f0
 foreground = #000000
 
-font-family = Monaco
+font-family = JetBrains Mono
+font-style = Medium
+font-style-bold = Bold
+font-style-italic = Italic
+font-style-bold-italic = Bold Italic
+
 font-thicken = false
+font-thicken-strength = 0
 font-size = 14
 
 macos-titlebar-proxy-icon = hidden
 window-padding-balance = true
+
 shell-integration = zsh
 shell-integration-features = cursor,sudo,title
-scrollback-limit = 9999
 
-keybind = cmd+w>s=new_split:down
-keybind = cmd+w>v=new_split:right
+scrollback-limit = 99999
 
-keybind = cmd+w>k=goto_split:up
-keybind = cmd+w>j=goto_split:down
-keybind = cmd+w>h=goto_split:left
-keybind = cmd+w>l=goto_split:right
+keybind = ctrl+w>s=new_split:down
+keybind = ctrl+w>v=new_split:right
 
-keybind = cmd+w>e=equalize_splits
+keybind = ctrl+w>k=goto_split:up
+keybind = ctrl+w>j=goto_split:down
+keybind = ctrl+w>h=goto_split:left
+keybind = ctrl+w>l=goto_split:right
+
+keybind = ctrl+w>e=equalize_splits
 
