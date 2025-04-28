@@ -1,6 +1,13 @@
 [alias]
 	ane = commit -a --amend --no-edit
 	pfl = push --force-with-lease
+	dab = !git branch | grep -v \"^\\*\" | xargs git branch -D
+	checkpoint = commit -am "checkpoint"
+    ls = !git log --pretty=format:'%C(yellow)%h %Cblue%ad %Cgreen%<(15,trunc)%an %Creset%s %C(cyan)%d' --date=short --no-merges
+    b = "!f() { \
+        local branch=$(git for-each-ref --format='%(refname:short)' refs/heads | fzf --height 40% --reverse --prompt='Select branch: '); \
+        [ -n \"$branch\" ] && git checkout \"$branch\"; \
+    }; f"
 [user]
 	email = roneygomes@users.noreply.github.com
 	name = Roney Gomes
