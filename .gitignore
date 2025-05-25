@@ -11,6 +11,9 @@
 .config/docker/contexts/
 .config/docker/.token_seed*
 
+# zed
+.config/zed/
+
 # private
 .private
 .ssh/config
