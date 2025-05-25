@@ -4,16 +4,8 @@
 <dict>
 	<key>AllowClipboardAccess</key>
 	<true/>
-	<key>AppleAntiAliasingThreshold</key>
-	<integer>1</integer>
-	<key>ApplePressAndHoldEnabled</key>
-	<false/>
-	<key>AppleScrollAnimationEnabled</key>
-	<integer>0</integer>
-	<key>AppleSmoothFixedFontsSizeThreshold</key>
-	<integer>1</integer>
-	<key>AppleWindowTabbingMode</key>
-	<string>manual</string>
+	<key>AlwaysOpenWindowAtStartup</key>
+	<true/>
 	<key>Default Bookmark Guid</key>
 	<string>3C60C9C9-76F6-4E30-BE65-EA8CF38F7FAE</string>
 	<key>DimBackgroundWindows</key>
@@ -213,6 +205,10 @@
 	<string>0x77-0x40000-0xd</string>
 	<key>NeverBlockSystemShutdown</key>
 	<true/>
+	<key>NeverWarnAboutShortLivedSessions_3C60C9C9-76F6-4E30-BE65-EA8CF38F7FAE</key>
+	<true/>
+	<key>NeverWarnAboutShortLivedSessions_3C60C9C9-76F6-4E30-BE65-EA8CF38F7FAE_selection</key>
+	<integer>0</integer>
 	<key>New Bookmarks</key>
 	<array>
 		<dict>
@@ -1296,12 +1292,16 @@
 	</array>
 	<key>OpenArrangementAtStartup</key>
 	<false/>
+	<key>OpenBookmark</key>
+	<false/>
 	<key>OpenNoWindowsAtStartup</key>
-	<true/>
+	<false/>
 	<key>PerPaneBackgroundImage</key>
 	<true/>
+	<key>PromptOnQuit</key>
+	<false/>
 	<key>QuitWhenAllWindowsClosed</key>
-	<true/>
+	<false/>
 	<key>SeparateStatusBarsPerPane</key>
 	<false/>
 	<key>ShowPaneTitles</key>
