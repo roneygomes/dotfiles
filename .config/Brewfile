@@ -16,3 +16,5 @@ cask "google-cloud-sdk"
 cask "1password-cli"
 cask "unnaturalscrollwheels"
 cask "iterm2"
+cask "font-iosevka"
+
