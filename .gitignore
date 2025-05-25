@@ -15,6 +15,10 @@
 .private
 .ssh/config
 
+# iterm2 - ignore everything except the main config file
+.config/iterm2/*
+!.config/iterm2/com.googlecode.iterm2.plist
+
 # emacs
 **/*~
 **/#*#
