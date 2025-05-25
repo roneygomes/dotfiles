@@ -25,6 +25,9 @@ alias bbi="brew update && \
     brew bundle install --cleanup --file=~/.config/Brewfile && \
     brew upgrade"
 
+# miliseconds since epoch
+alias epoch="python3 -c 'import time; print(int(time.time() * 1000))'"
+
 uuid() {
   uuid_string=$(uuidgen | awk '{print tolower($0)}')
   printf "%s" "$uuid_string" | pbcopy
