@@ -22,7 +22,7 @@
   "editor.cursorBlinking": "solid",
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.fontFamily": "Iosevka Fixed",
-  "editor.fontSize": 13,
+  "editor.fontSize": 13.5,
   "editor.formatOnSave": true,
   "editor.formatOnSaveMode": "file",
   "editor.guides.indentation": false,
@@ -107,7 +107,7 @@
   "window.newWindowDimensions": "maximized",
   "window.restoreFullscreen": true,
   "window.restoreWindows": "none",
-  "window.zoomLevel": 1,
+  "window.zoomLevel": 0.7,
   "window.zoomPerWindow": false,
   "workbench.colorCustomizations": {
     "[Nord Light Brighter]": {
