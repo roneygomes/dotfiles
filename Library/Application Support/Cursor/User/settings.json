@@ -1,0 +1,171 @@
+{
+  "[terraform]": {
+    "editor.defaultFormatter": "hashicorp.terraform"
+  },
+  "breadcrumbs.enabled": true,
+  "catppuccin-icons.specificFolders": false,
+  "cursor.chat.terminalShowHoverHint": false,
+  "cursor.composer.shouldAutoAcceptDiffs": false,
+  "debug.console.closeOnEnd": true,
+  "debug.console.fontFamily": "Iosevka Fixed",
+  "diffEditor.ignoreTrimWhitespace": false,
+  "diffEditor.renderSideBySide": false,
+  "editor.accessibilitySupport": "off",
+  "editor.autoSurround": "quotes",
+  "editor.bracketPairColorization.enabled": false,
+  "editor.codeActions.triggerOnFocusChange": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "editor.codeLensFontSize": 11,
+  "editor.codeLensFontFamily": "Sans-Serif",
+  "editor.cursorBlinking": "solid",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.fontFamily": "Iosevka Fixed",
+  "editor.fontSize": 13,
+  "editor.formatOnSave": true,
+  "editor.formatOnSaveMode": "file",
+  "editor.guides.indentation": false,
+  "editor.lineHeight": 1.5,
+  "editor.matchBrackets": "near",
+  "editor.minimap.enabled": false,
+  "editor.renderLineHighlight": "none",
+  "editor.renderWhitespace": "none",
+  "editor.rulers": [120],
+  "editor.scrollbar.horizontal": "hidden",
+  "editor.scrollbar.vertical": "hidden",
+  "editor.unicodeHighlight.ambiguousCharacters": false,
+  "editor.unicodeHighlight.invisibleCharacters": false,
+  "editor.wordWrap": "on",
+  "eslint.format.enable": true,
+  "eslint.ignoreUntitled": true,
+  "eslint.quiet": true,
+  "eslint.run": "onSave",
+  "eslint.runtime": "node",
+  "eslint.useESLintClass": true,
+  "eslint.validate": ["javascript", "typescript"],
+  "explorer.confirmDelete": false,
+  "explorer.confirmDragAndDrop": false,
+  "explorer.decorations.colors": false,
+  "explorer.excludeGitIgnore": false,
+  "extensions.ignoreRecommendations": true,
+  "files.autoSave": "afterDelay",
+  "files.exclude": {
+    ".cursor": true,
+    ".husky": true,
+    ".idea": true,
+    ".junie": true,
+    ".nx": true,
+    ".vscode": true,
+    ".yarn": true,
+    "dist": true
+  },
+  "git.autofetch": true,
+  "git.enableSmartCommit": true,
+  "git.openRepositoryInParentFolders": "never",
+  "gotoNextPreviousMember.symbolKinds": [
+    "method",
+    "function",
+    "enum",
+    "interface",
+    "constructor"
+  ],
+  "projectManager.git.baseFolders": ["~/projects"],
+  "projectManager.git.ignoredFolders": [
+    "node_modules",
+    "out",
+    "typings",
+    "test",
+    ".haxelib",
+    "target",
+    "dist"
+  ],
+  "projectManager.groupList": true,
+  "projectManager.openInNewWindowWhenClickingInStatusBar": true,
+  "projectManager.projectsLocation": "~/projects",
+  "projectManager.removeCurrentProjectFromList": false,
+  "projectManager.sortList": "Recent",
+  "redhat.telemetry.enabled": false,
+  "security.workspace.trust.untrustedFiles": "open",
+  "settingsSync.ignoredSettings": ["-window.zoomLevel"],
+  "shellcheck.ignorePatterns": {
+    "**/*.env": true,
+    "**/*.env.*": true
+  },
+  "task.problemMatchers.neverPrompt": {
+    "nx": true
+  },
+  "terminal.integrated.fontFamily": "Iosevka Term",
+  "terminal.integrated.fontSize": 13,
+  "typescript.implementationsCodeLens.enabled": false,
+  "typescript.referencesCodeLens.enabled": false,
+  "typescript.updateImportsOnFileMove.enabled": "never",
+  "vim.foldfix": true,
+  "vim.smartRelativeLine": false,
+  "vim.useSystemClipboard": true,
+  "window.autoDetectHighContrast": false,
+  "window.newWindowDimensions": "maximized",
+  "window.restoreFullscreen": true,
+  "window.restoreWindows": "none",
+  "window.zoomLevel": 1,
+  "window.zoomPerWindow": false,
+  "workbench.colorCustomizations": {
+    "[Nord Light Brighter]": {
+      "editor.background": "#fbf7f0",
+      "editorGroupHeader.border": "#d3d3d3",
+      "panelTitle.border": "#d3d3d3",
+      "sideBar.foreground": "#000000",
+      "terminal.background": "#fbf7f0",
+      "terminal.foreground": "#000000",
+      "editor.wordHighlightTextBorder": "default",
+      "editor.wordHighlightStrongBorder": "default",
+      "editor.wordHighlightBackground": "#eceeeee6",
+      "editor.wordHighlightStrongBackground": "#eceeeee6",
+      "editor.wordHighlightBorder": "default",
+      "editor.selectionHighlightBorder": "default",
+      "editorCodeLens.foreground": "#929292",
+      "gitlens.trailingLineForegroundColor": "#929292"
+    }
+  },
+  "workbench.colorTheme": "Nord Light Brighter",
+  "workbench.editor.showTabs": "single",
+  "workbench.iconTheme": "catppuccin-latte",
+  "workbench.settings.applyToAllProfiles": [
+    "editor.fontFamily",
+    "window.zoomLevel"
+  ],
+  "workbench.settings.editor": "json",
+  "workbench.tips.enabled": false,
+  "workbench.tree.renderIndentGuides": "none",
+  "gitlens.launchpad.indicator.enabled": false,
+  "gitlens.currentLine.fontFamily": "Sans-Serif",
+  "gitlens.currentLine.fontSize": 12,
+  "git.useEditorAsCommitInput": true,
+  "git.verboseCommit": true,
+  "rest-client.environmentVariables": {
+    "$shared": {},
+    "local": {
+      "base_url": "http://localhost:3031",
+      "customer_id": "LOCAL_CUSTOMER_ID",
+      "organization_id": "LOCAL_ORGANIZATION_ID",
+      "api_key": "LOCAL_API_KEY"
+    },
+    "devnet": {
+      "base_url": "DEVNET_BASE_URL",
+      "customer_id": "DEVNET_CUSTOMER_ID",
+      "organization_id": "DEVNET_ORGANIZATION_ID",
+      "api_key": "DEVNET_API_KEY"
+    },
+    "pre": {
+      "base_url": "PRE_MAINNET_BASE_URL",
+      "customer_id": "PRE_MAINNET_CUSTOMER_ID",
+      "organization_id": "PRE_MAINNET_ORGANIZATION_ID",
+      "api_key": "PRE_MAINNET_API_KEY"
+    }
+  },
+  "[sql]": {
+    "editor.defaultFormatter": "inferrinizzard.prettier-sql-vscode"
+  },
+  "diffEditor.hideUnchangedRegions.enabled": true,
+  "security.promptForLocalFileProtocolHandling": false
+}

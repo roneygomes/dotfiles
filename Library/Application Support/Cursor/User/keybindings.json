@@ -1,0 +1,205 @@
+// Place your key bindings in this file to override the defaults
+[
+  {
+    "key": "cmd+e",
+    "command": "workbench.action.showAllEditorsByMostRecentlyUsed"
+  },
+  {
+    "key": "ctrl+alt+p",
+    "command": "projectManager.listProjectsNewWindow"
+  },
+  {
+    "key": "alt+cmd+p",
+    "command": "-projectManager.listProjects"
+  },
+  {
+    "key": "ctrl+j",
+    "command": "editor.action.showDefinitionPreviewHover"
+  },
+  {
+    "key": "ctrl+alt+j",
+    "command": "editor.action.smartSelect.shrink",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+alt+k",
+    "command": "editor.action.smartSelect.expand",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+shift+cmd+right",
+    "command": "-editor.action.smartSelect.expand",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+shift+right",
+    "command": "-editor.action.smartSelect.expand",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+shift+left",
+    "command": "-editor.action.smartSelect.shrink",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+shift+cmd+left",
+    "command": "-editor.action.smartSelect.shrink",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "cmd+n",
+    "command": "explorer.newFile",
+    "when": "explorerViewletFocus"
+  },
+  {
+    "key": "cmd+shift+n",
+    "command": "explorer.newFolder",
+    "when": "explorerViewletFocus"
+  },
+  {
+    "key": "shift+cmd+'",
+    "command": "workbench.action.toggleMaximizedPanel",
+    "when": "panelAlignment == 'center' || panelPosition != 'bottom' && panelPosition != 'top'"
+  },
+  {
+    "key": "cmd+; t",
+    "command": "workbench.action.tasks.test"
+  },
+  {
+    "key": "ctrl+alt+r",
+    "command": "workbench.action.tasks.runTask"
+  },
+  {
+    "key": "ctrl+tab",
+    "command": "workbench.action.terminal.focusNext",
+    "when": "terminalFocus && terminalHasBeenCreated && !terminalEditorFocus || terminalFocus && terminalProcessSupported && !terminalEditorFocus"
+  },
+  {
+    "key": "shift+cmd+]",
+    "command": "-workbench.action.terminal.focusNext",
+    "when": "terminalFocus && terminalHasBeenCreated && !terminalEditorFocus || terminalFocus && terminalProcessSupported && !terminalEditorFocus"
+  },
+  {
+    "key": "ctrl+shift+tab",
+    "command": "workbench.action.terminal.focusPrevious",
+    "when": "terminalFocus && terminalHasBeenCreated && !terminalEditorFocus || terminalFocus && terminalProcessSupported && !terminalEditorFocus"
+  },
+  {
+    "key": "shift+cmd+[",
+    "command": "-workbench.action.terminal.focusPrevious",
+    "when": "terminalFocus && terminalHasBeenCreated && !terminalEditorFocus || terminalFocus && terminalProcessSupported && !terminalEditorFocus"
+  },
+  {
+    "key": "alt+cmd+l",
+    "command": "-bookmarks.jumpToNext",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "alt+cmd+j",
+    "command": "-bookmarks.jumpToPrevious",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "shift+alt+l",
+    "command": "-bookmarks.expandSelectionToNext",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "shift+alt+j",
+    "command": "-bookmarks.expandSelectionToPrevious",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "shift+alt+k",
+    "command": "-bookmarks.shrinkSelection",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "f3",
+    "command": "-editor.action.nextMatchFindAction",
+    "when": "editorFocus"
+  },
+  {
+    "key": "f3",
+    "command": "-workbench.action.terminal.findNext",
+    "when": "terminalFindFocused && terminalHasBeenCreated || terminalFindFocused && terminalProcessSupported || terminalFocusInAny && terminalHasBeenCreated || terminalFocusInAny && terminalProcessSupported"
+  },
+  {
+    "key": "f3",
+    "command": "-list.find",
+    "when": "listFocus && listSupportsFind"
+  },
+  {
+    "key": "f3",
+    "command": "-list.find.replInputFocus",
+    "when": "view == 'workbench.panel.repl.view'"
+  },
+  {
+    "key": "shift+cmd+b",
+    "command": "bookmarks.listFromAllFiles"
+  },
+  {
+    "key": "ctrl+shift+b",
+    "command": "workbench.view.extension.bookmarks"
+  },
+  {
+    "key": "ctrl+g",
+    "command": "-extension.vim_ctrl+g",
+    "when": "editorTextFocus && vim.active && vim.use<C-g> && !inDebugRepl"
+  },
+  {
+    "key": "f3",
+    "command": "bookmarks.toggle",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "alt+cmd+k",
+    "command": "-bookmarks.toggle",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "shift+f3",
+    "command": "bookmarks.toggleLabeled"
+  },
+  {
+    "key": "shift+f3",
+    "command": "-editor.action.previousMatchFindAction",
+    "when": "editorFocus"
+  },
+  {
+    "key": "shift+f3",
+    "command": "-workbench.action.terminal.findPrevious",
+    "when": "terminalFindFocused && terminalHasBeenCreated || terminalFindFocused && terminalProcessSupported || terminalFocusInAny && terminalHasBeenCreated || terminalFocusInAny && terminalProcessSupported"
+  },
+  {
+    "key": "cmd+f9",
+    "command": "-workbench.action.chat.nextFileTree",
+    "when": "chatIsEnabled && inChat"
+  },
+  {
+    "key": "cmd+f9",
+    "command": "workbench.action.tasks.build",
+    "when": "taskCommandsRegistered"
+  },
+  {
+    "key": "shift+cmd+b",
+    "command": "-workbench.action.tasks.build",
+    "when": "taskCommandsRegistered"
+  },
+  {
+    "key": "shift+cmd+j",
+    "command": "gotoNextPreviousMember.nextMember"
+  },
+  {
+    "key": "ctrl+down",
+    "command": "-gotoNextPreviousMember.nextMember"
+  },
+  {
+    "key": "shift+cmd+k",
+    "command": "gotoNextPreviousMember.previousMember"
+  },
+  {
+    "key": "ctrl+up",
+    "command": "-gotoNextPreviousMember.previousMember"
+  }
+]
