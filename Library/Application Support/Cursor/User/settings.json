@@ -51,7 +51,7 @@
   "extensions.ignoreRecommendations": true,
   "files.autoSave": "afterDelay",
   "files.exclude": {
-    ".cursor": true,
+    ".cursor": false,
     ".husky": true,
     ".idea": true,
     ".junie": true,
@@ -166,6 +166,10 @@
   "[sql]": {
     "editor.defaultFormatter": "inferrinizzard.prettier-sql-vscode"
   },
-  "diffEditor.hideUnchangedRegions.enabled": true,
-  "security.promptForLocalFileProtocolHandling": false
+  "security.promptForLocalFileProtocolHandling": false,
+  "database-client.autoSync": true,
+  "workbench.sideBar.location": "right",
+  "workbench.startupEditor": "none",
+  "workbench.editor.enablePreview": false,
+  "diffEditor.hideUnchangedRegions.enabled": true
 }
