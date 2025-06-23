@@ -28,6 +28,11 @@ alias bbi="brew update && \
 # miliseconds since epoch
 alias epoch="python3 -c 'import time; print(int(time.time() * 1000))'"
 
+# desktop notification
+notify() {
+    osascript -e "display notification \"$1\" with title \"$2\""
+}
+
 uuid() {
   uuid_string=$(uuidgen | awk '{print tolower($0)}')
   printf "%s" "$uuid_string" | pbcopy
