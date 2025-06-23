@@ -28,6 +28,13 @@ alias bbi="brew update && \
 # miliseconds since epoch
 alias epoch="python3 -c 'import time; print(int(time.time() * 1000))'"
 
+# git
+alias gst='git switch'
+alias gsc='git switch -c'
+alias gcm='git commit -m'
+alias gca='git commit --amend'
+alias gcane='git commit --amend --no-edit'
+
 uuid() {
   uuid_string=$(uuidgen | awk '{print tolower($0)}')
   printf "%s" "$uuid_string" | pbcopy
