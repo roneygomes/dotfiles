@@ -43,7 +43,8 @@
   "eslint.run": "onSave",
   "eslint.runtime": "node",
   "eslint.useESLintClass": true,
-  "eslint.validate": ["javascript", "typescript"],
+  "eslint.validate": ["typescript"],
+  "eslint.nodeEnv": null,
   "explorer.confirmDelete": false,
   "explorer.confirmDragAndDrop": false,
   "explorer.decorations.colors": false,
@@ -134,6 +135,7 @@
     "editor.fontFamily",
     "window.zoomLevel"
   ],
+  "workbench.sideBar.location": "right",
   "workbench.settings.editor": "json",
   "workbench.tips.enabled": false,
   "workbench.tree.renderIndentGuides": "none",
@@ -142,34 +144,17 @@
   "gitlens.currentLine.fontSize": 12,
   "git.useEditorAsCommitInput": true,
   "git.verboseCommit": true,
-  "rest-client.environmentVariables": {
-    "$shared": {},
-    "local": {
-      "base_url": "http://localhost:3031",
-      "customer_id": "LOCAL_CUSTOMER_ID",
-      "organization_id": "LOCAL_ORGANIZATION_ID",
-      "api_key": "LOCAL_API_KEY"
-    },
-    "devnet": {
-      "base_url": "DEVNET_BASE_URL",
-      "customer_id": "DEVNET_CUSTOMER_ID",
-      "organization_id": "DEVNET_ORGANIZATION_ID",
-      "api_key": "DEVNET_API_KEY"
-    },
-    "pre": {
-      "base_url": "PRE_MAINNET_BASE_URL",
-      "customer_id": "PRE_MAINNET_CUSTOMER_ID",
-      "organization_id": "PRE_MAINNET_ORGANIZATION_ID",
-      "api_key": "PRE_MAINNET_API_KEY"
-    }
-  },
   "[sql]": {
     "editor.defaultFormatter": "inferrinizzard.prettier-sql-vscode"
   },
   "security.promptForLocalFileProtocolHandling": false,
   "database-client.autoSync": true,
-  "workbench.sideBar.location": "right",
   "workbench.startupEditor": "none",
   "workbench.editor.enablePreview": false,
-  "diffEditor.hideUnchangedRegions.enabled": true
+  "workbench.hover.delay": 3000,
+  "json.schemaDownload.enable": true,
+  "geminicodeassist.enableTelemetry": false,
+  "diffEditor.codeLens": true,
+  "diffEditor.hideUnchangedRegions.enabled": true,
+  "markdown-mermaid.lightModeTheme": "base"
 }
