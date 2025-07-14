@@ -65,5 +65,8 @@ PATH=$ANDROID_HOME/emulator:$PATH:
 # nx
 export NX_CACHE_DIRECTORY=$HOME/.local/nx/cache
 
+# gcloud
+export CLOUDSDK_PYTHON_SITEPACKAGES=1
+
 # keep at the end
 export PATH=$PATH
