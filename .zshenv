@@ -68,5 +68,8 @@ export NX_CACHE_DIRECTORY=$HOME/.local/nx/cache
 # gcloud
 export CLOUDSDK_PYTHON_SITEPACKAGES=1
 
+# OpenAI Codex
+export CODEX_HOME=$HOME/.config/codex
+
 # keep at the end
 export PATH=$PATH
