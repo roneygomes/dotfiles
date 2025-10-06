@@ -5,7 +5,7 @@
     "command": "workbench.action.showAllEditorsByMostRecentlyUsed"
   },
   {
-    "key": "ctrl+alt+p",
+    "key": "ctrl+x p",
     "command": "projectManager.listProjectsNewWindow"
   },
   {
@@ -201,5 +201,9 @@
   {
     "key": "ctrl+up",
     "command": "-gotoNextPreviousMember.previousMember"
+  },
+  {
+    "key": "ctrl+shift+r",
+    "command": "extension.runJest"
   }
 ]
