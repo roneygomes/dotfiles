@@ -1,4 +1,4 @@
-(setq-default line-spacing 0.25)
+(setq-default line-spacing 0.1)
 
 (setq inhibit-splash-screen t)
 
@@ -8,6 +8,7 @@
 
 (setq-default truncate-lines t)
 (setq-default truncate-partial-width-windows t)
+(setq-default tab-width 4)
 
 (setq display-line-numbers-type 'relative)
 
@@ -16,12 +17,20 @@
 
 ;; for anything text editing we should have these essential modes
 (defun my-essential-modes ()
-  (whitespace-mode 1)
   (column-number-mode 1)
   (electric-pair-mode 1))
 
 (add-hook 'text-mode-hook 'my-essential-modes)
 (add-hook 'prog-mode-hook 'my-essential-modes)
+
+;; toggle function for showing hard tab markers
+(defun my-toggle-whitespace-mode ()
+  "Toggle display of whitespace characters (tabs and trailing spaces)."
+  (interactive)
+  (whitespace-mode 'toggle)
+  (if whitespace-mode
+      (message "Whitespace mode enabled")
+    (message "Whitespace mode disabled")))
 
 (blink-cursor-mode -1)
 
@@ -40,6 +49,9 @@
   (setq doom-modeline-minor-modes nil)
   (setq doom-modeline-check-simple-format t)
   (setq doom-modeline-lsp nil)
+  ;; Disable file state checking to improve performance (saves ~5% CPU on redisplay)
+  (setq doom-modeline-buffer-state-icon nil)
+  (setq doom-modeline-buffer-modification-icon nil)
 
   (doom-modeline-mode 1))
 
@@ -57,13 +69,13 @@
   (spacious-padding-mode 1))
 
 (set-face-attribute 'default nil
-                    :font "Gitlab Mono"
-                    :height 140
+                    :font "Iosevka"
+                    :height 160
                     :weight 'regular)
 
 (set-face-attribute 'fixed-pitch nil
-                    :font "Gitlab Mono"
-                    :height 130)
+                    :font "Iosevka"
+                    :height 150)
 
 (set-face-attribute 'variable-pitch nil
                     :font "Geneva"

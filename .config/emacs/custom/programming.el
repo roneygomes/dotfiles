@@ -12,8 +12,14 @@
   (treesit-auto-install 'prompt)
 
   :config
-  (treesit-auto-add-to-auto-mode-alist 'all)
-  (global-treesit-auto-mode))
+  ;; Only enable tree-sitter for specific languages I use
+  ;; We set up mode mappings statically instead of using global-treesit-auto-mode
+  ;; to avoid the expensive dynamic remapping on every file open
+  (setq treesit-auto-langs '(bash go rust typescript tsx javascript yaml json python sql toml dockerfile))
+  
+  ;; Add mode mappings once at startup - much faster than global-treesit-auto-mode
+  (dolist (lang treesit-auto-langs)
+    (treesit-auto-add-to-auto-mode-alist lang)))
 
 (use-package lsp-mode
   :ensure t
@@ -51,7 +57,7 @@
   :ensure t
   :config
   (setq company-minimum-prefix-length 1)
-  (setq company-idle-delay 0.0)
+  (setq company-idle-delay 0.2)
   (setq company-selection-wrap-around t)
   (setq company-tooltip-align-annotations t)
   (setq company-format-margin-function 'company-text-icons-margin)
@@ -71,17 +77,19 @@
 (use-package markdown-mode
   :ensure t
   :config
-  (setq markdown-command "pandoc"))
+  (setq markdown-command "pandoc")
+  (add-hook 'markdown-mode-hook 'visual-line-mode))
 
 (use-package treemacs
   :ensure t
+  :defer t
   :config
   (setq treemacs-width 40)
   (setq treemacs-select-when-already-in-treemacs 'move-back)
   (setq treemacs-no-delete-other-windows nil)
   (setq treemacs-sorting 'alphabetic-case-insensitive-asc)
   (setq treemacs-no-png-images t)
-  (setq treemacs--project-follow-delay 0.1)
+  (setq treemacs--project-follow-delay 0.5)
 
   (set-face-attribute 'treemacs-root-face nil :height 1.0 :font "Geneva-18" :weight 'bold)
   (set-face-attribute 'treemacs-file-face nil :height 1.0 :font "Geneva-14")
@@ -134,6 +142,11 @@
   (setq apheleia-formatters-respect-indent-level nil)
 
   (apheleia-global-mode 1))
+
+
+(add-hook 'emacs-lisp-mode-hook
+          (lambda ()
+            (setq indent-tabs-mode nil)))
 
 (provide 'programming)
 ;;; programming.el ends here

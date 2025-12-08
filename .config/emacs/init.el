@@ -8,8 +8,8 @@
 
 (setq auto-revert-avoid-polling t)
 (setq auto-revert-check-vc-info t)
-(setq auto-revert-interval 1)
-(setq auto-save-visited-interval 1)
+(setq auto-revert-interval 5)
+(setq auto-save-visited-interval 5)
 
 (setq ring-bell-function #'ignore)
 

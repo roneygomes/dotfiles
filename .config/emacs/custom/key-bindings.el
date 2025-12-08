@@ -1,28 +1,24 @@
 (setq mac-command-modifier 'super)
 
-;; command palette
-(global-set-key (kbd "s-p") 'execute-extended-command)
+(global-set-key (kbd "s-P") 'execute-extended-command)
+(global-set-key (kbd "s-p") 'project-find-file)
 
-;; user interface
+(global-set-key (kbd "s-o") 'find-file)
+(global-set-key (kbd "s-O") 'consult-outline)
+
 (global-set-key (kbd "s-=") 'text-scale-increase)
 (global-set-key (kbd "s--") 'text-scale-decrease)
 
-;; buffer management
 (global-set-key (kbd "s-s") 'save-buffer)
 (global-set-key (kbd "s-e") 'persp-switch-to-buffer*)
 (global-set-key (kbd "s-E") 'persp-switch-to-buffer)
 
-;; editing
 (global-set-key (kbd "s-/") 'comment-line)
 
-;; search
 (global-set-key (kbd "s-f") 'consult-line)
 (global-set-key (kbd "s-F") 'consult-git-grep)
 
-;; projects
-(global-set-key (kbd "s-O") 'find-file)
-(global-set-key (kbd "s-o") 'project-find-file)
-
+;; project switching
 (defun my/persp-switch-to-project (project-root)
   (interactive
    (list (project-prompt-project-dir)))
@@ -35,7 +31,7 @@
         (persp-switch project-name)
         (project-switch-project project-root)))))
 
-(global-set-key (kbd "s-P") 'persp-switch)
+(global-set-key (kbd "C-x C-p") 'persp-switch)
 (global-set-key (kbd "C-M-p") 'my/persp-switch-to-project)
 
 ;; file tree
@@ -47,14 +43,13 @@
   (let ((vterm-buffer-name (generate-new-buffer-name "*vterm*")))
     (vterm vterm-buffer-name)))
 
-(global-set-key (kbd "M-<f12>") 'vterm-toggle)
-(global-set-key (kbd "M-S-<f12>") 'my/new-vterm)
+(global-set-key (kbd "s-j") 'vterm-toggle)
+(global-set-key (kbd "s-J") 'my/new-vterm)
 
 (define-key emacs-lisp-mode-map (kbd "s-<return>") 'eval-last-sexp)
 (define-key lisp-mode-map (kbd "s-<return>") 'eval-last-sexp)
 
-(global-set-key (kbd "s-<f12>") 'consult-outline)
-(global-set-key (kbd "M-<f7>") 'xref-find-references)
+(global-set-key (kbd "S-<f12>") 'xref-find-references)
 
 (global-set-key (kbd "s-9") 'magit-status)
 
@@ -69,10 +64,10 @@
   (define-key lsp-mode-map (kbd "s-2") 'lsp-treemacs-symbols)
   (define-key lsp-mode-map (kbd "C-M-h") 'lsp-treemacs-call-hierarchy)
 
-  (define-key lsp-mode-map (kbd "s-S-<f12>") 'consult-lsp-symbols)
-  (define-key lsp-mode-map (kbd "s-<f12>") 'consult-lsp-file-symbols)
+  (define-key lsp-mode-map (kbd "C-M-o") 'consult-lsp-symbols)
+  (define-key lsp-mode-map (kbd "s-O") 'consult-lsp-file-symbols)
 
-  (define-key lsp-mode-map (kbd "s-j") 'eldoc-box-help-at-point)
+  (define-key lsp-mode-map (kbd "C-j") 'eldoc-box-help-at-point)
 
   (define-key lsp-mode-map (kbd "s-b") 'lsp-find-definition)
   (define-key lsp-mode-map (kbd "s-B") 'lsp-find-implementation)
@@ -83,12 +78,6 @@
 
   (define-key lsp-mode-map (kbd "M-<return>") 'lsp-execute-code-action))
 
-(use-package evil-collection
-  :after (evil)
-  :ensure t
-  :config
-  (evil-collection-init '(magit)))
-
 (use-package evil
   :ensure t
   :demand t
@@ -97,14 +86,23 @@
   (setq evil-vsplit-window-right t)
   (setq evil-split-window-below t)
   (setq evil-want-fine-undo t)
+  (setq evil-undo-system 'undo-fu)
+  (setq evil-auto-indent t)
+  (setq evil-respect-visual-line-mode t)
+  (setq evil-disable-insert-state-bindings t)
+  (setq evil-want-integration t)
+  (setq evil-want-C-u-scroll nil)
+  (setq evil-want-C-i-jump nil)
 
   :config
-  (evil-set-initial-state 'vterm-mode 'emacs)
-  (evil-set-initial-state 'deadgrep-mode 'emacs)
-  (evil-set-initial-state 'treemacs-mode 'emacs)
-  (evil-set-initial-state 'dired-mode 'emacs)
-  (evil-set-initial-state 'special-mode 'emacs)
-  (evil-set-initial-state 'magit-mode 'emacs)
+  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
+  (dolist (mode '(vterm-mode
+                  treemacs-mode
+                  dired-mode
+                  special-mode
+                  magit-mode))
+    (add-to-list 'evil-emacs-state-modes mode))
 
   ;; remap evil's window management commands
   (define-key evil-normal-state-map (kbd "s-b") 'evil-goto-definition)
