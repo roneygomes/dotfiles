@@ -33,6 +33,7 @@ alias bbi="brew update && \
 
 # miliseconds since epoch
 alias epoch="python3 -c 'import time; print(int(time.time() * 1000))'"
+alias prettier="npx prettier"
 
 # desktop notification
 notify() {
@@ -78,5 +79,6 @@ if [ -f '/opt/homebrew/share/google-cloud-sdk/path.zsh.inc' ]; then . '/opt/home
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/opt/homebrew/share/google-cloud-sdk/completion.zsh.inc' ]; then . '/opt/homebrew/share/google-cloud-sdk/completion.zsh.inc'; fi
+
 # initialise atuin (shell history management) without the up arrow key binding
 eval "$(atuin init zsh --disable-up-arrow)"
