@@ -4,6 +4,12 @@ ZSH=$HOME/.oh-my-zsh
 
 source "$ZSH"/oh-my-zsh.sh
 
+# disable fzf ctrl-r binding (atuin will rebind ctrl-r at the end)
+bindkey -r '^R'
+
+# Prevent fzf from binding ctrl-r if it loads later
+export FZF_CTRL_R_OPTS=''
+
 # 1Password plugins
 if [[ -f "$HOME"/.config/op/plugins.sh ]]; then
     source "$HOME"/.config/op/plugins.sh
