@@ -740,7 +740,10 @@
                                             "^com\\.apple\\.x11$",
                                             "^org\\.macosforge\\.xquartz\\.X11$",
                                             "^org\\.macports\\.X11$",
-                                            "^com\\.sublimetext\\."
+                                            "^com\\.sublimetext\\.",
+                                            "^com\\.microsoft\\.VSCode$",
+                                            "^com\\.todesktop\\..*$",
+                                            "^com\\.jetbrains\\..*$"
                                         ],
                                         "type": "frontmost_application_unless"
                                     }
@@ -802,7 +805,10 @@
                                             "^com\\.apple\\.x11$",
                                             "^org\\.macosforge\\.xquartz\\.X11$",
                                             "^org\\.macports\\.X11$",
-                                            "^com\\.sublimetext\\."
+                                            "^com\\.sublimetext\\.",
+                                            "^com\\.microsoft\\.VSCode$",
+                                            "^com\\.todesktop\\..*$",
+                                            "^com\\.jetbrains\\..*$"
                                         ],
                                         "type": "frontmost_application_unless"
                                     }
@@ -869,7 +875,10 @@
                                             "^com\\.apple\\.x11$",
                                             "^org\\.macosforge\\.xquartz\\.X11$",
                                             "^org\\.macports\\.X11$",
-                                            "^com\\.sublimetext\\."
+                                            "^com\\.sublimetext\\.",
+                                            "^com\\.microsoft\\.VSCode$",
+                                            "^com\\.todesktop\\..*$",
+                                            "^com\\.jetbrains\\..*$"
                                         ],
                                         "type": "frontmost_application_unless"
                                     }
@@ -936,7 +945,10 @@
                                             "^com\\.apple\\.x11$",
                                             "^org\\.macosforge\\.xquartz\\.X11$",
                                             "^org\\.macports\\.X11$",
-                                            "^com\\.sublimetext\\."
+                                            "^com\\.sublimetext\\.",
+                                            "^com\\.microsoft\\.VSCode$",
+                                            "^com\\.todesktop\\..*$",
+                                            "^com\\.jetbrains\\..*$"
                                         ],
                                         "type": "frontmost_application_unless"
                                     }
