@@ -41,3 +41,4 @@
 .config/emacs/recentf
 .config/emacs/transient/
 .config/emacs/tree-sitter/
+.config/emacs/.lsp-session-v1
