@@ -46,8 +46,7 @@ PATH=$(asdf where golang)/packages/bin:$PATH:
 . "$(asdf where rust)"/env
 
 # java
-JAVA_HOME=$(asdf where java)
-export JAVA_HOME
+export JAVA_HOME=$(asdf where java)
 
 # nodejs
 PATH=$(asdf where nodejs)/bin:$PATH:
