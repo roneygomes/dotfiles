@@ -12,16 +12,17 @@ export FZF_CTRL_R_OPTS=''
 
 # 1Password plugins
 if [[ -f "$HOME"/.config/op/plugins.sh ]]; then
-    source "$HOME"/.config/op/plugins.sh
+	source "$HOME"/.config/op/plugins.sh
 fi
 
 # secret stuff that can't be versioned
 if [[ -f "$HOME"/.private ]]; then
-    source "$HOME"/.private
+	source "$HOME"/.private
 fi
 
 # misc
-autoload -U colors; colors
+autoload -U colors
+colors
 
 # my local ip address
 alias ip="ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p'"
@@ -37,13 +38,13 @@ alias prettier="npx prettier"
 
 # desktop notification
 notify() {
-    osascript -e "display notification \"$1\" with title \"$2\""
+	osascript -e "display notification \"$1\" with title \"$2\""
 }
 
 uuid() {
-  uuid_string=$(uuidgen | awk '{print tolower($0)}')
-  printf "%s" "$uuid_string" | pbcopy
-  echo "$uuid_string"
+    uuid_string=$(uuidgen | awk '{print tolower($0)}')
+    printf "%s" "$uuid_string" | pbcopy
+    echo "$uuid_string"
 }
 
 # git branch selector with fzf (sorted by recency)
@@ -84,23 +85,80 @@ git_cleanup_stale_branches() {
 	echo "Cleaned up $deleted_count stale branch(es)"
 }
 
+# quote lines from file or stdin, adding commas (except last line)
+quote_lines() {
+	local quote_char="'"
+	local input_source
+	
+	# Parse arguments
+	while [[ $# -gt 0 ]]; do
+		case $1 in
+			-d|--double)
+				quote_char='"'
+				shift
+				;;
+			-s|--single)
+				quote_char="'"
+				shift
+				;;
+			-*)
+				echo "Usage: quote_lines [-d|--double|-s|--single] [file]" >&2
+				return 1
+				;;
+			*)
+				input_source="$1"
+				shift
+				;;
+		esac
+	done
+	
+	# Read from file or stdin
+	local lines=()
+
+	if [[ -n "$input_source" ]]; then
+		if [[ ! -f "$input_source" ]]; then
+			echo "Error: File '$input_source' not found" >&2
+			return 1
+		fi
+
+		while IFS= read -r line; do
+			lines+=("$line")
+		done < "$input_source"
+	else
+		while IFS= read -r line; do
+			lines+=("$line")
+		done
+	fi
+	
+	# Quote lines and add commas
+	local count=${#lines[@]}
+
+	for ((i=1; i<=count; i++)); do
+		if [[ $i -lt $count ]]; then
+			echo "${quote_char}${lines[$i]}${quote_char},"
+		else
+			echo "${quote_char}${lines[$i]}${quote_char}"
+		fi
+	done
+}
+
 # emacs vterm
 vterm_printf() {
-    if [ -n "$TMUX" ] \
-	&& { [ "${TERM%%-*}" = "tmux" ] \
-	    || [ "${TERM%%-*}" = "screen" ]; }; then
-	# Tell tmux to pass the escape sequences through
-	printf "\ePtmux;\e\e]%s\007\e\\" "$1"
-    elif [ "${TERM%%-*}" = "screen" ]; then
-	# GNU screen (screen, screen-256color, screen-256color-bce)
-	printf "\eP\e]%s\007\e\\" "$1"
-    else
-	printf "\e]%s\e\\" "$1"
-    fi
+	if [ -n "$TMUX" ] &&
+		{ [ "${TERM%%-*}" = "tmux" ] ||
+			[ "${TERM%%-*}" = "screen" ]; }; then
+		# Tell tmux to pass the escape sequences through
+		printf "\ePtmux;\e\e]%s\007\e\\" "$1"
+	elif [ "${TERM%%-*}" = "screen" ]; then
+		# GNU screen (screen, screen-256color, screen-256color-bce)
+		printf "\eP\e]%s\007\e\\" "$1"
+	else
+		printf "\e]%s\e\\" "$1"
+	fi
 }
 
 if [[ "$INSIDE_EMACS" = 'vterm' ]]; then
-    alias clear='vterm_printf "51;Evterm-clear-scrollback";tput clear'
+	alias clear='vterm_printf "51;Evterm-clear-scrollback";tput clear'
 fi
 
 # append completions to fpath
