@@ -50,6 +50,7 @@ export JAVA_HOME=$(asdf where java)
 
 # nodejs
 PATH=$(asdf where nodejs)/bin:$PATH:
+export NODE_OPTIONS="--max-old-space-size=2048"
 
 # docker
 export DOCKER_CONFIG=$HOME/.config/docker
