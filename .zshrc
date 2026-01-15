@@ -46,6 +46,44 @@ uuid() {
   echo "$uuid_string"
 }
 
+# git branch selector with fzf (sorted by recency)
+git_branch_selector() {
+    local branch=$(git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/heads | fzf --height 40% --reverse --prompt='Select branch: ')
+    [ -n "$branch" ] && git checkout "$branch"
+}
+
+# delete local branches older than one week with deleted remote branches
+git_cleanup_stale_branches() {
+	local current_branch=$(git branch --show-current)
+	local one_week_ago=$(date -v-7d +%s 2>/dev/null || date -d "7 days ago" +%s)
+	local deleted_count=0
+	
+	# fetch latest remote refs to check what exists
+	git fetch --prune --quiet 2>/dev/null
+	
+	# get all local branches except current
+	local branches=($(git branch --format='%(refname:short)' | grep -v "^$current_branch$"))
+	
+	for branch in "${branches[@]}"; do
+		# get last commit timestamp for this branch
+		local last_commit=$(git log -1 --format=%ct "$branch" 2>/dev/null)
+		[[ -z "$last_commit" ]] && continue
+		
+		# check if branch is older than one week
+		if [[ $last_commit -lt $one_week_ago ]]; then
+			# check if remote branch exists
+			if ! git ls-remote --heads origin "$branch" 2>/dev/null | grep -q "$branch"; then
+				echo "Deleting stale branch: $branch (last updated: $(date -r $last_commit +%Y-%m-%d 2>/dev/null || date -d @$last_commit +%Y-%m-%d))"
+				if git branch -D "$branch" 2>/dev/null; then
+					((deleted_count++))
+				fi
+			fi
+		fi
+	done
+	
+	echo "Cleaned up $deleted_count stale branch(es)"
+}
+
 # emacs vterm
 vterm_printf() {
     if [ -n "$TMUX" ] \
