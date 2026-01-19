@@ -867,7 +867,8 @@
                       "^org\\.macports\\.X11$",
                       "^com\\.sublimetext\\.",
                       "^com\\.microsoft\\.VSCode$",
-                      "^com\\.vscodium$"
+                      "^com\\.vscodium$",
+                      "^com\\.todesktop\\..*$"
                     ],
                     "type": "frontmost_application_unless"
                   }
