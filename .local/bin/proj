@@ -13,7 +13,7 @@ proj - Manage bare-cloned projects and worktrees
 Usage:
   proj clone <git-url> [project-name]    Clone a repository as a bare repo
   proj task <worktree>                   Switch to or create a worktree
-  proj list                              List all worktrees in current project
+  proj list                              List worktrees with fzf fuzzy finder
   proj --version                         Show version
   proj --help                            Show this help message
 
@@ -22,7 +22,7 @@ Examples:
   proj clone https://github.com/user/repo.git my-project
   proj task feat/new-feature
   proj task 123
-  proj list
+  proj list    # Opens fzf to select and switch to a worktree
 
 Tab Completion:
   The 'proj task' command supports tab completion for existing worktrees.
@@ -96,21 +96,67 @@ cmd_list() {
         exit 1
     fi
     
-    echo "Worktrees in $(basename "$project_root"):"
+    # Check if fzf is available
+    if ! command -v fzf &> /dev/null; then
+        echo "Worktrees in $(basename "$project_root"):"
+        cd "$project_root"
+        
+        # Simple list without fzf
+        for dir in */; do
+            if [ -d "$dir" ] && [ "$(basename "$dir")" != ".bare" ]; then
+                local worktree_name=$(basename "$dir")
+                if [ -d "$dir/.git" ] || [ -f "$dir/.git" ]; then
+                    local ref=$(cd "$dir" && git symbolic-ref --short HEAD 2>/dev/null || git describe --tags --exact-match 2>/dev/null || git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+                    echo "  - $worktree_name (ref: $ref)"
+                fi
+            fi
+        done
+        return
+    fi
+    
+    # Build list of worktrees for fzf
+    local worktree_list=""
     cd "$project_root"
     
-    # List all directories except .bare and hidden files
     for dir in */; do
         if [ -d "$dir" ] && [ "$(basename "$dir")" != ".bare" ]; then
             local worktree_name=$(basename "$dir")
-            # Check if it's actually a git worktree
             if [ -d "$dir/.git" ] || [ -f "$dir/.git" ]; then
-                # Get the current branch/tag/commit in this worktree
                 local ref=$(cd "$dir" && git symbolic-ref --short HEAD 2>/dev/null || git describe --tags --exact-match 2>/dev/null || git rev-parse --short HEAD 2>/dev/null || echo "unknown")
-                echo "  - $worktree_name (ref: $ref)"
+                worktree_list="$worktree_list$worktree_name|$ref\n"
             fi
         fi
     done
+    
+    if [ -z "$worktree_list" ]; then
+        echo "No worktrees found in $(basename "$project_root")"
+        return
+    fi
+    
+    # Use fzf to select a worktree
+    local selected=$(echo -e "$worktree_list" | sed '/^$/d' | \
+        awk -F'|' '{printf "%-30s %s\n", $1, "(ref: " $2 ")"}' | \
+        fzf --height 40% --reverse --border \
+            --header "Select worktree to switch to:" \
+            --preview "echo {} | awk '{print \$1}' | xargs -I {} ls -la $project_root/{}" \
+            --preview-window=right:50%:wrap)
+    
+    if [ -n "$selected" ]; then
+        # Extract worktree name (first field)
+        local worktree_name=$(echo "$selected" | awk '{print $1}')
+        local worktree_path="$project_root/$worktree_name"
+        
+        if [ -d "$worktree_path" ]; then
+            cd "$worktree_path"
+            echo "✅ Switched to worktree: $worktree_name"
+            echo "   Path: $worktree_path"
+            # Start a new shell in the worktree directory
+            exec $SHELL
+        else
+            echo "Error: Worktree directory not found: $worktree_path"
+            exit 1
+        fi
+    fi
 }
 
 # Main command router
