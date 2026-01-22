@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# Usage: setup-project <repo_url> [project_name]
+REPO_URL=$1
+PROJECT_NAME=$2
+MAIN_BRANCH="devnet"
+
+# 1. Validation
+if [ -z "$PROJECTS_DIR" ]; then
+    echo "Error: PROJECTS_DIR environment variable is not set."
+    exit 1
+fi
+
+if [ -z "$REPO_URL" ]; then
+    echo "Usage: setup-project <repo_url> [project_name]"
+    exit 1
+fi
+
+# Infer project name from repo URL if not provided
+if [ -z "$PROJECT_NAME" ]; then
+    # Extract the last part of the URL and remove .git suffix
+    PROJECT_NAME=$(basename "$REPO_URL" .git)
+    echo "Inferred project name: $PROJECT_NAME"
+fi
+
+TARGET_DIR="$PROJECTS_DIR/$PROJECT_NAME"
+
+if [ -d "$TARGET_DIR" ]; then
+    echo "Error: Directory $TARGET_DIR already exists."
+    exit 1
+fi
+
+# 2. Setup Directory
+mkdir -p "$TARGET_DIR" && cd "$TARGET_DIR"
+
+# 3. Clone as Bare
+git clone --bare "$REPO_URL" .bare
+
+# 4. Link and Ignore
+echo "gitdir: ./.bare" > .git
+{
+    echo "*"
+    echo "!.bare/"
+    echo "!.git"
+    echo "!.gitignore"
+} > .gitignore
+
+# 5. Config & Fetch
+cd .bare
+git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+git fetch origin
+cd ..
+
+# 6. Initialize Main Tree
+if git --git-dir=.bare show-ref --verify --quiet "refs/heads/$MAIN_BRANCH"; then
+    git worktree add "$MAIN_BRANCH" "$MAIN_BRANCH"
+else
+    git worktree add "$MAIN_BRANCH" "origin/$MAIN_BRANCH"
+fi
+
+echo "✅ Project $PROJECT_NAME initialized in $TARGET_DIR"

@@ -1,6 +1,8 @@
 export LC_ALL=en_US.UTF-8
 export DISABLE_AUTO_TITLE=true
 
+export PROJECTS_DIR=~/projects
+
 # oh-my-zsh
 export ZSH_DISABLE_COMPFIX=true
 export plugins=(cp vi-mode git git-extras fzf z)
