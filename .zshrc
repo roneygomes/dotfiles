@@ -4,6 +4,34 @@ ZSH=$HOME/.oh-my-zsh
 
 source "$ZSH"/oh-my-zsh.sh
 
+# Custom function to display project and worktree info
+project_worktree_info() {
+    # Check if we're in a git worktree with a bare repository
+    if git rev-parse --is-inside-work-tree &>/dev/null; then
+        local git_common_dir=$(git rev-parse --git-common-dir 2>/dev/null)
+        
+        # Check if this is a bare-cloned project (has .bare directory)
+        if [ -n "$git_common_dir" ]; then
+            local bare_dir=$(cd "$git_common_dir" 2>/dev/null && pwd)
+            
+            if [ "$(basename "$bare_dir")" = ".bare" ]; then
+                # Get project name (parent directory of .bare)
+                local project_root=$(dirname "$bare_dir")
+                local project_name=$(basename "$project_root")
+                
+                # Get worktree name (current worktree directory name)
+                local git_top_level=$(git rev-parse --show-toplevel 2>/dev/null)
+                local worktree_name=$(basename "$git_top_level")
+                
+                # Only show if we're in a worktree (not at project root)
+                if [ "$project_root" != "$git_top_level" ]; then
+                    echo "%F{cyan}[$project_name/%F{green}$worktree_name%F{cyan}]%f "
+                fi
+            fi
+        fi
+    fi
+}
+
 # disable fzf ctrl-r binding (atuin will rebind ctrl-r at the end)
 bindkey -r '^R'
 
@@ -178,3 +206,6 @@ if [ -f '/opt/homebrew/share/google-cloud-sdk/completion.zsh.inc' ]; then . '/op
 
 # initialise atuin (shell history management) without the up arrow key binding
 eval "$(atuin init zsh --disable-up-arrow)"
+
+# Override PROMPT to include project/worktree info
+PROMPT='$(project_worktree_info)%(?.%F{magenta}.%F{red})❯%f '
