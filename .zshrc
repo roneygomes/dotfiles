@@ -25,11 +25,15 @@ project_worktree_info() {
                 
                 # Only show if we're in a worktree (not at project root)
                 if [ "$project_root" != "$git_top_level" ]; then
-                    echo "%F{cyan}[$project_name/%F{green}$worktree_name%F{cyan}]%f "
+                    echo "%F{cyan}$project_name/%F{green}$worktree_name%f "
+                    return
                 fi
             fi
         fi
     fi
+    
+    # Not in a bare-cloned repo, show current directory
+    echo "%F{blue}%~%f "
 }
 
 # Git branch and status info
