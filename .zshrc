@@ -32,6 +32,24 @@ project_worktree_info() {
     fi
 }
 
+# Git branch and status info
+git_prompt_info_inline() {
+    if git rev-parse --is-inside-work-tree &>/dev/null; then
+        local branch=$(git symbolic-ref --short HEAD 2>/dev/null || git describe --tags --exact-match 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)
+        local dirty=$(git diff --quiet --ignore-submodules HEAD 2>/dev/null; [ $? -eq 1 ] && echo "*")
+        echo "%F{8}git:$branch$dirty%f "
+    fi
+}
+
+# Override the precmd to disable the multi-line output from refined theme
+precmd() {
+    # Empty function to override the theme's precmd
+}
+
+# Disable the theme's automatic prompt updates
+unsetopt prompt_subst
+setopt prompt_subst
+
 # disable fzf ctrl-r binding (atuin will rebind ctrl-r at the end)
 bindkey -r '^R'
 
@@ -207,5 +225,5 @@ if [ -f '/opt/homebrew/share/google-cloud-sdk/completion.zsh.inc' ]; then . '/op
 # initialise atuin (shell history management) without the up arrow key binding
 eval "$(atuin init zsh --disable-up-arrow)"
 
-# Override PROMPT to include project/worktree info
-PROMPT='$(project_worktree_info)%(?.%F{magenta}.%F{red})❯%f '
+# Override PROMPT to include project/worktree info on a single line
+PROMPT='$(project_worktree_info)$(git_prompt_info_inline)%(?.%F{magenta}.%F{red})❯%f '
