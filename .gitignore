@@ -42,3 +42,6 @@
 .config/emacs/transient/
 .config/emacs/tree-sitter/
 .config/emacs/.lsp-session-v1
+
+# .local/bin - ignore large binaries
+.local/bin/cloud-sql-proxy

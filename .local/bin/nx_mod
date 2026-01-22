@@ -1,0 +1,222 @@
+#!/bin/bash
+
+# Script to run tests for Nx projects affected by modified files
+
+# Function to display help information
+show_help() {
+    echo "Usage: $0 -t|--task TASK [OPTIONS]"
+    echo ""
+    echo "Run Nx tasks for projects affected by modified files."
+    echo ""
+    echo "REQUIRED:"
+    echo "  -t, --task TASK                 Specify the Nx task to run (e.g., test, lint, format, build)"
+    echo ""
+    echo "OPTIONS:"
+    echo "  -q, --quiet-script              Run in quiet mode (suppress script output)"
+    echo "  -scl, --suppress-command-logs   Suppress command output from Nx"
+    echo "  -c, --config CONFIG             Specify Nx configuration"
+    echo "  -h, --help                      Show this help message"
+    echo ""
+    echo "EXAMPLES:"
+    echo "  $0 -t test                  Run tests for affected projects"
+    echo "  $0 -t lint --quiet-script   Run lint in quiet mode"
+    echo "  $0 -t build -c production   Run build with production config"
+    echo ""
+    echo "Any additional arguments will be passed to the Nx task."
+}
+
+QUIET_SCRIPT_MODE=false
+SUPPRESS_COMMAND_OUTPUT=false
+NX_TASK="" # Task must be provided via -t/--task
+declare -a NX_TASK_ARGS=() # Array to hold arguments for the Nx task
+NX_CONFIG="" # Optional config for nx
+
+# Show help if no arguments provided
+if [[ $# -eq 0 ]]; then
+    echo -e "\033[31mError: No arguments provided.\033[0m"
+    echo ""
+    show_help
+    exit 1
+fi
+
+while [[ $# -gt 0 ]]; do # Process all arguments
+    case "$1" in
+        -h | --help)
+            show_help
+            exit 0
+            ;;
+        -q | --quiet-script)
+            QUIET_SCRIPT_MODE=true
+            shift # consume flag
+            ;;
+        -scl | --suppress-command-logs)
+            SUPPRESS_COMMAND_OUTPUT=true
+            shift # consume flag
+            ;;
+        -t | --task)
+            # Ensure $2 exists and is not a flag itself (doesn't start with -)
+            if [[ -z "$2" ]] || [[ "$2" =~ ^- ]]; then
+                echo -e "\033[31mError: The '$1' option requires a plain task name (e.g., test, lint, format).\033[0m"
+                echo -e "       The argument '$2' is missing or looks like an option/flag."
+                exit 1
+            fi
+            NX_TASK="$2"
+            shift 2 # consume -t and its argument (task name)
+            ;;
+        -c | --config)
+            # Ensure $2 exists and is not a flag itself (doesn't start with -)
+            if [[ -z "$2" ]] || [[ "$2" =~ ^- ]]; then
+                echo -e "\033[31mError: The '$1' option requires a config value.\033[0m"
+                echo -e "       The argument '$2' is missing or looks like an option/flag."
+                exit 1
+            fi
+            NX_CONFIG="$2"
+            shift 2 # consume -c and its argument (config value)
+            ;;
+        *)
+            # Argument is not a recognized script flag, so add it to NX_TASK_ARGS
+            NX_TASK_ARGS+=("$1")
+            shift # consume this argument
+            ;;
+    esac
+done
+
+# Validate that the task argument is provided
+if [[ -z "$NX_TASK" ]]; then
+    echo -e "\033[31mError: Task argument is required.\033[0m"
+    echo ""
+    show_help
+    exit 1
+fi
+
+# Get all modified files (staged or unstaged)
+modified_files=$(git status --porcelain | awk '{print $2}')
+
+if [ -z "$modified_files" ]; then
+	if [ "$QUIET_SCRIPT_MODE" = false ]; then
+	  echo -e "\t- \033[32mNo modified files to process.\033[0m"
+	fi
+	exit 0
+fi
+
+if [ "$QUIET_SCRIPT_MODE" = false ]; then
+  echo "Modified files:"
+fi
+
+projects_to_test=()
+projects_with_target=()
+project_json_path_list=()
+file_list=()
+file_project_list=()
+
+# Check if jq is installed
+if ! command -v jq &> /dev/null
+then
+    echo -e "\033[31mError: jq is not installed. Please install jq to run this script.\033[0m"
+    exit 1
+fi
+
+workspace_root=$(pwd) # Assuming the script is run from the workspace root
+
+for file in $modified_files; do
+    project_found_for_file=false
+    current_dir=$(dirname "$file")
+    while true; do
+        if [ -f "$current_dir/project.json" ]; then
+            project_name=$(jq -r '.name' "$current_dir/project.json" 2>/dev/null)
+            if [ -n "$project_name" ] && [ "$project_name" != "null" ]; then
+                projects_to_test+=("$project_name")
+                project_json_path_list+=("$current_dir/project.json")
+                file_list+=("$file")
+                file_project_list+=("$project_name")
+                project_found_for_file=true
+                break
+            fi
+        fi
+        if [ "$(realpath "$current_dir")" == "$(realpath "$workspace_root")" ]; then
+            break
+        fi
+        if [ -z "$current_dir" ] || [ "$current_dir" == "." ] || [ "$current_dir" == "/" ]; then
+            break
+        fi
+        parent_dir=$(dirname "$current_dir")
+        if [ "$parent_dir" == "$current_dir" ]; then
+            break
+        fi
+        current_dir="$parent_dir"
+    done
+    if $project_found_for_file && [ "$QUIET_SCRIPT_MODE" = false ]; then
+      echo -e "- \033[34m$(basename "$file")\033[0m → \033[32m$project_name\033[0m"
+      echo ""
+    fi
+done
+
+if [ ${#projects_to_test[@]} -eq 0 ]; then
+  if [ "$QUIET_SCRIPT_MODE" = false ]; then
+    echo -e "\033[33mNo relevant (TS/JS) projects found for the modified files that require processing.\033[0m"
+  fi
+  exit 0
+fi
+
+# Remove duplicates from the final list of projects to test
+unique_projects=$(echo "${projects_to_test[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
+
+# Filter projects to only those that have the NX_TASK as a target
+projects_with_target=()
+for i in "${!projects_to_test[@]}"; do
+  proj="${projects_to_test[$i]}"
+  project_json_path="${project_json_path_list[$i]}"
+  if [ -n "$project_json_path" ] && jq -e --arg tgt "$NX_TASK" '.targets[$tgt]' "$project_json_path" > /dev/null; then
+    projects_with_target+=("$proj")
+  elif jq -e --arg tgt "$NX_TASK" '.targetDefaults[$tgt]' nx.json > /dev/null; then
+    projects_with_target+=("$proj")
+  else
+    if [ "$QUIET_SCRIPT_MODE" = false ]; then
+      echo -e "\033[33mskipping $proj: no target '$NX_TASK' in $project_json_path and not inherited from nx.json\033[0m"
+    fi
+  fi
+done
+
+if [ ${#projects_with_target[@]} -eq 0 ]; then
+  if [ "$QUIET_SCRIPT_MODE" = false ]; then
+    echo -e "\033[33mNo projects with target '$NX_TASK' found for the modified files.\033[0m"
+  fi
+  exit 0
+fi
+
+# Remove duplicates from projects_with_target
+unique_projects=$(printf "%s\n" "${projects_with_target[@]}" | sort -u | tr '\n' ',' | sed 's/,*$//;s/,$//')
+
+if [ "$QUIET_SCRIPT_MODE" = false ]; then
+  echo ""
+  echo "Unique projects to process for task '$NX_TASK':"
+  for proj in $(echo "$unique_projects" | tr ',' ' '); do
+    if [ -n "$proj" ]; then
+      echo -e "    - \033[32m$proj\033[0m"
+    fi
+  done
+  echo ""
+fi
+
+NX_CONFIG_ARG=""
+if [ -n "$NX_CONFIG" ]; then
+  NX_CONFIG_ARG="-c=$NX_CONFIG"
+fi
+
+if [ "$SUPPRESS_COMMAND_OUTPUT" = true ]; then
+  yarn nx run-many --target="$NX_TASK" --projects="$unique_projects" $NX_CONFIG_ARG "${NX_TASK_ARGS[@]}" > /dev/null 2>&1
+else
+  yarn nx run-many --target="$NX_TASK" --projects="$unique_projects" $NX_CONFIG_ARG "${NX_TASK_ARGS[@]}"
+fi
+
+exit_code=$?
+
+if [ $exit_code -eq 0 ]; then
+    if [ "$QUIET_SCRIPT_MODE" = false ]; then
+      echo -e "\033[32mAll tasks ('$NX_TASK') for modified projects completed successfully.\033[0m"
+    fi
+else
+    echo -e "\033[31mSome tasks ('$NX_TASK') failed. Please review the output above.\033[0m"
+fi
+
+exit $exit_code 

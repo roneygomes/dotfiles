@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Fetch the current PR info using GitHub CLI
+gh_output=$(gh pr view --json title,url 2>/dev/null)
+
+if [ -z "$gh_output" ] || [ "$gh_output" = "null" ]; then
+  echo "No pull request found for the current branch."
+  exit 1
+fi
+
+pr_title=$(echo "$gh_output" | jq -r .title)
+pr_url=$(echo "$gh_output" | jq -r .url)
+
+echo "PR → $pr_title"
+echo "    $pr_url"

@@ -7,3 +7,8 @@ directory.
 ```sh
 stow --verbose 1 --target $HOME .
 ```
+
+## What's tracked
+
+- `.config/` - Application configurations
+- `.local/bin/` - User scripts and executables
