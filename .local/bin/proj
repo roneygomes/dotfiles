@@ -105,9 +105,9 @@ cmd_list() {
             local worktree_name=$(basename "$dir")
             # Check if it's actually a git worktree
             if [ -d "$dir/.git" ] || [ -f "$dir/.git" ]; then
-                # Get the current branch in this worktree
-                local branch=$(cd "$dir" && git branch --show-current 2>/dev/null || echo "detached")
-                echo "  - $worktree_name (branch: $branch)"
+                # Get the current branch/tag/commit in this worktree
+                local ref=$(cd "$dir" && git symbolic-ref --short HEAD 2>/dev/null || git describe --tags --exact-match 2>/dev/null || git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+                echo "  - $worktree_name (ref: $ref)"
             fi
         fi
     done
