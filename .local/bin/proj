@@ -1,0 +1,142 @@
+#!/bin/bash
+
+# proj - A CLI tool for managing bare-cloned projects and worktrees
+
+set -e
+
+VERSION="1.0.0"
+
+show_help() {
+    cat << EOF
+proj - Manage bare-cloned projects and worktrees
+
+Usage:
+  proj clone <git-url> [project-name]    Clone a repository as a bare repo
+  proj task <worktree>                   Switch to or create a worktree
+  proj list                              List all worktrees in current project
+  proj --version                         Show version
+  proj --help                            Show this help message
+
+Examples:
+  proj clone git@github.com:user/repo.git
+  proj clone https://github.com/user/repo.git my-project
+  proj task feat/new-feature
+  proj task 123
+  proj list
+
+Tab Completion:
+  The 'proj task' command supports tab completion for existing worktrees.
+  See ~/.zshrc for completion setup.
+EOF
+}
+
+show_version() {
+    echo "proj version $VERSION"
+}
+
+cmd_clone() {
+    local git_url=$1
+    local project_name=$2
+    
+    if [ -z "$git_url" ]; then
+        echo "Error: Git URL is required"
+        echo "Usage: proj clone <git-url> [project-name]"
+        exit 1
+    fi
+    
+    # Call setup-project
+    if [ -n "$project_name" ]; then
+        setup-project "$git_url" "$project_name"
+    else
+        setup-project "$git_url"
+    fi
+}
+
+cmd_task() {
+    local worktree=$1
+    
+    if [ -z "$worktree" ]; then
+        echo "Error: Worktree name is required"
+        echo "Usage: proj task <worktree>"
+        exit 1
+    fi
+    
+    # Call worktree-switch
+    worktree-switch "$worktree"
+}
+
+cmd_list() {
+    # Find the project root
+    local project_root=""
+    
+    if git rev-parse --is-inside-work-tree &>/dev/null; then
+        local git_common_dir=$(git rev-parse --git-common-dir 2>/dev/null)
+        if [ -n "$git_common_dir" ]; then
+            local bare_dir=$(cd "$git_common_dir" 2>/dev/null && pwd)
+            if [ "$(basename "$bare_dir")" = ".bare" ]; then
+                project_root=$(dirname "$bare_dir")
+            fi
+        fi
+    fi
+    
+    # Fallback: walk up to find .bare
+    if [ -z "$project_root" ]; then
+        local current_dir="$PWD"
+        while [ "$current_dir" != "/" ]; do
+            if [ -d "$current_dir/.bare" ]; then
+                project_root="$current_dir"
+                break
+            fi
+            current_dir=$(dirname "$current_dir")
+        done
+    fi
+    
+    if [ -z "$project_root" ]; then
+        echo "Error: Not in a bare-cloned project directory."
+        exit 1
+    fi
+    
+    echo "Worktrees in $(basename "$project_root"):"
+    cd "$project_root"
+    
+    # List all directories except .bare and hidden files
+    for dir in */; do
+        if [ -d "$dir" ] && [ "$(basename "$dir")" != ".bare" ]; then
+            local worktree_name=$(basename "$dir")
+            # Check if it's actually a git worktree
+            if [ -d "$dir/.git" ] || [ -f "$dir/.git" ]; then
+                # Get the current branch in this worktree
+                local branch=$(cd "$dir" && git branch --show-current 2>/dev/null || echo "detached")
+                echo "  - $worktree_name (branch: $branch)"
+            fi
+        fi
+    done
+}
+
+# Main command router
+case "${1:-}" in
+    clone)
+        shift
+        cmd_clone "$@"
+        ;;
+    task)
+        shift
+        cmd_task "$@"
+        ;;
+    list)
+        shift
+        cmd_list "$@"
+        ;;
+    --version|-v)
+        show_version
+        ;;
+    --help|-h|"")
+        show_help
+        ;;
+    *)
+        echo "Error: Unknown command '$1'"
+        echo ""
+        show_help
+        exit 1
+        ;;
+esac
