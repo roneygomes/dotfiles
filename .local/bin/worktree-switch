@@ -56,12 +56,8 @@ if [ -z "$PROJECT_ROOT" ]; then
     exit 1
 fi
 
-echo "Project root: $PROJECT_ROOT"
-
 # Change to project root
 cd "$PROJECT_ROOT"
-
-echo "Looking for branches..."
 
 # Function to find matching branch
 find_branch() {
@@ -69,20 +65,15 @@ find_branch() {
     local branches
     
     # Get all remote branches
-    echo "Querying git branches..." >&2
     branches=$(git --git-dir=.bare branch -r 2>&1 | sed 's/origin\///' | sed 's/^[[:space:]]*//' | grep -v '^HEAD' || true)
-    echo "Found branches" >&2
-    echo "Branch list: $branches" >&2
     
     # Try exact match first
-    echo "Trying exact match..." >&2
     if echo "$branches" | grep -q "^${input}$" || false; then
         echo "$input"
         return 0
     fi
     
     # Try with common prefixes
-    echo "Trying with prefixes..." >&2
     local prefixes=("feat/" "feature/" "fix/" "bugfix/" "hotfix/" "chore/" "docs/" "refactor/" "test/" "style/")
     
     for prefix in "${prefixes[@]}"; do
@@ -93,7 +84,6 @@ find_branch() {
     done
     
     # Try partial match (case-insensitive)
-    echo "Trying partial match..." >&2
     local matches=$(echo "$branches" | grep -i "$input" || true)
     local match_count=$(echo "$matches" | grep -v '^$' | wc -l | tr -d ' ' || echo "0")
     
@@ -112,11 +102,8 @@ find_branch() {
 }
 
 # Find the branch
-echo "Finding branch: $BRANCH_INPUT"
 BRANCH_NAME=$(find_branch "$BRANCH_INPUT") || FIND_RESULT=$?
 FIND_RESULT=${FIND_RESULT:-0}
-
-echo "Branch found: '$BRANCH_NAME' (result: $FIND_RESULT)"
 
 if [ $FIND_RESULT -eq 1 ]; then
     # Multiple matches found, error already printed
@@ -125,8 +112,6 @@ fi
 
 # Determine worktree directory name (use last part of branch for directory)
 WORKTREE_DIR=$(basename "$BRANCH_NAME")
-
-echo "Worktree directory will be: $WORKTREE_DIR"
 
 # Check if worktree directory already exists
 if [ -d "$WORKTREE_DIR" ]; then

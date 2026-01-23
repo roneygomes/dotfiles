@@ -268,13 +268,8 @@ cmd_delete() {
                 
                 local removed=false
                 
-                # Debug output
-                echo "Removing: $worktree_path"
-                echo "Running from: $run_from"
-                
                 # Try to remove using git worktree remove from another worktree
                 if [ -n "$run_from" ]; then
-                    echo "Executing: git worktree remove --force..."
                     (
                         cd "$run_from" || exit 1
                         git worktree remove "$worktree_path" --force
@@ -284,20 +279,16 @@ cmd_delete() {
                     if [ $exit_code -eq 0 ]; then
                         echo "✅ Removed worktree: $worktree_name"
                         removed=true
-                    else
-                        echo "Git worktree remove failed with exit code: $exit_code"
                     fi
                 fi
                 
                 # Fallback: remove directory manually and prune
                 if [ "$removed" = false ]; then
-                    echo "Using fallback: manual removal..."
                     if rm -rf "$worktree_path"; then
                         echo "✅ Removed worktree directory: $worktree_name"
                         # Prune the worktree reference from git
                         if [ -n "$run_from" ]; then
                             (cd "$run_from" && git worktree prune)
-                            echo "Pruned worktree references"
                         fi
                     else
                         echo "❌ Failed to remove worktree: $worktree_name"
