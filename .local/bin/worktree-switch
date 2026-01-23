@@ -70,8 +70,9 @@ find_branch() {
     
     # Get all remote branches
     echo "Querying git branches..." >&2
-    branches=$(git --git-dir=.bare branch -r 2>&1 | sed 's/origin\///' | sed 's/^[[:space:]]*//' | grep -v '^HEAD')
+    branches=$(git --git-dir=.bare branch -r 2>&1 | sed 's/origin\///' | sed 's/^[[:space:]]*//' | grep -v '^HEAD' || true)
     echo "Found branches" >&2
+    echo "Branch list: $branches" >&2
     
     # Try exact match first
     if echo "$branches" | grep -q "^${input}$"; then
@@ -108,8 +109,11 @@ find_branch() {
 }
 
 # Find the branch
+echo "Finding branch: $BRANCH_INPUT"
 BRANCH_NAME=$(find_branch "$BRANCH_INPUT")
 FIND_RESULT=$?
+
+echo "Branch found: $BRANCH_NAME (result: $FIND_RESULT)"
 
 if [ $FIND_RESULT -eq 1 ]; then
     # Multiple matches found, error already printed
@@ -118,6 +122,8 @@ fi
 
 # Determine worktree directory name (use last part of branch for directory)
 WORKTREE_DIR=$(basename "$BRANCH_NAME")
+
+echo "Worktree directory will be: $WORKTREE_DIR"
 
 # Check if worktree directory already exists
 if [ -d "$WORKTREE_DIR" ]; then
