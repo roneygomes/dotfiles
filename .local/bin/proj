@@ -253,25 +253,38 @@ cmd_delete() {
             echo
             
             if [[ $REPLY =~ ^[Yy]$ ]]; then
-                # Remove the worktree using git (run from project root or another worktree)
-                cd "$project_root"
-                if git worktree remove "$worktree_name" --force 2>/dev/null; then
-                    echo "✅ Removed worktree: $worktree_name"
-                else
-                    # Try running from .bare directory
-                    cd "$project_root/.bare"
-                    if GIT_DIR="$project_root/.bare" git worktree remove "../$worktree_name" --force 2>/dev/null; then
-                        echo "✅ Removed worktree: $worktree_name"
-                    else
-                        # Fallback: prune and remove directory manually
-                        cd "$project_root"
-                        git worktree prune 2>/dev/null
-                        if rm -rf "$worktree_path"; then
-                            echo "✅ Removed worktree directory: $worktree_name"
-                            git worktree prune 2>/dev/null
-                        else
-                            echo "❌ Failed to remove worktree: $worktree_name"
+                # Need to run git worktree remove from an existing worktree
+                # Find any existing worktree to run the command from
+                local run_from=""
+                for dir in "$project_root"/*; do
+                    if [ -d "$dir" ] && [ "$(basename "$dir")" != ".bare" ] && [ "$dir" != "$worktree_path" ]; then
+                        if [ -f "$dir/.git" ] || [ -d "$dir/.git" ]; then
+                            run_from="$dir"
+                            break
                         fi
+                    fi
+                done
+                
+                local removed=false
+                
+                # Try to remove using git worktree remove from another worktree
+                if [ -n "$run_from" ]; then
+                    if (cd "$run_from" && git worktree remove "$worktree_path" --force 2>/dev/null); then
+                        echo "✅ Removed worktree: $worktree_name"
+                        removed=true
+                    fi
+                fi
+                
+                # Fallback: remove directory manually and prune
+                if [ "$removed" = false ]; then
+                    if rm -rf "$worktree_path"; then
+                        echo "✅ Removed worktree directory: $worktree_name"
+                        # Prune the worktree reference from git
+                        if [ -n "$run_from" ]; then
+                            (cd "$run_from" && git worktree prune 2>/dev/null)
+                        fi
+                    else
+                        echo "❌ Failed to remove worktree: $worktree_name"
                     fi
                 fi
             else
