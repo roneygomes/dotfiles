@@ -61,9 +61,9 @@ echo "Project root: $PROJECT_ROOT"
 # Change to project root
 cd "$PROJECT_ROOT"
 
-# Fetch latest from remote
-echo "Fetching latest branches from remote..."
-git --git-dir=.bare fetch origin
+# Try to fetch latest from remote (skip if it takes too long or fails)
+echo "Fetching latest branches..."
+git --git-dir=.bare fetch origin --quiet 2>/dev/null || echo "Using cached branch list"
 
 # Function to find matching branch
 find_branch() {
