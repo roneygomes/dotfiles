@@ -253,15 +253,25 @@ cmd_delete() {
             echo
             
             if [[ $REPLY =~ ^[Yy]$ ]]; then
-                # Remove the worktree using git
-                if git --git-dir="$project_root/.bare" worktree remove "$worktree_path" --force 2>/dev/null; then
+                # Remove the worktree using git (run from project root or another worktree)
+                cd "$project_root"
+                if git worktree remove "$worktree_name" --force 2>/dev/null; then
                     echo "✅ Removed worktree: $worktree_name"
                 else
-                    # Fallback: remove directory manually
-                    if rm -rf "$worktree_path"; then
-                        echo "✅ Removed worktree directory: $worktree_name"
+                    # Try running from .bare directory
+                    cd "$project_root/.bare"
+                    if GIT_DIR="$project_root/.bare" git worktree remove "../$worktree_name" --force 2>/dev/null; then
+                        echo "✅ Removed worktree: $worktree_name"
                     else
-                        echo "❌ Failed to remove worktree: $worktree_name"
+                        # Fallback: prune and remove directory manually
+                        cd "$project_root"
+                        git worktree prune 2>/dev/null
+                        if rm -rf "$worktree_path"; then
+                            echo "✅ Removed worktree directory: $worktree_name"
+                            git worktree prune 2>/dev/null
+                        else
+                            echo "❌ Failed to remove worktree: $worktree_name"
+                        fi
                     fi
                 fi
             else
