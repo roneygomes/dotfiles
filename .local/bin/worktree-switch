@@ -75,24 +75,27 @@ find_branch() {
     echo "Branch list: $branches" >&2
     
     # Try exact match first
-    if echo "$branches" | grep -q "^${input}$"; then
+    echo "Trying exact match..." >&2
+    if echo "$branches" | grep -q "^${input}$" || false; then
         echo "$input"
         return 0
     fi
     
     # Try with common prefixes
+    echo "Trying with prefixes..." >&2
     local prefixes=("feat/" "feature/" "fix/" "bugfix/" "hotfix/" "chore/" "docs/" "refactor/" "test/" "style/")
     
     for prefix in "${prefixes[@]}"; do
-        if echo "$branches" | grep -q "^${prefix}${input}$"; then
+        if echo "$branches" | grep -q "^${prefix}${input}$" || false; then
             echo "${prefix}${input}"
             return 0
         fi
     done
     
     # Try partial match (case-insensitive)
-    local matches=$(echo "$branches" | grep -i "$input")
-    local match_count=$(echo "$matches" | grep -v '^$' | wc -l | tr -d ' ')
+    echo "Trying partial match..." >&2
+    local matches=$(echo "$branches" | grep -i "$input" || true)
+    local match_count=$(echo "$matches" | grep -v '^$' | wc -l | tr -d ' ' || echo "0")
     
     if [ "$match_count" -eq 1 ]; then
         echo "$matches"
