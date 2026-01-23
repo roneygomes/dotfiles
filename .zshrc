@@ -236,6 +236,7 @@ _proj_completion() {
         'clone:Clone a repository as a bare repo'
         'task:Switch to or create a worktree'
         'list:List all worktrees in current project'
+        'delete:Delete a worktree with fzf selection'
         '--help:Show help message'
         '--version:Show version'
     )
