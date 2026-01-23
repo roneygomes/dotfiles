@@ -61,13 +61,17 @@ echo "Project root: $PROJECT_ROOT"
 # Change to project root
 cd "$PROJECT_ROOT"
 
+echo "Looking for branches..."
+
 # Function to find matching branch
 find_branch() {
     local input=$1
     local branches
     
     # Get all remote branches
-    branches=$(git --git-dir=.bare branch -r | sed 's/origin\///' | sed 's/^[[:space:]]*//' | grep -v '^HEAD')
+    echo "Querying git branches..." >&2
+    branches=$(git --git-dir=.bare branch -r 2>&1 | sed 's/origin\///' | sed 's/^[[:space:]]*//' | grep -v '^HEAD')
+    echo "Found branches" >&2
     
     # Try exact match first
     if echo "$branches" | grep -q "^${input}$"; then
@@ -121,7 +125,9 @@ if [ -d "$WORKTREE_DIR" ]; then
     cd "$WORKTREE_DIR"
     echo "✅ Now in worktree: $WORKTREE_DIR"
     echo "   Branch: $(git branch --show-current)"
-    exit 0
+    echo "   Path: $(pwd)"
+    # Start a new shell in the worktree
+    exec $SHELL
 fi
 
 # Check if branch exists remotely
@@ -162,3 +168,6 @@ cd "$WORKTREE_DIR"
 echo "✅ Switched to worktree: $WORKTREE_DIR"
 echo "   Branch: $(git branch --show-current)"
 echo "   Path: $(pwd)"
+
+# Start a new shell in the worktree
+exec $SHELL
