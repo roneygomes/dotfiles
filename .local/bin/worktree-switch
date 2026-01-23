@@ -113,10 +113,10 @@ find_branch() {
 
 # Find the branch
 echo "Finding branch: $BRANCH_INPUT"
-BRANCH_NAME=$(find_branch "$BRANCH_INPUT")
-FIND_RESULT=$?
+BRANCH_NAME=$(find_branch "$BRANCH_INPUT") || FIND_RESULT=$?
+FIND_RESULT=${FIND_RESULT:-0}
 
-echo "Branch found: $BRANCH_NAME (result: $FIND_RESULT)"
+echo "Branch found: '$BRANCH_NAME' (result: $FIND_RESULT)"
 
 if [ $FIND_RESULT -eq 1 ]; then
     # Multiple matches found, error already printed
