@@ -250,7 +250,7 @@ cmd_delete() {
         if [ -d "$worktree_path" ]; then
             echo ""
             echo "About to delete worktree: $worktree_name"
-            read -p "Are you sure? (y/N): " -n 1 -r
+            read -p "Are you sure? (y/N): " -n 1 -r </dev/tty
             echo
             
             if [[ $REPLY =~ ^[Yy]$ ]]; then
