@@ -1,0 +1,323 @@
+#!/usr/bin/env node
+
+const { execFileSync } = require("child_process");
+const fs = require("fs");
+const path = require("path");
+
+function die(message, code = 1) {
+  process.stderr.write(`${message}\n`);
+  process.exit(code);
+}
+
+function showHelp(exitCode = 0) {
+  process.stdout.write(`pr-comments - Export GitHub PR comments as Markdown
+
+Usage:
+  pr-comments [--pr <number|url>] [--repo <owner/name>] [--out <file>] [--only <all|conversation|reviews|review-comments>]
+  pr-comments [<number|url>] [--repo <owner/name>] [--out <file>] [--only <...>]
+
+Options:
+  --pr <number|url>     PR number (requires --repo) or PR URL (optional; inferred from current branch if omitted)
+  --repo <owner/name>   Repo nameWithOwner (used when --pr is a number)
+  --out <file>          Write markdown to a file instead of stdout
+  --only <value>        Limit sections: all (default), conversation, reviews, review-comments
+  -h, --help            Show help
+
+Examples:
+  pr-comments --pr 123 --repo my-org/my-repo
+  pr-comments           # infer PR from current branch
+  pr-comments --pr https://github.com/my-org/my-repo/pull/123 --out pr-123-comments.md
+  pr-comments 123 --repo my-org/my-repo --only review-comments
+`);
+  process.exit(exitCode);
+}
+
+function runGh(args) {
+  try {
+    return execFileSync("gh", args, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+  } catch (err) {
+    const stderr = err && err.stderr ? String(err.stderr) : "";
+    const hint = stderr.trim() ? `\n\n${stderr.trim()}` : "";
+    die(`Failed to run: gh ${args.join(" ")}${hint}`);
+  }
+}
+
+function ghJson(args) {
+  const raw = runGh(args);
+  try {
+    return JSON.parse(raw);
+  } catch (e) {
+    const preview = raw.length > 500 ? `${raw.slice(0, 500)}…` : raw;
+    die(`Failed to parse JSON from gh output.\n\nOutput preview:\n${preview}`);
+  }
+}
+
+function isPositiveIntString(value) {
+  return /^[1-9]\d*$/.test(String(value));
+}
+
+function parsePrUrl(prUrl) {
+  // Supports: https://github.com/<owner>/<repo>/pull/<num>
+  const m = String(prUrl).match(/github\.com\/([^/]+)\/([^/]+)\/pull\/(\d+)/i);
+  if (!m) return null;
+  return { owner: m[1], repo: m[2], number: Number(m[3]) };
+}
+
+function parseArgs(argv) {
+  const args = argv.slice(2);
+  const out = { pr: null, repo: null, outFile: null, only: "all" };
+
+  // Allow first positional arg to be PR
+  if (args[0] && !args[0].startsWith("-")) {
+    out.pr = args[0];
+    args.shift();
+  }
+
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i];
+    if (a === "-h" || a === "--help") showHelp(0);
+    if (a === "--pr") {
+      out.pr = args[i + 1];
+      i++;
+      continue;
+    }
+    if (a === "--repo") {
+      out.repo = args[i + 1];
+      i++;
+      continue;
+    }
+    if (a === "--out") {
+      out.outFile = args[i + 1];
+      i++;
+      continue;
+    }
+    if (a === "--only") {
+      out.only = args[i + 1];
+      i++;
+      continue;
+    }
+    die(`Unknown argument: ${a}\nRun: pr-comments --help`);
+  }
+
+  const allowed = new Set(["all", "conversation", "reviews", "review-comments"]);
+  if (!allowed.has(out.only)) die(`Invalid --only value: ${out.only}\nAllowed: ${Array.from(allowed).join(", ")}`);
+
+  return out;
+}
+
+function resolveRepoFromContext() {
+  // Works inside a checked-out repo authenticated to GitHub
+  const info = ghJson(["repo", "view", "--json", "nameWithOwner"]);
+  if (!info || !info.nameWithOwner) die("Unable to determine repo from context. Please pass --repo <owner/name>.");
+  return info.nameWithOwner;
+}
+
+function resolvePrTarget(prInput, repoOpt) {
+  if (!prInput) {
+    // Infer the PR from the current repo+branch context.
+    // This matches `gh pr view` behavior (uses current branch tracking).
+    const info = ghJson(["pr", "view", "--json", "number,url"]);
+    const byUrl = info && info.url ? parsePrUrl(info.url) : null;
+    if (byUrl) return { owner: byUrl.owner, repo: byUrl.repo, number: byUrl.number };
+
+    const number = info && info.number ? Number(info.number) : null;
+    if (!number) die("No pull request found for the current branch. Provide --pr <number|url>.");
+
+    // Fallback if URL is missing/unexpected: use repo context + PR number
+    const nameWithOwner = repoOpt || resolveRepoFromContext();
+    const m = String(nameWithOwner).match(/^([^/]+)\/([^/]+)$/);
+    if (!m) die(`Invalid --repo value (expected owner/name): ${nameWithOwner}`);
+    return { owner: m[1], repo: m[2], number };
+  }
+
+  const byUrl = parsePrUrl(prInput);
+  if (byUrl) {
+    return { owner: byUrl.owner, repo: byUrl.repo, number: byUrl.number };
+  }
+
+  if (!isPositiveIntString(prInput)) {
+    die(`PR must be a number or a GitHub PR URL. Got: ${prInput}`);
+  }
+
+  const nameWithOwner = repoOpt || resolveRepoFromContext();
+  const m = String(nameWithOwner).match(/^([^/]+)\/([^/]+)$/);
+  if (!m) die(`Invalid --repo value (expected owner/name): ${nameWithOwner}`);
+  return { owner: m[1], repo: m[2], number: Number(prInput) };
+}
+
+function mdQuote(text) {
+  const raw = (text ?? "").toString();
+  if (!raw.trim()) return "> _(no body)_";
+  return raw
+    .replace(/\r\n/g, "\n")
+    .split("\n")
+    .map((line) => `> ${line}`)
+    .join("\n");
+}
+
+function fmtDate(iso) {
+  if (!iso) return "";
+  // Keep it stable and sortable in Markdown
+  return String(iso).replace("T", " ").replace("Z", " UTC");
+}
+
+function compareIso(a, b) {
+  const aa = a ? Date.parse(a) : 0;
+  const bb = b ? Date.parse(b) : 0;
+  return aa - bb;
+}
+
+function fetchPrInfo(owner, repo, number) {
+  return ghJson(["api", `repos/${owner}/${repo}/pulls/${number}`]);
+}
+
+function fetchIssueComments(owner, repo, number) {
+  return ghJson(["api", "--paginate", `repos/${owner}/${repo}/issues/${number}/comments?per_page=100`]);
+}
+
+function fetchReviewComments(owner, repo, number) {
+  return ghJson(["api", "--paginate", `repos/${owner}/${repo}/pulls/${number}/comments?per_page=100`]);
+}
+
+function fetchReviews(owner, repo, number) {
+  return ghJson(["api", "--paginate", `repos/${owner}/${repo}/pulls/${number}/reviews?per_page=100`]);
+}
+
+function renderMarkdown({ prInfo, issueComments, reviews, reviewComments, only }) {
+  const lines = [];
+  const prUrl = prInfo && prInfo.html_url ? prInfo.html_url : "";
+  const prTitle = prInfo && prInfo.title ? prInfo.title : `PR #${prInfo.number}`;
+
+  lines.push(`# PR comments`);
+  lines.push("");
+  if (prUrl) lines.push(`- **PR**: [${prTitle}](${prUrl})`);
+  else lines.push(`- **PR**: ${prTitle}`);
+  lines.push(`- **Generated**: ${new Date().toISOString().replace("T", " ").replace("Z", " UTC")}`);
+  lines.push("");
+
+  const wantConversation = only === "all" || only === "conversation";
+  const wantReviews = only === "all" || only === "reviews";
+  const wantReviewComments = only === "all" || only === "review-comments";
+
+  if (wantConversation) {
+    lines.push(`## Conversation comments`);
+    lines.push("");
+    const sorted = Array.isArray(issueComments) ? [...issueComments].sort((a, b) => compareIso(a.created_at, b.created_at)) : [];
+    if (!sorted.length) {
+      lines.push(`_(none)_`);
+      lines.push("");
+    } else {
+      for (const c of sorted) {
+        const login = c && c.user && c.user.login ? c.user.login : "unknown";
+        const url = c && c.html_url ? c.html_url : "";
+        lines.push(`- **@${login}** — ${fmtDate(c.created_at)}${url ? ` ([link](${url}))` : ""}`);
+        lines.push(mdQuote(c.body));
+        lines.push("");
+      }
+    }
+  }
+
+  if (wantReviews) {
+    lines.push(`## Review summaries`);
+    lines.push("");
+    const withBody = Array.isArray(reviews) ? reviews.filter((r) => (r && r.body ? String(r.body).trim() : "")).sort((a, b) => compareIso(a.submitted_at, b.submitted_at)) : [];
+    if (!withBody.length) {
+      lines.push(`_(none)_`);
+      lines.push("");
+    } else {
+      for (const r of withBody) {
+        const login = r && r.user && r.user.login ? r.user.login : "unknown";
+        const url = r && r.html_url ? r.html_url : "";
+        const state = r && r.state ? String(r.state).toUpperCase() : "REVIEW";
+        lines.push(`- **@${login}** — ${state} — ${fmtDate(r.submitted_at)}${url ? ` ([link](${url}))` : ""}`);
+        lines.push(mdQuote(r.body));
+        lines.push("");
+      }
+    }
+  }
+
+  if (wantReviewComments) {
+    lines.push(`## Review comments (inline)`);
+    lines.push("");
+
+    const items = Array.isArray(reviewComments)
+      ? [...reviewComments].sort((a, b) => {
+          const pa = a && a.path ? a.path : "";
+          const pb = b && b.path ? b.path : "";
+          if (pa !== pb) return pa.localeCompare(pb);
+          const la = a && (a.original_line || a.line) ? (a.original_line || a.line) : 0;
+          const lb = b && (b.original_line || b.line) ? (b.original_line || b.line) : 0;
+          if (la !== lb) return la - lb;
+          return compareIso(a.created_at, b.created_at);
+        })
+      : [];
+
+    if (!items.length) {
+      lines.push(`_(none)_`);
+      lines.push("");
+    } else {
+      let currentPath = null;
+      for (const c of items) {
+        const p = c && c.path ? c.path : "(unknown file)";
+        if (p !== currentPath) {
+          currentPath = p;
+          lines.push(`### \`${currentPath}\``);
+          lines.push("");
+        }
+
+        const login = c && c.user && c.user.login ? c.user.login : "unknown";
+        const url = c && c.html_url ? c.html_url : "";
+        const lineNo = c && (c.original_line || c.line) ? (c.original_line || c.line) : null;
+        const where = lineNo ? `line ${lineNo}` : "line ?";
+
+        lines.push(`- **@${login}** — ${where} — ${fmtDate(c.created_at)}${url ? ` ([link](${url}))` : ""}`);
+        if (c && c.diff_hunk && String(c.diff_hunk).trim()) {
+          lines.push("");
+          lines.push("```diff");
+          lines.push(String(c.diff_hunk).replace(/\r\n/g, "\n").trimEnd());
+          lines.push("```");
+        }
+        lines.push(mdQuote(c.body));
+        lines.push("");
+      }
+    }
+  }
+
+  return lines.join("\n");
+}
+
+function main() {
+  const opts = parseArgs(process.argv);
+  const { owner, repo, number } = resolvePrTarget(opts.pr, opts.repo);
+
+  const prInfo = fetchPrInfo(owner, repo, number);
+
+  const issueComments = opts.only === "review-comments" || opts.only === "reviews"
+    ? []
+    : fetchIssueComments(owner, repo, number);
+
+  const reviews = opts.only === "conversation" || opts.only === "review-comments"
+    ? []
+    : fetchReviews(owner, repo, number);
+
+  const reviewComments = opts.only === "conversation" || opts.only === "reviews"
+    ? []
+    : fetchReviewComments(owner, repo, number);
+
+  const md = renderMarkdown({ prInfo, issueComments, reviews, reviewComments, only: opts.only });
+
+  if (opts.outFile) {
+    const outPath = path.resolve(process.cwd(), opts.outFile);
+    const dir = path.dirname(outPath);
+    if (!fs.existsSync(dir)) {
+      die(`Output directory does not exist: ${dir}`);
+    }
+    fs.writeFileSync(outPath, md, "utf8");
+    return;
+  }
+
+  process.stdout.write(md);
+  if (!md.endsWith("\n")) process.stdout.write("\n");
+}
+
+main();
