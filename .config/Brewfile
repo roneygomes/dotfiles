@@ -34,3 +34,5 @@ cask "cursor-cli"
 cask "vscodium"
 cask "obsidian"
 cask "1password-cli"
+cask "claude-code"
+
