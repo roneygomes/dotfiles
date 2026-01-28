@@ -45,3 +45,6 @@
 
 # .local/bin - ignore large binaries
 .local/bin/cloud-sql-proxy
+
+# claude code local settings
+.claude/settings.local.json
