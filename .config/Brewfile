@@ -36,4 +36,5 @@ cask "obsidian"
 cask "1password-cli"
 cask "claude-code"
 cask "font-jetbrains-mono"
+cask "markedit"
 
