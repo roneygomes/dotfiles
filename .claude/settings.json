@@ -1,14 +1,4 @@
 {
-  "enabledPlugins": {
-    "ed3d-00-getting-started@ed3d-plugins": true,
-    "ed3d-basic-agents@ed3d-plugins": true,
-    "ed3d-extending-claude@ed3d-plugins": true,
-    "ed3d-hook-claudemd-reminder@ed3d-plugins": true,
-    "ed3d-hook-skill-reinforcement@ed3d-plugins": true,
-    "ed3d-house-style@ed3d-plugins": true,
-    "ed3d-plan-and-execute@ed3d-plugins": true,
-    "ed3d-research-agents@ed3d-plugins": true
-  },
   "permissions": {
     "allow": [
       "Read",
@@ -28,6 +18,11 @@
       "Bash(diff *)",
       "Bash(file *)",
       "Bash(stat *)",
+      "Bash(du *)",
+      "Bash(find *)",
+      "Bash(uptime)",
+      "Bash(whoami)",
+      "Bash(hostname)",
       "Bash(git add *)",
       "Bash(git commit *)",
       "Bash(git status *)",
@@ -51,6 +46,22 @@
       "Bash(yarn *)",
       "Bash(pnpm *)",
       "Bash(npx *)",
+      "Bash(nx *)",
+      "Bash(npx nx *)",
+      "Bash(pytest *)",
+      "Bash(jest *)",
+      "Bash(vitest *)",
+      "Bash(rspec *)",
+      "Bash(eslint *)",
+      "Bash(pylint *)",
+      "Bash(flake8 *)",
+      "Bash(rubocop *)",
+      "Bash(mypy *)",
+      "Bash(tsc --noEmit *)",
+      "Bash(prettier *)",
+      "Bash(black *)",
+      "Bash(rustfmt *)",
+      "Bash(gofmt *)",
       "Bash(brew *)",
       "Bash(python *)",
       "Bash(pip *)",
@@ -71,6 +82,9 @@
       "Bash(chmod 777 *)",
       "Bash(git push --force *)",
       "Bash(git reset --hard *)",
+      "Bash(env)",
+      "Bash(printenv *)",
+      "Bash(export *)",
       "Read(./.env)",
       "Read(./.env.*)",
       "Read(./secrets/**)",
@@ -80,7 +94,24 @@
     "ask": [
       "Bash(git push *)",
       "Bash(docker *)",
-      "Bash(kubectl *)"
+      "Bash(kubectl *)",
+      "Bash(ps *)",
+      "Bash(netstat *)",
+      "Bash(ss *)",
+      "Bash(lsof *)",
+      "Bash(top)",
+      "Bash(htop)"
     ]
-  }
+  },
+  "enabledPlugins": {
+    "ed3d-00-getting-started@ed3d-plugins": true,
+    "ed3d-basic-agents@ed3d-plugins": true,
+    "ed3d-extending-claude@ed3d-plugins": true,
+    "ed3d-hook-claudemd-reminder@ed3d-plugins": true,
+    "ed3d-hook-skill-reinforcement@ed3d-plugins": true,
+    "ed3d-house-style@ed3d-plugins": true,
+    "ed3d-plan-and-execute@ed3d-plugins": true,
+    "ed3d-research-agents@ed3d-plugins": true
+  },
+  "model": "sonnet"
 }
