@@ -48,3 +48,6 @@
 
 # claude code local settings
 .claude/settings.local.json
+
+# codex
+.config/codex

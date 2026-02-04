@@ -104,14 +104,9 @@
     ]
   },
   "enabledPlugins": {
-    "ed3d-00-getting-started@ed3d-plugins": true,
+    "ralphy-planning@roneygomes-plugins": true,
     "ed3d-basic-agents@ed3d-plugins": true,
-    "ed3d-extending-claude@ed3d-plugins": true,
-    "ed3d-hook-claudemd-reminder@ed3d-plugins": true,
-    "ed3d-hook-skill-reinforcement@ed3d-plugins": true,
-    "ed3d-house-style@ed3d-plugins": true,
     "ed3d-plan-and-execute@ed3d-plugins": true,
     "ed3d-research-agents@ed3d-plugins": true
-  },
-  "model": "sonnet"
+  }
 }

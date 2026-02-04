@@ -1,0 +1,19 @@
+# Default stow ignores (must be re-declared when using .stow-local-ignore)
+RCS
+.+,v
+CVS
+\.\#.+
+\.cvsignore
+\.svn
+_darcs
+\.hg
+\.git
+\.gitignore
+\.gitmodules
+\.stow-local-ignore
+
+# Project-specific files (not meant for $HOME)
+CLAUDE\.md
+\.claude/settings\.local\.json
+LICENSE\.txt
+README\.md

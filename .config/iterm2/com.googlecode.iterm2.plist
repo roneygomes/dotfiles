@@ -1266,8 +1266,8 @@
 				<key>Red Component</key>
 				<real>0.97999999999999998</real>
 			</dict>
-			<key>Background Image Location</key>
-			<string></string>
+			<key>Background Image Mode</key>
+			<integer>0</integer>
 			<key>Badge Color</key>
 			<dict>
 				<key>Alpha Component</key>
@@ -1634,7 +1634,7 @@
 			<key>Non-ASCII Anti Aliased</key>
 			<true/>
 			<key>Normal Font</key>
-			<string>Iosevka-Term 17</string>
+			<string>Iosevka-Term 18</string>
 			<key>Option Key Sends</key>
 			<integer>0</integer>
 			<key>Prompt Before Closing 2</key>
@@ -1942,6 +1942,8 @@
 			<key>Use Bold Font</key>
 			<true/>
 			<key>Use Bright Bold</key>
+			<true/>
+			<key>Use Custom Tab Title</key>
 			<true/>
 			<key>Use Italic Font</key>
 			<true/>

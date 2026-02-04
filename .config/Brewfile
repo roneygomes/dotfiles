@@ -21,6 +21,7 @@ brew "openssl@3"
 brew "charmbracelet/tap/crush"
 brew "ripgrep"
 brew "bat"
+brew "tmux"
 
 cask "logseq"
 cask "google-cloud-sdk"

@@ -103,6 +103,13 @@ uuid() {
 	echo "$uuid_string"
 }
 
+# Run command in the background in a tmux session.
+# Usage: run_bg session_name "command"
+tmux_bg() {
+    tmux new-session -d -s "$1" "$2"
+    echo "Task '$2' is running in tmux session: $1."
+}
+
 # Quote lines from file or stdin, adding commas (except last line)
 quote_lines() {
 	local quote_char="'"
