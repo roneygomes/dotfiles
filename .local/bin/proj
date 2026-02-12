@@ -80,10 +80,17 @@ git_project() {
 }
 
 tmux_session_name_for_tree() {
-    local tree_name=$1
-    local session_name
-    session_name=$(echo "$tree_name" | sed 's/[^[:alnum:]_-]/-/g')
-    [ -n "$session_name" ] || session_name="tree"
+    local project_name=$1
+    local tree_name=$2
+    local project_part
+    project_part=$(echo "$project_name" | sed 's/[^[:alnum:]_-]/-/g' | sed 's/^-*//; s/-*$//')
+    local tree_part
+    tree_part=$(echo "$tree_name" | sed 's/[^[:alnum:]_-]/-/g' | sed 's/^-*//; s/-*$//')
+    [ -n "$tree_part" ] || tree_part="tree"
+    local session_name="$tree_part"
+    if [ -n "$project_part" ]; then
+        session_name="${project_part}-${tree_part}"
+    fi
     echo "$session_name"
 }
 
@@ -96,8 +103,10 @@ switch_to_tree() {
         exec "$SHELL"
     fi
 
+    local project_name
+    project_name=$(basename "$(dirname "$tree_path")")
     local session_name
-    session_name=$(tmux_session_name_for_tree "$tree_name")
+    session_name=$(tmux_session_name_for_tree "$project_name" "$tree_name")
 
     if tmux has-session -t "$session_name" 2>/dev/null; then
         if [ -n "${TMUX:-}" ]; then
@@ -528,9 +537,16 @@ cmd_trees_switch() {
         echo "Usage: proj trees <tree>"
         exit 1
     fi
-    
-    # Call worktree-switch
-    worktree-switch "$worktree"
+
+    local project_root
+    project_root=$(find_project_root)
+
+    if [ -z "$project_root" ]; then
+        echo "Error: Not inside a git project or worktree."
+        exit 1
+    fi
+
+    create_tree_in_project "$project_root" "$worktree"
 }
 
 cmd_trees_new() {
