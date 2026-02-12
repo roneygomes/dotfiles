@@ -89,7 +89,7 @@ tmux_session_name_for_tree() {
     [ -n "$tree_part" ] || tree_part="tree"
     local session_name="$tree_part"
     if [ -n "$project_part" ]; then
-        session_name="${project_part}-${tree_part}"
+        session_name="${project_part} -> ${tree_part}"
     fi
     echo "$session_name"
 }
@@ -120,6 +120,26 @@ switch_to_tree() {
             tmux switch-client -t "$session_name"
         else
             tmux new-session -s "$session_name" -c "$tree_path"
+        fi
+    fi
+}
+
+kill_tmux_session_for_tree() {
+    local project_name=$1
+    local tree_name=$2
+
+    if ! command -v tmux &> /dev/null; then
+        return 0
+    fi
+
+    local session_name
+    session_name=$(tmux_session_name_for_tree "$project_name" "$tree_name")
+
+    if tmux has-session -t "$session_name" 2>/dev/null; then
+        if tmux kill-session -t "$session_name" 2>/dev/null; then
+            echo "Removed tmux session: $session_name"
+        else
+            echo "Warning: Failed to remove tmux session: $session_name"
         fi
     fi
 }
@@ -657,25 +677,24 @@ cmd_trees_list() {
 }
 
 cmd_trees_delete() {
-    # Find the project root
-    local project_root
-    project_root=$(find_project_root)
-    
-    if [ -z "$project_root" ]; then
-        echo "Error: Not inside a git project or worktree."
-        exit 1
-    fi
-    
-    local project_name
-    project_name=$(basename "$project_root")
-    local project_trees_dir
-    project_trees_dir=$(get_project_trees_dir "$project_name")
+    local trees_base_dir
+    trees_base_dir=$(get_trees_base_dir)
+    local projects_dir
+    projects_dir=$(get_projects_dir)
 
-    # Get current worktree to prevent self-deletion
-    local current_worktree
-    current_worktree=""
+    if [ ! -d "$trees_base_dir" ]; then
+        echo "No trees found in $trees_base_dir"
+        return
+    fi
+
+    # Get current worktree path to prevent self-deletion
+    local current_worktree_path
+    current_worktree_path=""
     if git rev-parse --is-inside-work-tree &>/dev/null; then
-        current_worktree=$(basename "$(git rev-parse --show-toplevel 2>/dev/null)")
+        current_worktree_path=$(git rev-parse --show-toplevel 2>/dev/null || true)
+        if [ -n "$current_worktree_path" ]; then
+            current_worktree_path=$(cd "$current_worktree_path" 2>/dev/null && pwd -P || true)
+        fi
     fi
     
     # Check if fzf is available
@@ -684,42 +703,48 @@ cmd_trees_delete() {
         exit 1
     fi
     
-    # Build list of worktrees for fzf
+    # Build list of all worktrees for fzf
     local worktree_list=""
-    if [ ! -d "$project_trees_dir" ]; then
-        echo "No deletable worktrees found in $project_name"
-        return
-    fi
-    
-    for dir in "$project_trees_dir"/*; do
-        if [ -d "$dir" ]; then
-            local worktree_name
-            worktree_name=$(basename "$dir")
+    for project_dir in "$trees_base_dir"/*; do
+        [ -d "$project_dir" ] || continue
+        local project_name
+        project_name=$(basename "$project_dir")
+
+        for dir in "$project_dir"/*; do
+            [ -d "$dir" ] || continue
             if [ -d "$dir/.git" ] || [ -f "$dir/.git" ]; then
-                # Skip current worktree
-                if [ "$worktree_name" = "$current_worktree" ]; then
+                local worktree_name
+                worktree_name=$(basename "$dir")
+                local dir_abs
+                dir_abs=$(cd "$dir" 2>/dev/null && pwd -P || true)
+
+                # Skip current worktree path
+                if [ -n "$current_worktree_path" ] && [ "$dir_abs" = "$current_worktree_path" ]; then
                     continue
                 fi
+
                 local ref
                 ref=$(cd "$dir" && git symbolic-ref --short HEAD 2>/dev/null || git describe --tags --exact-match 2>/dev/null || git rev-parse --short HEAD 2>/dev/null || echo "unknown")
-                worktree_list="$worktree_list$worktree_name|$ref\n"
+                worktree_list="${worktree_list}${project_name}|${worktree_name}|${ref}|${dir}\n"
             fi
-        fi
+        done
     done
     
     if [ -z "$worktree_list" ]; then
-        echo "No deletable worktrees found in $project_name"
-        echo "(Current worktree cannot be deleted)"
+        echo "No deletable worktrees found in $trees_base_dir"
+        if [ -n "$current_worktree_path" ]; then
+            echo "(Current worktree cannot be deleted)"
+        fi
         return
     fi
     
     # Use fzf to select worktrees to delete (multi-select enabled)
     local selected
     selected=$(echo -e "$worktree_list" | sed '/^$/d' | \
-        awk -F'|' '{printf "%-30s %s\n", $1, "(ref: " $2 ")"}' | \
+        awk -F'|' '{printf "%-40s %s\n", $1 "/" $2, "(ref: " $3 ")"}' | \
         fzf --multi --height 40% --reverse --border \
-            --header "Select worktree(s) to DELETE (Tab to multi-select, Enter to confirm):" \
-            --preview "ls -la \"$project_trees_dir/\$(echo {} | awk '{print \$1}')\" 2>/dev/null | head -10" \
+            --header "Select tree(s) to DELETE (Tab to multi-select, Enter to confirm):" \
+            --preview "item=\$(echo {} | awk '{print \$1}'); proj=\${item%%/*}; name=\${item#*/}; ls -la \"$trees_base_dir/\$proj/\$name\" 2>/dev/null | head -10" \
             --preview-window=right:50%:wrap)
     
     if [ -z "$selected" ]; then
@@ -730,29 +755,48 @@ cmd_trees_delete() {
     # Process each selected worktree
     # Use process substitution instead of pipe to avoid subshell issues
     while IFS= read -r line; do
-        local worktree_name
-        worktree_name=$(echo "$line" | awk '{print $1}')
-        local worktree_path="$project_trees_dir/$worktree_name"
+        local tree_key
+        tree_key=$(echo "$line" | awk '{print $1}')
+        local selected_project="${tree_key%%/*}"
+        local worktree_name="${tree_key#*/}"
+        local worktree_path="$trees_base_dir/$selected_project/$worktree_name"
+        local project_root="$projects_dir/$selected_project"
         
         if [ -d "$worktree_path" ]; then
             echo ""
-            echo "About to delete worktree: $worktree_name"
+            echo "About to delete worktree: $selected_project/$worktree_name"
             read -p "Are you sure? (y/N): " -n 1 -r </dev/tty
             echo
             
             if [[ $REPLY =~ ^[Yy]$ ]]; then
-                if git_project "$project_root" worktree remove "$worktree_path" --force; then
-                    echo "Removed worktree: $worktree_name"
+                local removed_worktree=0
+                if [ -d "$project_root/.git" ] || [ -d "$project_root/.bare" ]; then
+                    if git_project "$project_root" worktree remove "$worktree_path" --force; then
+                        echo "Removed worktree: $selected_project/$worktree_name"
+                        removed_worktree=1
+                    else
+                        if rm -rf "$worktree_path"; then
+                            echo "Removed worktree directory: $selected_project/$worktree_name"
+                            git_project "$project_root" worktree prune || true
+                            removed_worktree=1
+                        else
+                            echo "Failed to remove worktree: $selected_project/$worktree_name"
+                        fi
+                    fi
                 else
                     if rm -rf "$worktree_path"; then
-                        echo "Removed worktree directory: $worktree_name"
-                        git_project "$project_root" worktree prune || true
+                        echo "Removed worktree directory: $selected_project/$worktree_name"
+                        removed_worktree=1
                     else
-                        echo "Failed to remove worktree: $worktree_name"
+                        echo "Failed to remove worktree: $selected_project/$worktree_name"
                     fi
                 fi
+
+                if [ "$removed_worktree" -eq 1 ]; then
+                    kill_tmux_session_for_tree "$selected_project" "$worktree_name"
+                fi
             else
-                echo "Skipped: $worktree_name"
+                echo "Skipped: $selected_project/$worktree_name"
             fi
         else
             echo "Worktree directory not found: $worktree_path"
