@@ -4,12 +4,12 @@
 REPO_URL=$1
 PROJECT_NAME=$2
 MAIN_BRANCH="devnet"
+TREES_BASE_DIR="${PROJ_TREES_DIR:-$HOME/.proj/trees}"
+TREES_BASE_DIR="${TREES_BASE_DIR/#\~/$HOME}"
 
 # 1. Validation
-if [ -z "$PROJECTS_DIR" ]; then
-    echo "Error: PROJECTS_DIR environment variable is not set."
-    exit 1
-fi
+PROJECTS_DIR="${PROJECTS_DIR:-${PROJ_DIR:-$HOME/projects}}"
+PROJECTS_DIR="${PROJECTS_DIR/#\~/$HOME}"
 
 if [ -z "$REPO_URL" ]; then
     echo "Usage: setup-project <repo_url> [project_name]"
@@ -24,6 +24,7 @@ if [ -z "$PROJECT_NAME" ]; then
 fi
 
 TARGET_DIR="$PROJECTS_DIR/$PROJECT_NAME"
+PROJECT_TREES_DIR="$TREES_BASE_DIR/$PROJECT_NAME"
 
 if [ -d "$TARGET_DIR" ]; then
     echo "Error: Directory $TARGET_DIR already exists."
@@ -52,10 +53,14 @@ git fetch origin
 cd ..
 
 # 6. Initialize Main Tree
+mkdir -p "$PROJECT_TREES_DIR"
+MAIN_TREE_PATH="$PROJECT_TREES_DIR/$MAIN_BRANCH"
+
 if git --git-dir=.bare show-ref --verify --quiet "refs/heads/$MAIN_BRANCH"; then
-    git worktree add "$MAIN_BRANCH" "$MAIN_BRANCH"
+    git worktree add "$MAIN_TREE_PATH" "$MAIN_BRANCH"
 else
-    git worktree add "$MAIN_BRANCH" "origin/$MAIN_BRANCH"
+    git worktree add "$MAIN_TREE_PATH" "origin/$MAIN_BRANCH"
 fi
 
 echo "✅ Project $PROJECT_NAME initialized in $TARGET_DIR"
+echo "✅ Main worktree created at $MAIN_TREE_PATH"

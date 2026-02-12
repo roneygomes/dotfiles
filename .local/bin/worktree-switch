@@ -1,92 +1,151 @@
 #!/bin/bash
 
 # Usage: worktree-switch <branch_name>
-# Creates and switches to a worktree for the given branch in a bare-cloned project
+# Creates and switches to a centralized worktree for the given branch
 
 set -e
 
 BRANCH_INPUT=$1
+TREES_BASE_DIR="${PROJ_TREES_DIR:-$HOME/.proj/trees}"
+TREES_BASE_DIR="${TREES_BASE_DIR/#\~/$HOME}"
 
 if [ -z "$BRANCH_INPUT" ]; then
     echo "Usage: worktree-switch <branch_name>"
     echo ""
     echo "Examples:"
-    echo "  worktree-switch my-feature          # Creates worktree for branch"
-    echo "  worktree-switch feat/my-feature     # Handles branch prefixes"
-    echo "  worktree-switch 123                 # Works with ticket numbers"
+    echo "  worktree-switch my-feature"
+    echo "  worktree-switch feat/my-feature"
+    echo "  worktree-switch 123"
     exit 1
 fi
 
-# Find the project root (where .bare is located)
 find_project_root() {
-    local current_dir="$PWD"
-    
-    # Check if we're in a git worktree
+    local project_root=""
+
     if git rev-parse --is-inside-work-tree &>/dev/null; then
-        # Get the common git directory (points to .bare)
-        local git_common_dir=$(git rev-parse --git-common-dir 2>/dev/null)
+        local git_common_dir
+        git_common_dir=$(git rev-parse --git-common-dir 2>/dev/null)
         if [ -n "$git_common_dir" ]; then
-            # Get the directory containing .bare
-            local bare_dir=$(cd "$git_common_dir" && pwd)
-            if [ "$(basename "$bare_dir")" = ".bare" ]; then
-                # Return the parent directory
-                dirname "$bare_dir"
-                return 0
+            local common_dir_abs
+            common_dir_abs=$(cd "$git_common_dir" 2>/dev/null && pwd)
+            case "$(basename "$common_dir_abs")" in
+                .bare|.git)
+                    project_root=$(dirname "$common_dir_abs")
+                    ;;
+            esac
+        fi
+
+        if [ -z "$project_root" ]; then
+            local toplevel
+            toplevel=$(git rev-parse --show-toplevel 2>/dev/null || true)
+            if [ -n "$toplevel" ] && { [ -d "$toplevel/.git" ] || [ -d "$toplevel/.bare" ]; }; then
+                project_root="$toplevel"
             fi
         fi
     fi
-    
-    # Fallback: walk up to find .bare directory
-    while [ "$current_dir" != "/" ]; do
-        if [ -d "$current_dir/.bare" ]; then
-            echo "$current_dir"
-            return 0
+
+    if [ -z "$project_root" ]; then
+        local current_dir="$PWD"
+        while [ "$current_dir" != "/" ]; do
+            if [ -d "$current_dir/.git" ] || [ -d "$current_dir/.bare" ]; then
+                project_root="$current_dir"
+                break
+            fi
+            current_dir=$(dirname "$current_dir")
+        done
+    fi
+
+    [ -n "$project_root" ] && echo "$project_root"
+}
+
+is_legacy_bare_project() {
+    local project_root=$1
+    [ -d "$project_root/.bare" ]
+}
+
+git_project() {
+    local project_root=$1
+    shift
+
+    if is_legacy_bare_project "$project_root"; then
+        git --git-dir="$project_root/.bare" "$@"
+    else
+        git -C "$project_root" "$@"
+    fi
+}
+
+tmux_session_name_for_tree() {
+    local tree_name=$1
+    local session_name
+    session_name=$(echo "$tree_name" | sed 's/[^[:alnum:]_-]/-/g')
+    [ -n "$session_name" ] || session_name="tree"
+    echo "$session_name"
+}
+
+switch_to_tree() {
+    local tree_path=$1
+    local tree_name=$2
+
+    if ! command -v tmux &> /dev/null; then
+        cd "$tree_path"
+        exec "$SHELL"
+    fi
+
+    local session_name
+    session_name=$(tmux_session_name_for_tree "$tree_name")
+
+    if tmux has-session -t "$session_name" 2>/dev/null; then
+        if [ -n "${TMUX:-}" ]; then
+            tmux switch-client -t "$session_name"
+        else
+            tmux attach-session -t "$session_name"
         fi
-        current_dir=$(dirname "$current_dir")
-    done
-    
-    return 1
+    else
+        if [ -n "${TMUX:-}" ]; then
+            tmux new-session -d -s "$session_name" -c "$tree_path"
+            tmux switch-client -t "$session_name"
+        else
+            tmux new-session -s "$session_name" -c "$tree_path"
+        fi
+    fi
 }
 
 PROJECT_ROOT=$(find_project_root)
 
 if [ -z "$PROJECT_ROOT" ]; then
-    echo "Error: Not in a bare-cloned project directory."
-    echo "This script works with projects set up using setup-project."
+    echo "Error: Not inside a git project or worktree."
     exit 1
 fi
 
-# Change to project root
 cd "$PROJECT_ROOT"
+PROJECT_NAME=$(basename "$PROJECT_ROOT")
+PROJECT_TREES_DIR="$TREES_BASE_DIR/$PROJECT_NAME"
+mkdir -p "$PROJECT_TREES_DIR"
 
-# Function to find matching branch
 find_branch() {
     local input=$1
     local branches
-    
-    # Get all remote branches
-    branches=$(git --git-dir=.bare branch -r 2>&1 | sed 's/origin\///' | sed 's/^[[:space:]]*//' | grep -v '^HEAD' || true)
-    
-    # Try exact match first
+
+    branches=$(git_project "$PROJECT_ROOT" branch -r 2>/dev/null | sed 's/origin\///' | sed 's/^[[:space:]]*//' | grep -v '^HEAD' || true)
+
     if echo "$branches" | grep -q "^${input}$" || false; then
         echo "$input"
         return 0
     fi
-    
-    # Try with common prefixes
+
     local prefixes=("feat/" "feature/" "fix/" "bugfix/" "hotfix/" "chore/" "docs/" "refactor/" "test/" "style/")
-    
     for prefix in "${prefixes[@]}"; do
         if echo "$branches" | grep -q "^${prefix}${input}$" || false; then
             echo "${prefix}${input}"
             return 0
         fi
     done
-    
-    # Try partial match (case-insensitive)
-    local matches=$(echo "$branches" | grep -i "$input" || true)
-    local match_count=$(echo "$matches" | grep -v '^$' | wc -l | tr -d ' ' || echo "0")
-    
+
+    local matches
+    matches=$(echo "$branches" | grep -i "$input" || true)
+    local match_count
+    match_count=$(echo "$matches" | grep -v '^$' | wc -l | tr -d ' ' || echo "0")
+
     if [ "$match_count" -eq 1 ]; then
         echo "$matches"
         return 0
@@ -95,73 +154,51 @@ find_branch() {
         echo "$matches" | sed 's/^/  - /' >&2
         return 1
     fi
-    
-    # No match found - assume it's a new branch name
+
     echo "$input"
     return 2
 }
 
-# Find the branch
 BRANCH_NAME=$(find_branch "$BRANCH_INPUT") || FIND_RESULT=$?
 FIND_RESULT=${FIND_RESULT:-0}
 
-if [ $FIND_RESULT -eq 1 ]; then
-    # Multiple matches found, error already printed
+if [ "$FIND_RESULT" -eq 1 ]; then
     exit 1
 fi
 
-# Determine worktree directory name (use last part of branch for directory)
 WORKTREE_DIR=$(basename "$BRANCH_NAME")
+WORKTREE_PATH="$PROJECT_TREES_DIR/$WORKTREE_DIR"
 
-# Check if worktree directory already exists
-if [ -d "$WORKTREE_DIR" ]; then
+if [ -d "$WORKTREE_PATH" ]; then
     echo "Worktree directory '$WORKTREE_DIR' already exists. Switching to it..."
-    cd "$WORKTREE_DIR"
-    echo "✅ Now in worktree: $WORKTREE_DIR"
-    echo "   Branch: $(git branch --show-current)"
-    echo "   Path: $(pwd)"
-    # Start a new shell in the worktree
-    exec $SHELL
+    switch_to_tree "$WORKTREE_PATH" "$WORKTREE_DIR"
 fi
 
-# Check if branch exists remotely
-BRANCH_EXISTS=$(git --git-dir=.bare branch -r | grep -c "origin/${BRANCH_NAME}" || true)
-
-if [ "$BRANCH_EXISTS" -gt 0 ]; then
+if git_project "$PROJECT_ROOT" show-ref --verify --quiet "refs/remotes/origin/$BRANCH_NAME"; then
     echo "Creating worktree for existing branch: $BRANCH_NAME"
-    git worktree add "$WORKTREE_DIR" "origin/$BRANCH_NAME"
+    git_project "$PROJECT_ROOT" worktree add "$WORKTREE_PATH" "origin/$BRANCH_NAME"
 else
     echo "Branch '$BRANCH_NAME' not found remotely."
     read -p "Create new branch '$BRANCH_NAME'? (y/N): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        # Find the default/main branch to base off
-        DEFAULT_BRANCH=$(git --git-dir=.bare symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@refs/remotes/origin/@@' || echo "main")
-        
-        # Check if default branch exists, otherwise try common alternatives
-        if ! git --git-dir=.bare show-ref --verify --quiet "refs/remotes/origin/$DEFAULT_BRANCH"; then
+        DEFAULT_BRANCH=$(git_project "$PROJECT_ROOT" symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@refs/remotes/origin/@@' || echo "main")
+
+        if ! git_project "$PROJECT_ROOT" show-ref --verify --quiet "refs/remotes/origin/$DEFAULT_BRANCH"; then
             for branch in "main" "master" "devnet" "develop"; do
-                if git --git-dir=.bare show-ref --verify --quiet "refs/remotes/origin/$branch"; then
+                if git_project "$PROJECT_ROOT" show-ref --verify --quiet "refs/remotes/origin/$branch"; then
                     DEFAULT_BRANCH=$branch
                     break
                 fi
             done
         fi
-        
+
         echo "Creating new branch '$BRANCH_NAME' based on '$DEFAULT_BRANCH'..."
-        git worktree add -b "$BRANCH_NAME" "$WORKTREE_DIR" "origin/$DEFAULT_BRANCH"
+        git_project "$PROJECT_ROOT" worktree add -b "$BRANCH_NAME" "$WORKTREE_PATH" "origin/$DEFAULT_BRANCH"
     else
         echo "Cancelled."
         exit 1
     fi
 fi
 
-# Switch to the worktree directory
-cd "$WORKTREE_DIR"
-
-echo "✅ Switched to worktree: $WORKTREE_DIR"
-echo "   Branch: $(git branch --show-current)"
-echo "   Path: $(pwd)"
-
-# Start a new shell in the worktree
-exec $SHELL
+switch_to_tree "$WORKTREE_PATH" "$WORKTREE_DIR"

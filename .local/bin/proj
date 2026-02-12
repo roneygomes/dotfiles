@@ -1,43 +1,259 @@
 #!/bin/bash
 
-# proj - A CLI tool for managing bare-cloned projects and worktrees
+# proj - A CLI tool for managing projects and worktrees
 
 set -e
 
 VERSION="1.0.0"
 
+get_projects_dir() {
+    local projects_dir="${PROJ_DIR:-$HOME/projects}"
+    echo "${projects_dir/#\~/$HOME}"
+}
+
+get_trees_base_dir() {
+    local trees_dir="${PROJ_TREES_DIR:-$HOME/.proj/trees}"
+    echo "${trees_dir/#\~/$HOME}"
+}
+
+get_project_trees_dir() {
+    local project_name=$1
+    local trees_base_dir
+    trees_base_dir=$(get_trees_base_dir)
+    echo "$trees_base_dir/$project_name"
+}
+
+find_project_root() {
+    local project_root=""
+
+    if git rev-parse --is-inside-work-tree &>/dev/null; then
+        local git_common_dir
+        git_common_dir=$(git rev-parse --git-common-dir 2>/dev/null)
+        if [ -n "$git_common_dir" ]; then
+            local common_dir_abs
+            common_dir_abs=$(cd "$git_common_dir" 2>/dev/null && pwd)
+            case "$(basename "$common_dir_abs")" in
+                .bare|.git)
+                    project_root=$(dirname "$common_dir_abs")
+                    ;;
+            esac
+        fi
+
+        if [ -z "$project_root" ]; then
+            local toplevel
+            toplevel=$(git rev-parse --show-toplevel 2>/dev/null || true)
+            if [ -n "$toplevel" ] && { [ -d "$toplevel/.git" ] || [ -d "$toplevel/.bare" ]; }; then
+                project_root="$toplevel"
+            fi
+        fi
+    fi
+
+    # Fallback: walk up to find .git/.bare
+    if [ -z "$project_root" ]; then
+        local current_dir="$PWD"
+        while [ "$current_dir" != "/" ]; do
+            if [ -d "$current_dir/.git" ] || [ -d "$current_dir/.bare" ]; then
+                project_root="$current_dir"
+                break
+            fi
+            current_dir=$(dirname "$current_dir")
+        done
+    fi
+
+    [ -n "$project_root" ] && echo "$project_root"
+}
+
+is_legacy_bare_project() {
+    local project_root=$1
+    [ -d "$project_root/.bare" ]
+}
+
+git_project() {
+    local project_root=$1
+    shift
+
+    if is_legacy_bare_project "$project_root"; then
+        git --git-dir="$project_root/.bare" "$@"
+    else
+        git -C "$project_root" "$@"
+    fi
+}
+
+tmux_session_name_for_tree() {
+    local tree_name=$1
+    local session_name
+    session_name=$(echo "$tree_name" | sed 's/[^[:alnum:]_-]/-/g')
+    [ -n "$session_name" ] || session_name="tree"
+    echo "$session_name"
+}
+
+switch_to_tree() {
+    local tree_path=$1
+    local tree_name=$2
+
+    if ! command -v tmux &> /dev/null; then
+        cd "$tree_path"
+        exec "$SHELL"
+    fi
+
+    local session_name
+    session_name=$(tmux_session_name_for_tree "$tree_name")
+
+    if tmux has-session -t "$session_name" 2>/dev/null; then
+        if [ -n "${TMUX:-}" ]; then
+            tmux switch-client -t "$session_name"
+        else
+            tmux attach-session -t "$session_name"
+        fi
+    else
+        if [ -n "${TMUX:-}" ]; then
+            tmux new-session -d -s "$session_name" -c "$tree_path"
+            tmux switch-client -t "$session_name"
+        else
+            tmux new-session -s "$session_name" -c "$tree_path"
+        fi
+    fi
+}
+
+find_branch_for_input() {
+    local project_root=$1
+    local input=$2
+    local branches
+
+    branches=$(git_project "$project_root" branch -r 2>/dev/null | sed 's/origin\///' | sed 's/^[[:space:]]*//' | grep -v '^HEAD' || true)
+
+    if echo "$branches" | grep -q "^${input}$" || false; then
+        echo "$input"
+        return 0
+    fi
+
+    local prefixes=("feat/" "feature/" "fix/" "bugfix/" "hotfix/" "chore/" "docs/" "refactor/" "test/" "style/")
+    for prefix in "${prefixes[@]}"; do
+        if echo "$branches" | grep -q "^${prefix}${input}$" || false; then
+            echo "${prefix}${input}"
+            return 0
+        fi
+    done
+
+    local matches
+    matches=$(echo "$branches" | grep -i "$input" || true)
+    local match_count
+    if [ -z "$matches" ]; then
+        match_count=0
+    else
+        match_count=$(echo "$matches" | grep -c '^' || echo "0")
+    fi
+
+    if [ "$match_count" -eq 1 ]; then
+        echo "$matches"
+        return 0
+    elif [ "$match_count" -gt 1 ]; then
+        echo "Error: Multiple branches match '$input':" >&2
+        while IFS= read -r line; do
+            echo "  - $line" >&2
+        done <<< "$matches"
+        return 1
+    fi
+
+    echo "$input"
+    return 2
+}
+
+create_tree_in_project() {
+    local project_root=$1
+    local tree_input=$2
+
+    local branch_name
+    branch_name=$(find_branch_for_input "$project_root" "$tree_input") || local find_result=$?
+    find_result=${find_result:-0}
+
+    if [ "$find_result" -eq 1 ]; then
+        return 1
+    fi
+
+    local tree_dir
+    tree_dir=$(basename "$branch_name")
+    local project_name
+    project_name=$(basename "$project_root")
+    local project_trees_dir
+    project_trees_dir=$(get_project_trees_dir "$project_name")
+    local tree_path="$project_trees_dir/$tree_dir"
+
+    mkdir -p "$project_trees_dir"
+
+    if [ -d "$tree_path" ]; then
+        switch_to_tree "$tree_path" "$tree_dir"
+        return 0
+    fi
+
+    local branch_exists=0
+    local local_branch_exists=0
+    if git_project "$project_root" show-ref --verify --quiet "refs/remotes/origin/$branch_name"; then
+        branch_exists=1
+    fi
+    if git_project "$project_root" show-ref --verify --quiet "refs/heads/$branch_name"; then
+        local_branch_exists=1
+    fi
+
+    if [ "$branch_exists" -gt 0 ]; then
+        git_project "$project_root" worktree add "$tree_path" "origin/$branch_name" >/dev/null 2>&1
+    elif [ "$local_branch_exists" -gt 0 ]; then
+        git_project "$project_root" worktree add "$tree_path" "$branch_name" >/dev/null 2>&1
+    else
+        echo "Branch '$branch_name' not found remotely or locally."
+        read -p "Create new branch '$branch_name'? (y/N): " -n 1 -r </dev/tty
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            echo "Cancelled."
+            return 1
+        fi
+
+        local default_branch
+        default_branch=$(git_project "$project_root" symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@refs/remotes/origin/@@' || echo "main")
+        if ! git_project "$project_root" show-ref --verify --quiet "refs/remotes/origin/$default_branch"; then
+            for branch in "main" "master" "devnet" "develop"; do
+                if git_project "$project_root" show-ref --verify --quiet "refs/remotes/origin/$branch"; then
+                    default_branch=$branch
+                    break
+                fi
+            done
+        fi
+
+        git_project "$project_root" worktree add -b "$branch_name" "$tree_path" "origin/$default_branch" >/dev/null 2>&1
+    fi
+
+    switch_to_tree "$tree_path" "$tree_dir"
+}
+
 show_help() {
     cat << EOF
-proj - Manage bare-cloned projects and worktrees
+proj - Manage git projects and centralized worktrees
 
 Usage:
-  proj clone|new <git-url> [project-name]    Clone a repository as a bare repo
   proj list|ls                               List and switch between projects
-  proj task <worktree>                       Switch to or create a worktree
-  proj task new <worktree>                   Create worktree and start coding agent
-  proj task list|ls                          List worktrees with fzf fuzzy finder
-  proj task delete                           Delete a worktree with fzf selection
+  proj trees                                 List all trees grouped by project
+  proj trees <tree>                          Switch to or create a tree (current project)
+  proj trees new <tree>                      Create tree and start coding agent
+  proj trees delete                          Delete a tree with fzf selection
   proj --version                             Show version
   proj --help                                Show this help message
 
 Examples:
-  proj clone git@github.com:user/repo.git
-  proj new git@github.com:user/repo.git my-project  # Alias for clone
   proj list                          # List and switch to a project
   proj ls                            # Alias for 'list'
-  proj task feat/new-feature         # Switch to existing worktree
-  proj task new feat/new-feature     # Create worktree and open in cursor
-  proj task new 123                  # Create task 123 and open in cursor
-  proj task list                     # List and select worktree
-  proj task ls                       # Alias for 'task list'
-  proj task delete                   # Delete worktree with fzf
+  proj trees                         # List all trees grouped by project
+  proj trees feat/new-feature        # Switch to existing tree
+  proj trees new feat/new-feature    # Create tree and open in cursor
+  proj trees new 123                 # Create tree from ticket id and open in cursor
+  proj trees delete                  # Delete tree with fzf
 
 Environment Variables:
   PROJ_DIR              Projects directory (default: ~/projects)
+  PROJ_TREES_DIR        Worktrees base directory (default: ~/.proj/trees)
   PROJ_CODING_AGENT     Override the default coding agent (default: cursor-agent)
 
 Tab Completion:
-  The 'proj task' command supports tab completion for existing worktrees.
+  The 'proj trees' command supports tab completion for existing trees.
   See ~/.zshrc for completion setup.
 EOF
 }
@@ -47,155 +263,116 @@ show_version() {
 }
 
 cmd_list() {
-    # Get the canonical projects directory
-    local projects_dir="${PROJ_DIR:-$HOME/projects}"
-    
-    # Expand tilde if present
-    projects_dir="${projects_dir/#\~/$HOME}"
-    
+    local projects_dir
+    projects_dir=$(get_projects_dir)
+
     if [ ! -d "$projects_dir" ]; then
         echo "Error: Projects directory not found: $projects_dir"
         echo "Set PROJ_DIR environment variable to override the default location."
         exit 1
     fi
-    
-    # Check if fzf is available
-    if ! command -v fzf &> /dev/null; then
-        echo "Projects in $projects_dir:"
-        
-        # Simple list without fzf
-        for dir in "$projects_dir"/*; do
-            if [ ! -d "$dir" ]; then
-                continue
-            fi
-            
-            local project_name
-            project_name=$(basename "$dir")
-            
-            # Check if it's a bare-cloned project or a regular git repo
-            if [ -d "$dir/.bare" ]; then
-                local worktree_count
-                worktree_count=$(find "$dir" -maxdepth 1 -type d ! -name ".bare" ! -name "$(basename "$dir")" | wc -l | tr -d ' ')
-                echo "  - $project_name ($worktree_count worktrees) [bare-cloned]"
-            elif [ -d "$dir/.git" ]; then
-                echo "  - $project_name [git repo]"
-            fi
-        done
-        return
-    fi
-    
-    # Build list of projects for fzf
+
     local project_list=""
-    
+    local trees_base_dir
+    trees_base_dir=$(get_trees_base_dir)
+
     for dir in "$projects_dir"/*; do
-        if [ ! -d "$dir" ]; then
-            continue
-        fi
-        
+        [ -d "$dir" ] || continue
+        [ -d "$dir/.git" ] || [ -d "$dir/.bare" ] || continue
+
         local project_name
         project_name=$(basename "$dir")
-        
-        # Check if it's a bare-cloned project
-        if [ -d "$dir/.bare" ]; then
-            # Count worktrees (excluding .bare directory)
-            local worktree_count=0
-            for worktree in "$dir"/*; do
-                if [ -d "$worktree" ] && [ "$(basename "$worktree")" != ".bare" ]; then
-                    if [ -d "$worktree/.git" ] || [ -f "$worktree/.git" ]; then
-                        worktree_count=$((worktree_count + 1))
-                    fi
+
+        local worktree_count=0
+        local trees_dir="$trees_base_dir/$project_name"
+        if [ -d "$trees_dir" ]; then
+            for worktree in "$trees_dir"/*; do
+                if [ -d "$worktree" ] && { [ -d "$worktree/.git" ] || [ -f "$worktree/.git" ]; }; then
+                    worktree_count=$((worktree_count + 1))
                 fi
             done
-            
-            # Get default branch
-            local default_branch
-            default_branch=$(cd "$dir" && git --git-dir=.bare symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@refs/remotes/origin/@@' || echo "unknown")
-            
-            project_list="$project_list$project_name|bare|$worktree_count|$default_branch\n"
-        # Check if it's a regular git repository
-        elif [ -d "$dir/.git" ]; then
-            local current_branch
-            current_branch=$(cd "$dir" && git branch --show-current 2>/dev/null || echo "detached")
-            project_list="$project_list$project_name|git|1|$current_branch\n"
         fi
+
+        local default_branch
+        default_branch=$(git_project "$dir" symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@refs/remotes/origin/@@' || true)
+        if [ -z "$default_branch" ]; then
+            default_branch=$(git_project "$dir" branch --show-current 2>/dev/null || echo "unknown")
+        fi
+
+        local project_type="git"
+        if is_legacy_bare_project "$dir"; then
+            project_type="bare"
+        fi
+
+        project_list="$project_list$project_name|$project_type|$worktree_count|$default_branch\n"
     done
-    
+
     if [ -z "$project_list" ]; then
         echo "No git projects found in $projects_dir"
-        echo "Use 'proj clone' to create a new project."
         return
     fi
-    
-    # Use fzf to select a project
+
+    if ! command -v fzf &> /dev/null; then
+        echo "Projects in $projects_dir:"
+        echo -e "$project_list" | sed '/^$/d' | awk -F'|' '{printf "  - %s (%s worktrees, default: %s)%s\n", $1, $3, $4, ($2=="bare"?" [legacy bare]":"")}'
+        return
+    fi
+
     local selected
     selected=$(echo -e "$project_list" | sed '/^$/d' | \
         awk -F'|' '{
-            if ($2 == "bare") {
-                printf "%-30s %s\n", $1, "(" $3 " worktrees, default: " $4 ")"
-            } else {
-                printf "%-30s %s\n", $1, "(branch: " $4 ")"
-            }
+            printf "%-30s %s%s\n", $1, "(" $3 " worktrees, default: " $4 ")", ($2=="bare"?" [legacy bare]":"")
         }' | \
         fzf --height 40% --reverse --border \
             --header "Select project to switch to:" \
             --preview "ls -la $projects_dir/{} 2>/dev/null | head -20" \
             --preview-window=right:50%:wrap)
-    
+
     if [ -n "$selected" ]; then
-        # Extract project name (first field)
         local project_name
         project_name=$(echo "$selected" | awk '{print $1}')
         local project_path="$projects_dir/$project_name"
-        
+
         if [ -d "$project_path" ]; then
             local target_dir="$project_path"
-            
-            # For bare-cloned projects, let user select worktree interactively
-            if [ -d "$project_path/.bare" ]; then
-                # Build list of worktrees
-                local worktree_list=""
-                for dir in "$project_path"/*; do
-                    if [ -d "$dir" ] && [ "$(basename "$dir")" != ".bare" ]; then
-                        if [ -d "$dir/.git" ] || [ -f "$dir/.git" ]; then
-                            local worktree_name
-                            worktree_name=$(basename "$dir")
-                            local branch
-                            branch=$(cd "$dir" && git branch --show-current 2>/dev/null || git describe --tags --exact-match 2>/dev/null || git rev-parse --short HEAD 2>/dev/null || echo "unknown")
-                            worktree_list="$worktree_list$worktree_name|$branch\n"
-                        fi
+
+            local project_trees_dir
+            project_trees_dir=$(get_project_trees_dir "$project_name")
+            local worktree_list=""
+
+            if [ -d "$project_trees_dir" ]; then
+                for dir in "$project_trees_dir"/*; do
+                    if [ -d "$dir" ] && { [ -d "$dir/.git" ] || [ -f "$dir/.git" ]; }; then
+                        local worktree_name
+                        worktree_name=$(basename "$dir")
+                        local branch
+                        branch=$(cd "$dir" && git branch --show-current 2>/dev/null || git describe --tags --exact-match 2>/dev/null || git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+                        worktree_list="$worktree_list$worktree_name|$branch\n"
                     fi
                 done
-                
-                if [ -n "$worktree_list" ]; then
-                    # Use fzf to select a worktree
-                    local selected_worktree
-                    selected_worktree=$(echo -e "$worktree_list" | sed '/^$/d' | \
-                        awk -F'|' '{printf "%-30s %s\n", $1, "(branch: " $2 ")"}' | \
-                        fzf --height 40% --reverse --border \
-                            --header "Select worktree in $project_name:" \
-                            --preview "ls -la $project_path/{} 2>/dev/null | head -20" \
-                            --preview-window=right:50%:wrap)
-                    
-                    if [ -n "$selected_worktree" ]; then
-                        local worktree_name
-                        worktree_name=$(echo "$selected_worktree" | awk '{print $1}')
-                        target_dir="$project_path/$worktree_name"
-                    else
-                        # User cancelled worktree selection
-                        return
-                    fi
-                else
-                    echo "No worktrees found in project: $project_name"
+            fi
+
+            if [ -n "$worktree_list" ]; then
+                local selected_worktree
+                selected_worktree=$(echo -e "$worktree_list" | sed '/^$/d' | \
+                    awk -F'|' '{printf "%-30s %s\n", $1, "(branch: " $2 ")"}' | \
+                    fzf --height 40% --reverse --border \
+                        --header "Select worktree in $project_name (Esc to open project root):" \
+                        --preview "ls -la $project_trees_dir/{} 2>/dev/null | head -20" \
+                        --preview-window=right:50%:wrap)
+
+                if [ -n "$selected_worktree" ]; then
+                    local worktree_name
+                    worktree_name=$(echo "$selected_worktree" | awk '{print $1}')
+                    target_dir="$project_trees_dir/$worktree_name"
+                    switch_to_tree "$target_dir" "$worktree_name"
                     return
                 fi
             fi
-            # For regular git repos, use the project directory itself
-            
+
             cd "$target_dir"
             echo "Switched to project: $project_name"
-            
-            # Start a new shell in the project directory
-            exec $SHELL
+            exec "$SHELL"
         else
             echo "Error: Project directory not found: $project_path"
             exit 1
@@ -203,59 +380,152 @@ cmd_list() {
     fi
 }
 
-cmd_clone() {
-    local git_url=$1
-    local project_name=$2
-    
-    if [ -z "$git_url" ]; then
-        echo "Error: Git URL is required"
-        echo "Usage: proj clone <git-url> [project-name]"
-        exit 1
+cmd_trees_all() {
+    local projects_dir
+    projects_dir=$(get_projects_dir)
+    local trees_base_dir
+    trees_base_dir=$(get_trees_base_dir)
+
+    if [ ! -d "$trees_base_dir" ]; then
+        echo "No trees found in $trees_base_dir"
+        return
     fi
-    
-    # Call setup-project
-    if [ -n "$project_name" ]; then
-        setup-project "$git_url" "$project_name"
-    else
-        setup-project "$git_url"
+
+    local tree_rows=""
+    local grouped_rows=""
+
+    for project_dir in "$trees_base_dir"/*; do
+        [ -d "$project_dir" ] || continue
+        local project_name
+        project_name=$(basename "$project_dir")
+        local printed_header=0
+
+        for tree_dir in "$project_dir"/*; do
+            if [ -d "$tree_dir" ] && { [ -d "$tree_dir/.git" ] || [ -f "$tree_dir/.git" ]; }; then
+                local tree_name
+                tree_name=$(basename "$tree_dir")
+                local ref
+                ref=$(cd "$tree_dir" && git symbolic-ref --short HEAD 2>/dev/null || git describe --tags --exact-match 2>/dev/null || git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+
+                tree_rows="${tree_rows}${project_name}|${tree_name}|${ref}|${tree_dir}\n"
+
+                if [ "$printed_header" -eq 0 ]; then
+                    grouped_rows="${grouped_rows}${project_name}:\n"
+                    printed_header=1
+                fi
+                grouped_rows="${grouped_rows}  - ${tree_name} (${ref})\n"
+            fi
+        done
+
+        if [ "$printed_header" -eq 1 ]; then
+            grouped_rows="${grouped_rows}\n"
+        fi
+    done
+
+    if [ -z "$tree_rows" ]; then
+        echo "No trees found in $trees_base_dir"
+        return
+    fi
+
+    if ! command -v fzf &> /dev/null; then
+        echo -e "$grouped_rows"
+        return
+    fi
+
+    local menu_rows
+    menu_rows="new|[+] Create new tree||\n${tree_rows}"
+
+    local selected
+    selected=$(echo -e "$menu_rows" | sed '/^$/d' | \
+        awk -F'|' '{
+            if ($1 == "new") {
+                printf "%-40s %s\n", $2, ""
+            } else {
+                printf "%-40s %s\n", $1 "/" $2, "(ref: " $3 ")"
+            }
+        }' | \
+        fzf --height 50% --reverse --border \
+            --header "Select tree to switch to (or create a new one):" \
+            --preview "item=\$(echo {} | awk '{print \$1}'); if [ \"\$item\" = \"[+]\" ]; then echo \"Create a new tree\"; else proj=\${item%%/*}; name=\${item#*/}; ls -la \"$trees_base_dir/\$proj/\$name\" 2>/dev/null | head -30; fi" \
+            --preview-window=right:50%:wrap)
+
+    if [ -n "$selected" ]; then
+        local selected_tree
+        selected_tree=$(echo "$selected" | awk '{print $1}')
+        if [ "$selected_tree" = "[+]" ]; then
+            local project_rows=""
+            for dir in "$projects_dir"/*; do
+                [ -d "$dir" ] || continue
+                [ -d "$dir/.git" ] || [ -d "$dir/.bare" ] || continue
+                local project_name
+                project_name=$(basename "$dir")
+                project_rows="${project_rows}${project_name}|${dir}\n"
+            done
+
+            if [ -z "$project_rows" ]; then
+                echo "No projects found in $projects_dir"
+                return
+            fi
+
+            local selected_project
+            selected_project=$(echo -e "$project_rows" | sed '/^$/d' | awk -F'|' '{print $1}' | \
+                fzf --height 40% --reverse --border \
+                    --header "Select project for new tree:" \
+                    --preview "ls -la $projects_dir/{} 2>/dev/null | head -30" \
+                    --preview-window=right:50%:wrap)
+
+            [ -n "$selected_project" ] || return
+
+            local new_tree_name
+            read -r -p "New tree name: " new_tree_name </dev/tty
+            if [ -z "$new_tree_name" ]; then
+                echo "Cancelled: tree name is required."
+                return
+            fi
+
+            create_tree_in_project "$projects_dir/$selected_project" "$new_tree_name"
+            return
+        else
+            local selected_project="${selected_tree%%/*}"
+            local selected_name="${selected_tree#*/}"
+            local selected_path="$trees_base_dir/$selected_project/$selected_name"
+
+            if [ -d "$selected_path" ]; then
+                switch_to_tree "$selected_path" "$selected_name"
+            fi
+        fi
     fi
 }
 
-cmd_task() {
+cmd_trees() {
     local subcommand=$1
     
     # Check if first argument is a subcommand
     case "$subcommand" in
         new)
             shift
-            cmd_task_new "$@"
-            ;;
-        list|ls)
-            shift
-            cmd_task_list "$@"
+            cmd_trees_new "$@"
             ;;
         delete)
             shift
-            cmd_task_delete "$@"
+            cmd_trees_delete "$@"
             ;;
-        "")
-            echo "Error: Worktree name or subcommand is required"
-            echo "Usage: proj task <worktree> | proj task new <worktree> | proj task list | proj task delete"
-            exit 1
+        list|ls|"")
+            cmd_trees_all
             ;;
         *)
             # Treat as worktree name for switching
-            cmd_task_switch "$@"
+            cmd_trees_switch "$@"
             ;;
     esac
 }
 
-cmd_task_switch() {
+cmd_trees_switch() {
     local worktree=$1
     
     if [ -z "$worktree" ]; then
-        echo "Error: Worktree name is required"
-        echo "Usage: proj task <worktree>"
+        echo "Error: Tree name is required"
+        echo "Usage: proj trees <tree>"
         exit 1
     fi
     
@@ -263,228 +533,53 @@ cmd_task_switch() {
     worktree-switch "$worktree"
 }
 
-cmd_task_new() {
+cmd_trees_new() {
     local worktree=$1
     
     if [ -z "$worktree" ]; then
-        echo "Error: Worktree name is required"
-        echo "Usage: proj task new <worktree>"
+        echo "Error: Tree name is required"
+        echo "Usage: proj trees new <tree>"
         exit 1
     fi
     
-    # Set the coding agent (default to cursor-agent, but allow override)
-    local coding_agent="${PROJ_CODING_AGENT:-cursor-agent}"
-    
-    # Find the project root (where .bare is located)
-    local project_root
-    project_root=""
-    
-    if git rev-parse --is-inside-work-tree &>/dev/null; then
-        local git_common_dir
-        git_common_dir=$(git rev-parse --git-common-dir 2>/dev/null)
-        if [ -n "$git_common_dir" ]; then
-            local bare_dir
-            bare_dir=$(cd "$git_common_dir" 2>/dev/null && pwd)
-            if [ "$(basename "$bare_dir")" = ".bare" ]; then
-                project_root=$(dirname "$bare_dir")
-            fi
-        fi
-    fi
-    
-    # Fallback: walk up to find .bare
-    if [ -z "$project_root" ]; then
-        local current_dir="$PWD"
-        while [ "$current_dir" != "/" ]; do
-            if [ -d "$current_dir/.bare" ]; then
-                project_root="$current_dir"
-                break
-            fi
-            current_dir=$(dirname "$current_dir")
-        done
-    fi
-    
-    if [ -z "$project_root" ]; then
-        echo "Error: Not in a bare-cloned project directory."
-        exit 1
-    fi
-    
-    # Helper function to find matching branch
-    find_branch() {
-        local input=$1
-        local branches
-        
-        # Get all remote branches
-        branches=$(git --git-dir="$project_root/.bare" branch -r 2>&1 | sed 's/origin\///' | sed 's/^[[:space:]]*//' | grep -v '^HEAD' || true)
-        
-        # Try exact match first
-        if echo "$branches" | grep -q "^${input}$" || false; then
-            echo "$input"
-            return 0
-        fi
-        
-        # Try with common prefixes
-        local prefixes=("feat/" "feature/" "fix/" "bugfix/" "hotfix/" "chore/" "docs/" "refactor/" "test/" "style/")
-        
-        for prefix in "${prefixes[@]}"; do
-            if echo "$branches" | grep -q "^${prefix}${input}$" || false; then
-                echo "${prefix}${input}"
-                return 0
-            fi
-        done
-        
-        # Try partial match (case-insensitive)
-        local matches
-        matches=$(echo "$branches" | grep -i "$input" || true)
-        local match_count
-        if [ -z "$matches" ]; then
-            match_count=0
-        else
-            match_count=$(echo "$matches" | grep -c '^' || echo "0")
-        fi
-        
-        if [ "$match_count" -eq 1 ]; then
-            echo "$matches"
-            return 0
-        elif [ "$match_count" -gt 1 ]; then
-            echo "Error: Multiple branches match '$input':" >&2
-            while IFS= read -r line; do
-                echo "  - $line" >&2
-            done <<< "$matches"
-            return 1
-        fi
-        
-        # No match found - assume it's a new branch name
-        echo "$input"
-        return 2
-    }
-    
-    # Change to project root
-    cd "$project_root"
-    
-    # Find the branch
-    local branch_name
-    branch_name=$(find_branch "$worktree") || local find_result=$?
-    find_result=${find_result:-0}
-    
-    if [ "$find_result" -eq 1 ]; then
-        # Multiple matches found, error already printed
-        exit 1
-    fi
-    
-    # Determine worktree directory name (use last part of branch for directory)
-    local worktree_dir
-    worktree_dir=$(basename "$branch_name")
-    local worktree_path="$project_root/$worktree_dir"
-    
-    # Check if worktree directory already exists
-    if [ -d "$worktree_path" ]; then
-        cd "$worktree_path"
-        if command -v "$coding_agent" &> /dev/null; then
-            "$coding_agent"
-            # Stay in the worktree directory after agent exits
-            exec $SHELL
-        else
-            echo "Error: Coding agent '$coding_agent' not found in PATH."
-            echo "Please install $coding_agent or set PROJ_CODING_AGENT to a different editor."
-            exit 1
-        fi
-    fi
-    
-    # Check if branch exists remotely
-    local branch_exists
-    branch_exists=$(git --git-dir="$project_root/.bare" branch -r | grep -c "origin/${branch_name}" || true)
-    
-    # Check if branch exists locally
-    local local_branch_exists
-    local_branch_exists=$(git --git-dir="$project_root/.bare" branch | grep -c "^\s*${branch_name}$" || true)
-    
-    if [ "$branch_exists" -gt 0 ]; then
-        git worktree add "$worktree_dir" "origin/$branch_name" >/dev/null 2>&1
-    elif [ "$local_branch_exists" -gt 0 ]; then
-        git worktree add "$worktree_dir" "$branch_name" >/dev/null 2>&1
-    else
-        echo "Branch '$branch_name' not found remotely or locally."
-        read -p "Create new branch '$branch_name'? (y/N): " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            # Find the default/main branch to base off
-            local default_branch
-            default_branch=$(git --git-dir="$project_root/.bare" symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@refs/remotes/origin/@@' || echo "main")
-            
-            # Check if default branch exists, otherwise try common alternatives
-            if ! git --git-dir="$project_root/.bare" show-ref --verify --quiet "refs/remotes/origin/$default_branch"; then
-                for branch in "main" "master" "devnet" "develop"; do
-                    if git --git-dir="$project_root/.bare" show-ref --verify --quiet "refs/remotes/origin/$branch"; then
-                        default_branch=$branch
-                        break
-                    fi
-                done
-            fi
-            
-            git worktree add -b "$branch_name" "$worktree_dir" "origin/$default_branch" >/dev/null 2>&1
-        else
-            echo "Cancelled."
-            exit 1
-        fi
-    fi
-    
-    # Change to the worktree directory
-    cd "$worktree_path"
-    
-    # Launch the coding agent
-    if command -v "$coding_agent" &> /dev/null; then
-        "$coding_agent"
-        # Stay in the worktree directory after agent exits
-        exec $SHELL
-    else
-        echo "Error: Coding agent '$coding_agent' not found in PATH."
-        echo "Please install $coding_agent or set PROJ_CODING_AGENT to a different editor."
-        exit 1
-    fi
-}
-
-cmd_task_list() {
     # Find the project root
     local project_root
-    project_root=""
-    
-    if git rev-parse --is-inside-work-tree &>/dev/null; then
-        local git_common_dir
-        git_common_dir=$(git rev-parse --git-common-dir 2>/dev/null)
-        if [ -n "$git_common_dir" ]; then
-            local bare_dir
-            bare_dir=$(cd "$git_common_dir" 2>/dev/null && pwd)
-            if [ "$(basename "$bare_dir")" = ".bare" ]; then
-                project_root=$(dirname "$bare_dir")
-            fi
-        fi
-    fi
-    
-    # Fallback: walk up to find .bare
-    if [ -z "$project_root" ]; then
-        local current_dir="$PWD"
-        while [ "$current_dir" != "/" ]; do
-            if [ -d "$current_dir/.bare" ]; then
-                project_root="$current_dir"
-                break
-            fi
-            current_dir=$(dirname "$current_dir")
-        done
-    fi
+    project_root=$(find_project_root)
     
     if [ -z "$project_root" ]; then
-        echo "Error: Not in a bare-cloned project directory."
+        echo "Error: Not inside a git project or worktree."
         exit 1
     fi
     
+    create_tree_in_project "$project_root" "$worktree"
+}
+
+cmd_trees_list() {
+    # Find the project root
+    local project_root
+    project_root=$(find_project_root)
+    
+    if [ -z "$project_root" ]; then
+        echo "Error: Not inside a git project or worktree."
+        exit 1
+    fi
+    
+    local project_name
+    project_name=$(basename "$project_root")
+    local project_trees_dir
+    project_trees_dir=$(get_project_trees_dir "$project_name")
+
     # Check if fzf is available
     if ! command -v fzf &> /dev/null; then
-        echo "Worktrees in $(basename "$project_root"):"
-        cd "$project_root"
+        echo "Worktrees in $project_name:"
+        if [ ! -d "$project_trees_dir" ]; then
+            echo "No worktrees found in $project_name"
+            return
+        fi
         
         # Simple list without fzf
-        for dir in */; do
-            if [ -d "$dir" ] && [ "$(basename "$dir")" != ".bare" ]; then
+        for dir in "$project_trees_dir"/*; do
+            if [ -d "$dir" ]; then
                 local worktree_name
                 worktree_name=$(basename "$dir")
                 if [ -d "$dir/.git" ] || [ -f "$dir/.git" ]; then
@@ -499,10 +594,13 @@ cmd_task_list() {
     
     # Build list of worktrees for fzf
     local worktree_list=""
-    cd "$project_root"
+    if [ ! -d "$project_trees_dir" ]; then
+        echo "No worktrees found in $project_name"
+        return
+    fi
     
-    for dir in */; do
-        if [ -d "$dir" ] && [ "$(basename "$dir")" != ".bare" ]; then
+    for dir in "$project_trees_dir"/*; do
+        if [ -d "$dir" ]; then
             local worktree_name
             worktree_name=$(basename "$dir")
             if [ -d "$dir/.git" ] || [ -f "$dir/.git" ]; then
@@ -514,7 +612,7 @@ cmd_task_list() {
     done
     
     if [ -z "$worktree_list" ]; then
-        echo "No worktrees found in $(basename "$project_root")"
+        echo "No worktrees found in $project_name"
         return
     fi
     
@@ -524,20 +622,17 @@ cmd_task_list() {
         awk -F'|' '{printf "%-30s %s\n", $1, "(ref: " $2 ")"}' | \
         fzf --height 40% --reverse --border \
             --header "Select worktree to switch to:" \
-            --preview "echo {} | awk '{print \$1}' | xargs -I {} ls -la $project_root/{}" \
+            --preview "echo {} | awk '{print \$1}' | xargs -I {} ls -la $project_trees_dir/{}" \
             --preview-window=right:50%:wrap)
     
     if [ -n "$selected" ]; then
         # Extract worktree name (first field)
         local worktree_name
         worktree_name=$(echo "$selected" | awk '{print $1}')
-        local worktree_path="$project_root/$worktree_name"
+        local worktree_path="$project_trees_dir/$worktree_name"
         
         if [ -d "$worktree_path" ]; then
-            cd "$worktree_path"
-            echo "Switched to worktree: $worktree_name"
-            # Start a new shell in the worktree directory
-            exec $SHELL
+            switch_to_tree "$worktree_path" "$worktree_name"
         else
             echo "Error: Worktree directory not found: $worktree_path"
             exit 1
@@ -545,40 +640,21 @@ cmd_task_list() {
     fi
 }
 
-cmd_task_delete() {
+cmd_trees_delete() {
     # Find the project root
     local project_root
-    project_root=""
-    
-    if git rev-parse --is-inside-work-tree &>/dev/null; then
-        local git_common_dir
-        git_common_dir=$(git rev-parse --git-common-dir 2>/dev/null)
-        if [ -n "$git_common_dir" ]; then
-            local bare_dir
-            bare_dir=$(cd "$git_common_dir" 2>/dev/null && pwd)
-            if [ "$(basename "$bare_dir")" = ".bare" ]; then
-                project_root=$(dirname "$bare_dir")
-            fi
-        fi
-    fi
-    
-    # Fallback: walk up to find .bare
-    if [ -z "$project_root" ]; then
-        local current_dir="$PWD"
-        while [ "$current_dir" != "/" ]; do
-            if [ -d "$current_dir/.bare" ]; then
-                project_root="$current_dir"
-                break
-            fi
-            current_dir=$(dirname "$current_dir")
-        done
-    fi
+    project_root=$(find_project_root)
     
     if [ -z "$project_root" ]; then
-        echo "Error: Not in a bare-cloned project directory."
+        echo "Error: Not inside a git project or worktree."
         exit 1
     fi
     
+    local project_name
+    project_name=$(basename "$project_root")
+    local project_trees_dir
+    project_trees_dir=$(get_project_trees_dir "$project_name")
+
     # Get current worktree to prevent self-deletion
     local current_worktree
     current_worktree=""
@@ -588,16 +664,19 @@ cmd_task_delete() {
     
     # Check if fzf is available
     if ! command -v fzf &> /dev/null; then
-        echo "Error: fzf is required for 'proj delete'. Please install fzf."
+        echo "Error: fzf is required for 'proj trees delete'. Please install fzf."
         exit 1
     fi
     
     # Build list of worktrees for fzf
     local worktree_list=""
-    cd "$project_root"
+    if [ ! -d "$project_trees_dir" ]; then
+        echo "No deletable worktrees found in $project_name"
+        return
+    fi
     
-    for dir in */; do
-        if [ -d "$dir" ] && [ "$(basename "$dir")" != ".bare" ]; then
+    for dir in "$project_trees_dir"/*; do
+        if [ -d "$dir" ]; then
             local worktree_name
             worktree_name=$(basename "$dir")
             if [ -d "$dir/.git" ] || [ -f "$dir/.git" ]; then
@@ -613,7 +692,7 @@ cmd_task_delete() {
     done
     
     if [ -z "$worktree_list" ]; then
-        echo "No deletable worktrees found in $(basename "$project_root")"
+        echo "No deletable worktrees found in $project_name"
         echo "(Current worktree cannot be deleted)"
         return
     fi
@@ -624,7 +703,7 @@ cmd_task_delete() {
         awk -F'|' '{printf "%-30s %s\n", $1, "(ref: " $2 ")"}' | \
         fzf --multi --height 40% --reverse --border \
             --header "Select worktree(s) to DELETE (Tab to multi-select, Enter to confirm):" \
-            --preview "ls -la \"$project_root/\$(echo {} | awk '{print \$1}')\" 2>/dev/null | head -10" \
+            --preview "ls -la \"$project_trees_dir/\$(echo {} | awk '{print \$1}')\" 2>/dev/null | head -10" \
             --preview-window=right:50%:wrap)
     
     if [ -z "$selected" ]; then
@@ -637,7 +716,7 @@ cmd_task_delete() {
     while IFS= read -r line; do
         local worktree_name
         worktree_name=$(echo "$line" | awk '{print $1}')
-        local worktree_path="$project_root/$worktree_name"
+        local worktree_path="$project_trees_dir/$worktree_name"
         
         if [ -d "$worktree_path" ]; then
             echo ""
@@ -646,51 +725,21 @@ cmd_task_delete() {
             echo
             
             if [[ $REPLY =~ ^[Yy]$ ]]; then
-                # Need to run git worktree remove from an existing worktree
-                # Find any existing worktree to run the command from
-                local run_from=""
-                for dir in "$project_root"/*; do
-                    if [ -d "$dir" ] && [ "$(basename "$dir")" != ".bare" ] && [ "$dir" != "$worktree_path" ]; then
-                        if [ -f "$dir/.git" ] || [ -d "$dir/.git" ]; then
-                            run_from="$dir"
-                            break
-                        fi
-                    fi
-                done
-                
-                local removed=false
-                
-                # Try to remove using git worktree remove from another worktree
-                if [ -n "$run_from" ]; then
-                    (
-                        cd "$run_from" || exit 1
-                        git worktree remove "$worktree_path" --force
-                    )
-                    local exit_code=$?
-                    
-                    if [ $exit_code -eq 0 ]; then
-                        echo "Removed worktree: $worktree_name"
-                        removed=true
-                    fi
-                fi
-                
-                # Fallback: remove directory manually and prune
-                if [ "$removed" = false ]; then
+                if git_project "$project_root" worktree remove "$worktree_path" --force; then
+                    echo "Removed worktree: $worktree_name"
+                else
                     if rm -rf "$worktree_path"; then
                         echo "Removed worktree directory: $worktree_name"
-                        # Prune the worktree reference from git
-                        if [ -n "$run_from" ]; then
-                            (cd "$run_from" && git worktree prune)
-                        fi
+                        git_project "$project_root" worktree prune || true
                     else
-                        echo "❌ Failed to remove worktree: $worktree_name"
+                        echo "Failed to remove worktree: $worktree_name"
                     fi
                 fi
             else
                 echo "Skipped: $worktree_name"
             fi
         else
-            echo "⚠️  Worktree directory not found: $worktree_path"
+            echo "Worktree directory not found: $worktree_path"
         fi
     done < <(echo "$selected")
     
@@ -700,23 +749,27 @@ cmd_task_delete() {
 
 # Main command router
 case "${1:-}" in
-    clone|new)
-        shift
-        cmd_clone "$@"
-        ;;
     list|ls)
         shift
         cmd_list "$@"
         ;;
-    task)
+    trees)
         shift
-        cmd_task "$@"
+        cmd_trees "$@"
+        ;;
+    task)
+        echo "Error: 'proj task' was renamed to 'proj trees'."
+        exit 1
         ;;
     --version|-v)
         show_version
         ;;
     --help|-h|"")
         show_help
+        ;;
+    clone|new)
+        echo "Error: 'proj $1' was removed. Use your normal git clone workflow, then 'proj trees ...'."
+        exit 1
         ;;
     *)
         echo "Error: Unknown command '$1'"

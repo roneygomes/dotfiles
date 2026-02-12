@@ -268,10 +268,8 @@ PROMPT='$(project_worktree_info)$(git_prompt_info_inline)%(?.%F{magenta}.%F{red}
 _proj_completion() {
 	local -a commands
 	commands=(
-		'clone:Clone a repository as a bare repo'
-		'task:Switch to or create a worktree'
-		'list:List all worktrees in current project'
-		'delete:Delete a worktree with fzf selection'
+		'list:List and switch between projects'
+		'trees:List and manage trees'
 		'--help:Show help message'
 		'--version:Show version'
 	)
@@ -288,25 +286,27 @@ _proj_completion() {
 			;;
 		args)
 			case $words[1] in
-				task)
+				trees)
 					# Find project root and list worktrees
 					local project_root=""
+					local trees_base_dir="${PROJ_TREES_DIR:-$HOME/.proj/trees}"
+					trees_base_dir="${trees_base_dir/#\~/$HOME}"
 
 					if git rev-parse --is-inside-work-tree &>/dev/null 2>&1; then
 						local git_common_dir=$(git rev-parse --git-common-dir 2>/dev/null)
 						if [ -n "$git_common_dir" ]; then
-							local bare_dir=$(cd "$git_common_dir" 2>/dev/null && pwd)
-							if [ "$(basename "$bare_dir")" = ".bare" ]; then
-								project_root=$(dirname "$bare_dir")
+							local common_dir=$(cd "$git_common_dir" 2>/dev/null && pwd)
+							if [ "$(basename "$common_dir")" = ".bare" ] || [ "$(basename "$common_dir")" = ".git" ]; then
+								project_root=$(dirname "$common_dir")
 							fi
 						fi
 					fi
 
-					# Fallback: walk up to find .bare
+					# Fallback: walk up to find .git/.bare
 					if [ -z "$project_root" ]; then
 						local current_dir="$PWD"
 						while [ "$current_dir" != "/" ]; do
-							if [ -d "$current_dir/.bare" ]; then
+							if [ -d "$current_dir/.git" ] || [ -d "$current_dir/.bare" ]; then
 								project_root="$current_dir"
 								break
 							fi
@@ -315,30 +315,33 @@ _proj_completion() {
 					fi
 
 					if [ -n "$project_root" ]; then
+						local project_name=$(basename "$project_root")
+						local project_trees_dir="$trees_base_dir/$project_name"
 						local -a worktrees
 						local -a remote_branches
 
 						# List existing worktree directories
-						for dir in "$project_root"/*(/); do
-							if [ "$(basename "$dir")" != ".bare" ]; then
-								local worktree_name=$(basename "$dir")
-								worktrees+=("$worktree_name:existing worktree")
-							fi
+						for dir in "$project_trees_dir"/*(/N); do
+							local worktree_name=$(basename "$dir")
+							worktrees+=("$worktree_name:existing worktree")
 						done
 
 						# List remote branches
+						local branches=""
 						if [ -d "$project_root/.bare" ]; then
-							local branches=$(git --git-dir="$project_root/.bare" branch -r 2>/dev/null | sed 's/origin\///' | sed 's/^[[:space:]]*//' | grep -v '^HEAD')
-							while IFS= read -r branch; do
-								if [ -n "$branch" ]; then
-									# Only add if not already a worktree
-									local branch_base=$(basename "$branch")
-									if [ ! -d "$project_root/$branch_base" ]; then
-										remote_branches+=("$branch:remote branch")
-									fi
-								fi
-							done <<< "$branches"
+							branches=$(git --git-dir="$project_root/.bare" branch -r 2>/dev/null | sed 's/origin\///' | sed 's/^[[:space:]]*//' | grep -v '^HEAD')
+						else
+							branches=$(git -C "$project_root" branch -r 2>/dev/null | sed 's/origin\///' | sed 's/^[[:space:]]*//' | grep -v '^HEAD')
 						fi
+						while IFS= read -r branch; do
+							if [ -n "$branch" ]; then
+								# Only add if not already a worktree
+								local branch_base=$(basename "$branch")
+								if [ ! -d "$project_trees_dir/$branch_base" ]; then
+									remote_branches+=("$branch:remote branch")
+								fi
+							fi
+						done <<< "$branches"
 
 						if [ ${#worktrees[@]} -gt 0 ] || [ ${#remote_branches[@]} -gt 0 ]; then
 							_describe 'worktrees' worktrees
