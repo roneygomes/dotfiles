@@ -104,9 +104,9 @@
     ]
   },
   "enabledPlugins": {
-    "ralphy-planning@roneygomes-plugins": true,
-    "ed3d-basic-agents@ed3d-plugins": true,
-    "ed3d-plan-and-execute@ed3d-plugins": true,
-    "ed3d-research-agents@ed3d-plugins": true
+    "typescript-lsp@claude-plugins-official": true,
+    "commit-commands@claude-plugins-official": true,
+    "github@claude-plugins-official": true,
+    "linear@claude-plugins-official": true
   }
 }
