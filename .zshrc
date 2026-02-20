@@ -1,3 +1,10 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 #!/bin/zsh
 
 # ==============================================================================
@@ -72,7 +79,7 @@ export FZF_CTRL_R_OPTS=''
 # ==============================================================================
 
 # Local IP address
-alias ip="ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p'"
+# alias ip="ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p'"
 
 # Brew bundle install
 alias bbi="brew update && \
@@ -209,152 +216,7 @@ git_cleanup_stale_branches() {
 	echo "Cleaned up $deleted_count stale branch(es)"
 }
 
-# ==============================================================================
-# PROMPT
-# ==============================================================================
 
-# Override the precmd to disable the multi-line output from refined theme
-precmd() {
-	# Empty function to override the theme's precmd
-}
-
-# Custom function to display project and worktree info
-project_worktree_info() {
-	# Check if we're in a git worktree with a bare repository
-	if git rev-parse --is-inside-work-tree &>/dev/null; then
-		local git_common_dir=$(git rev-parse --git-common-dir 2>/dev/null)
-
-		# Check if this is a bare-cloned project (has .bare directory)
-		if [ -n "$git_common_dir" ]; then
-			local bare_dir=$(cd "$git_common_dir" 2>/dev/null && pwd)
-
-			if [ "$(basename "$bare_dir")" = ".bare" ]; then
-				# Get project name (parent directory of .bare)
-				local project_root=$(dirname "$bare_dir")
-				local project_name=$(basename "$project_root")
-
-				# Get worktree name (current worktree directory name)
-				local git_top_level=$(git rev-parse --show-toplevel 2>/dev/null)
-				local worktree_name=$(basename "$git_top_level")
-
-				# Only show if we're in a worktree (not at project root)
-				if [ "$project_root" != "$git_top_level" ]; then
-					echo "%F{cyan}$project_name/%F{green}$worktree_name%f "
-					return
-				fi
-			fi
-		fi
-	fi
-
-	# Not in a bare-cloned repo, show current directory
-	echo "%F{blue}%~%f "
-}
-
-# Git branch and status info
-git_prompt_info_inline() {
-	if git rev-parse --is-inside-work-tree &>/dev/null; then
-		local branch=$(git symbolic-ref --short HEAD 2>/dev/null || git describe --tags --exact-match 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)
-		local dirty=$(git diff --quiet --ignore-submodules HEAD 2>/dev/null; [ $? -eq 1 ] && echo "*")
-		echo "%F{8}git:$branch$dirty%f "
-	fi
-}
-
-PROMPT='$(project_worktree_info)$(git_prompt_info_inline)%(?.%F{magenta}.%F{red})❯%f '
-
-# ==============================================================================
-# PROJ COMMAND COMPLETION
-# ==============================================================================
-
-_proj_completion() {
-	local -a commands
-	commands=(
-		'list:List and switch between projects'
-		'trees:List and manage trees'
-		'--help:Show help message'
-		'--version:Show version'
-	)
-
-	local state
-
-	_arguments -C \
-		'1: :->command' \
-		'*:: :->args'
-
-	case $state in
-		command)
-			_describe 'proj commands' commands
-			;;
-		args)
-			case $words[1] in
-				trees)
-					# Find project root and list worktrees
-					local project_root=""
-					local trees_base_dir="${PROJ_TREES_DIR:-$HOME/.proj/trees}"
-					trees_base_dir="${trees_base_dir/#\~/$HOME}"
-
-					if git rev-parse --is-inside-work-tree &>/dev/null 2>&1; then
-						local git_common_dir=$(git rev-parse --git-common-dir 2>/dev/null)
-						if [ -n "$git_common_dir" ]; then
-							local common_dir=$(cd "$git_common_dir" 2>/dev/null && pwd)
-							if [ "$(basename "$common_dir")" = ".bare" ] || [ "$(basename "$common_dir")" = ".git" ]; then
-								project_root=$(dirname "$common_dir")
-							fi
-						fi
-					fi
-
-					# Fallback: walk up to find .git/.bare
-					if [ -z "$project_root" ]; then
-						local current_dir="$PWD"
-						while [ "$current_dir" != "/" ]; do
-							if [ -d "$current_dir/.git" ] || [ -d "$current_dir/.bare" ]; then
-								project_root="$current_dir"
-								break
-							fi
-							current_dir=$(dirname "$current_dir")
-						done
-					fi
-
-					if [ -n "$project_root" ]; then
-						local project_name=$(basename "$project_root")
-						local project_trees_dir="$trees_base_dir/$project_name"
-						local -a worktrees
-						local -a remote_branches
-
-						# List existing worktree directories
-						for dir in "$project_trees_dir"/*(/N); do
-							local worktree_name=$(basename "$dir")
-							worktrees+=("$worktree_name:existing worktree")
-						done
-
-						# List remote branches
-						local branches=""
-						if [ -d "$project_root/.bare" ]; then
-							branches=$(git --git-dir="$project_root/.bare" branch -r 2>/dev/null | sed 's/origin\///' | sed 's/^[[:space:]]*//' | grep -v '^HEAD')
-						else
-							branches=$(git -C "$project_root" branch -r 2>/dev/null | sed 's/origin\///' | sed 's/^[[:space:]]*//' | grep -v '^HEAD')
-						fi
-						while IFS= read -r branch; do
-							if [ -n "$branch" ]; then
-								# Only add if not already a worktree
-								local branch_base=$(basename "$branch")
-								if [ ! -d "$project_trees_dir/$branch_base" ]; then
-									remote_branches+=("$branch:remote branch")
-								fi
-							fi
-						done <<< "$branches"
-
-						if [ ${#worktrees[@]} -gt 0 ] || [ ${#remote_branches[@]} -gt 0 ]; then
-							_describe 'worktrees' worktrees
-							_describe 'remote branches' remote_branches
-						fi
-					fi
-					;;
-			esac
-			;;
-	esac
-}
-
-compdef _proj_completion proj
 
 # ==============================================================================
 # EMACS VTERM INTEGRATION
@@ -383,3 +245,6 @@ fi
 # ==============================================================================
 
 eval "$(atuin init zsh --disable-up-arrow)"
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh

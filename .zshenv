@@ -6,7 +6,7 @@ export PROJECTS_DIR=~/projects
 # oh-my-zsh
 export ZSH_DISABLE_COMPFIX=true
 export plugins=(cp vi-mode git git-extras fzf z)
-export ZSH_THEME=refined
+export ZSH_THEME="powerlevel10k/powerlevel10k"
 
 # homebrew
 PATH=/opt/homebrew/bin:$PATH:
