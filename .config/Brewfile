@@ -23,6 +23,7 @@ brew "ripgrep"
 brew "bat"
 brew "tmux"
 
+cask "orbstack"
 cask "logseq"
 cask "google-cloud-sdk"
 cask "gcloud-cli"

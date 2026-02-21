@@ -10,6 +10,7 @@
 .config/docker/buildx/
 .config/docker/contexts/
 .config/docker/.token_seed*
+.config/docker/cli-plugins
 
 # zed
 .config/zed/

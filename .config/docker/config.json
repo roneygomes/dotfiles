@@ -1,9 +1,10 @@
 {
-  "auths": {},
-  "cliPluginsExtraDirs": [
-    "/opt/homebrew/lib/docker/cli-plugins"
-  ],
-  "credHelpers": {
-    "us-central1-docker.pkg.dev": "gcloud"
-  }
+	"auths": {},
+	"credHelpers": {
+		"us-central1-docker.pkg.dev": "gcloud"
+	},
+	"currentContext": "orbstack",
+	"cliPluginsExtraDirs": [
+		"/opt/homebrew/lib/docker/cli-plugins"
+	]
 }
