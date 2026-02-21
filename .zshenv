@@ -21,10 +21,10 @@ export HOMEBREW_NO_ENV_HINTS=true
 export LDFLAGS="-L/usr/local/opt/openssl@3/lib"
 export CPPFLAGS="-I/usr/local/opt/openssl@3/include"
 
-PKG_CONFIG_PATH="$(brew --prefix)/opt/cyrus-sasl/lib/pkgconfig"
+[[ $(uname) == Darwin ]] && PKG_CONFIG_PATH="$(brew --prefix)/opt/cyrus-sasl/lib/pkgconfig"
 export PKG_CONFIG_PATH
 
-OPENSSL_ROOT_DIR="$(brew --prefix)/opt/openssl@3"
+[[ $(uname) == Darwin ]] && OPENSSL_ROOT_DIR="$(brew --prefix)/opt/openssl@3"
 export OPENSSL_ROOT_DIR
 
 PATH=/usr/local/opt/openssl@3/bin:$PATH:
@@ -42,16 +42,24 @@ PATH=$HOME/.rd/bin:$PATH:
 PATH=$HOME/.asdf/shims:$PATH:
 
 # go
-PATH=$(asdf where golang)/packages/bin:$PATH:
+_go="$(asdf where golang 2>/dev/null)"
+[[ -n "$_go" ]] && PATH=$_go/packages/bin:$PATH
+unset _go
 
 # rust
-. "$(asdf where rust)"/env
+_rust_env="$(asdf where rust 2>/dev/null)/env"
+[[ -f "$_rust_env" ]] && . "$_rust_env"
+unset _rust_env
 
 # java
-export JAVA_HOME=$(asdf where java)
+_java="$(asdf where java 2>/dev/null)"
+[[ -n "$_java" ]] && export JAVA_HOME=$_java
+unset _java
 
 # nodejs
-PATH=$(asdf where nodejs)/bin:$PATH:
+_nodejs="$(asdf where nodejs 2>/dev/null)"
+[[ -n "$_nodejs" ]] && PATH=$_nodejs/bin:$PATH
+unset _nodejs
 export NODE_OPTIONS="--max-old-space-size=2048"
 
 # docker
