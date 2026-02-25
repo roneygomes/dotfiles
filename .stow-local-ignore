@@ -15,6 +15,7 @@ _darcs
 # Project-specific files (not meant for $HOME)
 CLAUDE\.md
 \.claude/settings\.local\.json
+\.config/op/config
 LICENSE\.txt
 README\.md
 Dockerfile
