@@ -1,5 +1,4 @@
 tap "hashicorp/tap"
-tap "charmbracelet/tap"
 
 brew "asdf"
 brew "stow"
@@ -18,7 +17,6 @@ brew "atuin"
 brew "cmake"
 brew "libtool"
 brew "openssl@3"
-brew "charmbracelet/tap/crush"
 brew "ripgrep"
 brew "bat"
 brew "tmux"
