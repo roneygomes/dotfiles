@@ -19,16 +19,14 @@ RUN apt-get update && apt-get install -y \
 ENV LANG=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
 
-# ── Docker Engine (DinD) ──────────────────────────────────────────────────────
+# ── Docker CLI (DooD – daemon runs on host via mounted socket) ────────────────
 RUN install -m 0755 -d /etc/apt/keyrings \
     && curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc \
     && chmod a+r /etc/apt/keyrings/docker.asc \
     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" \
     > /etc/apt/sources.list.d/docker.list \
     && apt-get update && apt-get install -y \
-    docker-ce \
     docker-ce-cli \
-    containerd.io \
     docker-buildx-plugin \
     docker-compose-plugin \
     && rm -rf /var/lib/apt/lists/*
@@ -38,8 +36,7 @@ RUN install -m 0755 -d /etc/apt/keyrings \
 RUN usermod -l dev -d /home/dev -m -s /bin/zsh ubuntu \
     && groupmod -n dev ubuntu \
     && echo "dev ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/dev \
-    && chmod 0440 /etc/sudoers.d/dev \
-    && usermod -aG docker dev
+    && chmod 0440 /etc/sudoers.d/dev
 
 RUN mkdir -p /nix && chown dev:dev /nix
 
