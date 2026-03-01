@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+# devbox - manage the dev container
+#
+# Commands:
+#   devbox build   Build the image from the dotfiles repo
+#   devbox start   Create (or resume) the container and attach a shell
+
+set -e
+
+IMAGE="${DEVBOX_IMAGE:-devbox}"
+CONTAINER="${DEVBOX_CONTAINER:-devbox}"
+DOTFILES_DIR="${DOTFILES_DIR:-$HOME/projects/dotfiles}"
+
+# ---------------------------------------------------------------------------
+# Commands
+# ---------------------------------------------------------------------------
+cmd_build() {
+  if [[ ! -f "$DOTFILES_DIR/Dockerfile" ]]; then
+    echo "error: Dockerfile not found in $DOTFILES_DIR" >&2
+    echo "       Set DOTFILES_DIR to override the default location." >&2
+    exit 1
+  fi
+
+  echo "Building image '$IMAGE' from $DOTFILES_DIR ..."
+  docker build -t "$IMAGE" "$DOTFILES_DIR"
+  echo "Done."
+}
+
+cmd_start() {
+  local status
+  if docker inspect --type container "$CONTAINER" &>/dev/null; then
+    status=$(docker inspect --type container --format='{{.State.Status}}' "$CONTAINER")
+  else
+    status="missing"
+  fi
+
+  case "$status" in
+    running)
+      echo "Attaching to running container '$CONTAINER' ..."
+      exec docker exec -it "$CONTAINER" /bin/zsh
+      ;;
+    exited|created|paused)
+      echo "Starting container '$CONTAINER' ..."
+      docker start "$CONTAINER" > /dev/null
+      exec docker exec -it "$CONTAINER" /bin/zsh
+      ;;
+    missing)
+      echo "Creating container '$CONTAINER' from image '$IMAGE' ..."
+      exec docker run -it \
+        --name "$CONTAINER" \
+        -v /var/run/docker.sock:/var/run/docker.sock \
+        -v "$HOME/projects:/home/dev/projects" \
+        -v "$HOME/.claude:/home/dev/.claude" \
+        "$IMAGE"
+      ;;
+    *)
+      echo "error: container '$CONTAINER' is in unexpected state: $status" >&2
+      exit 1
+      ;;
+  esac
+}
+
+cmd_help() {
+  cat << EOF
+devbox - manage the dev container
+
+Usage:
+  devbox build   Build the Docker image
+  devbox start   Attach to the container (creates it if needed)
+  devbox help    Show this help message
+
+Environment variables:
+  DEVBOX_IMAGE      Image name (default: devbox)
+  DEVBOX_CONTAINER  Container name (default: devbox)
+  DOTFILES_DIR      Path to dotfiles repo (default: ~/projects/dotfiles)
+EOF
+}
+
+# ---------------------------------------------------------------------------
+# Router
+# ---------------------------------------------------------------------------
+case "${1:-}" in
+  build) cmd_build ;;
+  start) cmd_start ;;
+  help|--help|-h) cmd_help ;;
+  "")
+    echo "error: command required" >&2
+    echo "" >&2
+    cmd_help >&2
+    exit 1
+    ;;
+  *)
+    echo "error: unknown command '$1'" >&2
+    echo "" >&2
+    cmd_help >&2
+    exit 1
+    ;;
+esac
