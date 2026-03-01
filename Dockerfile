@@ -2,73 +2,102 @@ FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# System packages
+# ── Bootstrap (bare minimum for nix to run) ───────────────────────────────────
 RUN apt-get update && apt-get install -y \
     build-essential \
-    ca-certificates gnupg \
-    curl wget unzip \
+    ca-certificates \
+    curl \
     git \
-    zsh tmux \
-    ripgrep bat stow vim \
-    jq \
-    sudo \
     locales \
+    sudo \
+    xz-utils \
+    zsh \
     && locale-gen en_US.UTF-8 \
     && update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 \
-    && rm -rf /var/lib/apt/lists/*
-
-# Node.js 24.x
-RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
-    && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 ENV LANG=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
 
-# GitHub CLI
-RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
-    | gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg \
-    && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
-    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
-    > /etc/apt/sources.list.d/github-cli.list \
-    && apt-get update && apt-get install -y gh \
+# ── Docker Engine (DinD) ──────────────────────────────────────────────────────
+RUN install -m 0755 -d /etc/apt/keyrings \
+    && curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc \
+    && chmod a+r /etc/apt/keyrings/docker.asc \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" \
+    > /etc/apt/sources.list.d/docker.list \
+    && apt-get update && apt-get install -y \
+    docker-ce \
+    docker-ce-cli \
+    containerd.io \
+    docker-buildx-plugin \
+    docker-compose-plugin \
     && rm -rf /var/lib/apt/lists/*
 
-# Install global npm packages as root (writes to /usr/lib/node_modules)
-RUN npm install -g @anthropic-ai/claude-code @openai/codex
-
+# ── Create dev user ───────────────────────────────────────────────────────────
 # Ubuntu 24.04 ships an 'ubuntu' user at UID 1000; rename it to 'dev'
 RUN usermod -l dev -d /home/dev -m -s /bin/zsh ubuntu \
     && groupmod -n dev ubuntu \
     && echo "dev ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/dev \
-    && chmod 0440 /etc/sudoers.d/dev
+    && chmod 0440 /etc/sudoers.d/dev \
+    && usermod -aG docker dev
+
+RUN mkdir -p /nix && chown dev:dev /nix
 
 USER dev
 WORKDIR /home/dev
 
-# Install oh-my-zsh
+# ── Nix (single-user, no daemon) ──────────────────────────────────────────────
+RUN curl -L https://nixos.org/nix/install | sh -s -- --no-daemon \
+    && mkdir -p ~/.config/nix \
+    && echo "experimental-features = nix-command flakes" > ~/.config/nix/nix.conf
+
+ENV PATH=/home/dev/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH
+
+# ── Dev tools via flake ───────────────────────────────────────────────────────
+COPY --chown=dev:dev flake.nix /tmp/devenv/flake.nix
+RUN nix profile install 'path:/tmp/devenv' \
+    && nix-collect-garbage -d \
+    && rm -rf /tmp/devenv
+
+RUN git lfs install
+
+# ── oh-my-zsh ─────────────────────────────────────────────────────────────────
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 
-# Install powerlevel10k theme + pre-download gitstatusd so the first shell start isn't slow
+# ── Powerlevel10k + pre-download gitstatusd ───────────────────────────────────
 RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git \
     ~/.oh-my-zsh/custom/themes/powerlevel10k \
     && ~/.oh-my-zsh/custom/themes/powerlevel10k/gitstatus/install
 
-# Install fzf from source (apt package lacks key-bindings at the path oh-my-zsh expects)
+# ── fzf from source (oh-my-zsh plugin needs ~/.fzf/shell/) ───────────────────
 RUN git clone --depth=1 https://github.com/junegunn/fzf.git ~/.fzf \
     && ~/.fzf/install --all --no-update-rc
 
-# Bake in p10k config
-COPY --chown=dev:dev .p10k.zsh /home/dev/.p10k.zsh
+# ── nvm + Node LTS ───────────────────────────────────────────────────────────
+# nvm needs bash and must not see the nix-provided node in PATH
+SHELL ["/bin/bash", "-c"]
+RUN export NVM_DIR="$HOME/.nvm" \
+    && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash \
+    && source "$NVM_DIR/nvm.sh" \
+    && nvm install --lts \
+    && nvm alias default 'lts/*'
+SHELL ["/bin/sh", "-c"]
 
-# Install atuin
-RUN curl -sSf https://setup.atuin.sh | bash
+# ── Config files ──────────────────────────────────────────────────────────────
+COPY --chown=dev:dev .p10k.zsh /home/dev/.p10k.zsh
+COPY --chown=dev:dev .config/git/ /home/dev/.config/git/
+COPY --chown=dev:dev .local/bin/ /home/dev/.local/bin/
+COPY --chown=dev:dev docker/.zshrc /home/dev/.zshrc
+COPY --chown=dev:dev docker/.zshenv /home/dev/.zshenv
+COPY --chown=dev:dev docker/entrypoint.sh /home/dev/.local/bin/entrypoint.sh
+
+RUN chmod +x /home/dev/.local/bin/*
 
 ENV SHELL=/bin/zsh
-ENV PATH="/home/dev/.atuin/bin:${PATH}"
 ENV IN_CONTAINER=1
 ENV POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true
 
 WORKDIR /home/dev/projects
 
+ENTRYPOINT ["/home/dev/.local/bin/entrypoint.sh"]
 CMD ["/bin/zsh"]
