@@ -46,6 +46,15 @@ cmd_start() {
       ;;
     missing)
       echo "Creating container '$CONTAINER' from image '$IMAGE' ..."
+
+      local -a ssh_agent_args=()
+      if [[ -S "${SSH_AUTH_SOCK:-}" ]]; then
+        ssh_agent_args=(
+          -v "$SSH_AUTH_SOCK:/run/ssh-auth.sock"
+          -e "SSH_AUTH_SOCK=/run/ssh-auth.sock"
+        )
+      fi
+
       exec docker run -it \
         --name "$CONTAINER" \
         -v "${CONTAINER}_home:/home/dev" \
@@ -58,6 +67,7 @@ cmd_start() {
         -v "$DOTFILES_DIR/.p10k.zsh:/home/dev/.p10k.zsh:ro" \
         -v "$DOTFILES_DIR/.config/git:/home/dev/.config/git:ro" \
         -v "$DOTFILES_DIR/.local/bin:/home/dev/.local/bin:ro" \
+        "${ssh_agent_args[@]}" \
         "$IMAGE"
       ;;
     *)
