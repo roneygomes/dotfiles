@@ -7,6 +7,7 @@ export PROJECTS_DIR=~/projects
 export ZSH_DISABLE_COMPFIX=true
 export plugins=(cp vi-mode git git-extras fzf z)
 export ZSH_THEME="powerlevel10k/powerlevel10k"
+export ZSH_CUSTOM=$HOME/.config/oh-my-zsh-custom
 
 # nix
 if [ -f "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then

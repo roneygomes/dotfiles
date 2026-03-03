@@ -9,8 +9,6 @@ RUN apt-get update && apt-get install -y \
     curl \
     git \
     locales \
-    openssh-client \
-    socat \
     sudo \
     xz-utils \
     zsh \
@@ -48,39 +46,28 @@ WORKDIR /home/dev
 # ── Nix (single-user, no daemon) ──────────────────────────────────────────────
 RUN curl -L https://nixos.org/nix/install | sh -s -- --no-daemon \
     && mkdir -p ~/.config/nix \
-    && echo "experimental-features = nix-command flakes" > ~/.config/nix/nix.conf
+    && printf 'experimental-features = nix-command flakes\nconnect-timeout = 120\nhttp-connections = 1\n' > ~/.config/nix/nix.conf
 
 ENV PATH=/home/dev/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH
 
+# ── nixpkgs channel (downloaded from nixos.org, avoids GitHub CDN inside Docker)
+RUN nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs \
+    && nix-channel --update
+
 # ── Dev tools via flake ───────────────────────────────────────────────────────
 COPY --chown=dev:dev flake.nix /tmp/devenv/flake.nix
-RUN nix profile install 'path:/tmp/devenv' \
+RUN NIXPKGS_PATH=$(nix-instantiate --find-file nixpkgs) \
+    && nix profile install 'path:/tmp/devenv' \
+       --override-input nixpkgs "path:$NIXPKGS_PATH" \
     && nix-collect-garbage -d \
     && rm -rf /tmp/devenv
 
 RUN git lfs install
 
-# ── oh-my-zsh ─────────────────────────────────────────────────────────────────
-RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-
-# ── Powerlevel10k + pre-download gitstatusd ───────────────────────────────────
-RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git \
-    ~/.oh-my-zsh/custom/themes/powerlevel10k \
-    && ~/.oh-my-zsh/custom/themes/powerlevel10k/gitstatus/install
-
-# ── fzf from source (oh-my-zsh plugin needs ~/.fzf/shell/) ───────────────────
-RUN git clone --depth=1 https://github.com/junegunn/fzf.git ~/.fzf \
-    && ~/.fzf/install --all --no-update-rc
-
-# ── nvm + Node LTS ───────────────────────────────────────────────────────────
-# nvm needs bash and must not see the nix-provided node in PATH
-SHELL ["/bin/bash", "-c"]
-RUN export NVM_DIR="$HOME/.nvm" \
-    && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash \
-    && source "$NVM_DIR/nvm.sh" \
-    && nvm install --lts \
-    && nvm alias default 'lts/*'
-SHELL ["/bin/sh", "-c"]
+# ── Powerlevel10k theme (link nix package into oh-my-zsh custom themes) ──────
+RUN mkdir -p ~/.config/oh-my-zsh-custom/themes \
+    && ln -s ~/.nix-profile/share/zsh-powerlevel10k \
+       ~/.config/oh-my-zsh-custom/themes/powerlevel10k
 
 # ── Entrypoint ────────────────────────────────────────────────────────────────
 # Dotfiles are mounted as a volume at runtime (/home/dev/.dotfiles).

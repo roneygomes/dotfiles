@@ -24,15 +24,21 @@
             paths = with pkgs; [
               claude-code
               codex
+              fzf
               gh
-              google-cloud-sdk
-              ripgrep
-              jq
-              uv
-              jwt-cli
-              terraform
               git-lfs
+              google-cloud-sdk
+              jq
+              jwt-cli
+              nodejs
+              oh-my-zsh
+              openssh
               postgresql
+              ripgrep
+              socat
+              terraform
+              uv
+              zsh-powerlevel10k
             ];
           };
         }
