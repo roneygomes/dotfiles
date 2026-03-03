@@ -11,6 +11,42 @@ IMAGE="${DEVBOX_IMAGE:-devbox}"
 CONTAINER="${DEVBOX_CONTAINER:-devbox}"
 DOTFILES_DIR="${DOTFILES_DIR:-$HOME/projects/dotfiles}"
 
+# Port used to bridge the macOS SSH agent socket into the container via TCP.
+SSH_BRIDGE_PORT="${DEVBOX_SSH_BRIDGE_PORT:-12345}"
+SSH_BRIDGE_STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/devbox"
+SSH_BRIDGE_PID_FILE="$SSH_BRIDGE_STATE_DIR/ssh-bridge.pid"
+SSH_BRIDGE_SOCK_FILE="$SSH_BRIDGE_STATE_DIR/ssh-bridge.sock"
+
+# ---------------------------------------------------------------------------
+# SSH agent bridge
+#
+# macOS Unix sockets can't be used directly inside OrbStack/Docker containers
+# (virtio-fs shares the file but not the socket endpoint). Instead we run a
+# socat TCP listener on the Mac that forwards to $SSH_AUTH_SOCK, and a
+# corresponding socat inside the container that exposes it as a Unix socket.
+# ---------------------------------------------------------------------------
+ensure_ssh_bridge() {
+  [[ -S "${SSH_AUTH_SOCK:-}" ]] || return 0
+  command -v socat &>/dev/null || { echo "warning: socat not found, SSH agent forwarding disabled" >&2; return 0; }
+
+  mkdir -p "$SSH_BRIDGE_STATE_DIR"
+
+  # Kill stale bridge (dead PID or SSH_AUTH_SOCK changed since last start)
+  if [[ -f "$SSH_BRIDGE_PID_FILE" && -f "$SSH_BRIDGE_SOCK_FILE" ]]; then
+    local pid; pid=$(cat "$SSH_BRIDGE_PID_FILE")
+    local last_sock; last_sock=$(cat "$SSH_BRIDGE_SOCK_FILE")
+    if kill -0 "$pid" 2>/dev/null && [[ "$last_sock" == "$SSH_AUTH_SOCK" ]]; then
+      return 0  # already running with the correct socket
+    fi
+    kill "$pid" 2>/dev/null || true
+  fi
+
+  socat "TCP-LISTEN:${SSH_BRIDGE_PORT},fork,reuseaddr" \
+        "UNIX-CONNECT:${SSH_AUTH_SOCK}" &
+  echo $! > "$SSH_BRIDGE_PID_FILE"
+  echo "$SSH_AUTH_SOCK" > "$SSH_BRIDGE_SOCK_FILE"
+}
+
 # ---------------------------------------------------------------------------
 # Commands
 # ---------------------------------------------------------------------------
@@ -40,23 +76,18 @@ cmd_start() {
       exec docker exec -it "$CONTAINER" /bin/zsh
       ;;
     exited|created|paused)
+      ensure_ssh_bridge
       echo "Starting container '$CONTAINER' ..."
       docker start "$CONTAINER" > /dev/null
       exec docker exec -it "$CONTAINER" /bin/zsh
       ;;
     missing)
+      ensure_ssh_bridge
       echo "Creating container '$CONTAINER' from image '$IMAGE' ..."
-
-      local -a ssh_agent_args=()
-      if [[ -S "${SSH_AUTH_SOCK:-}" ]]; then
-        ssh_agent_args=(
-          -v "$SSH_AUTH_SOCK:/run/ssh-auth.sock"
-          -e "SSH_AUTH_SOCK=/run/ssh-auth.sock"
-        )
-      fi
-
       exec docker run -it \
         --name "$CONTAINER" \
+        --add-host=host.docker.internal:host-gateway \
+        -e "SSH_AGENT_BRIDGE_PORT=${SSH_BRIDGE_PORT}" \
         -v "${CONTAINER}_home:/home/dev" \
         -v /var/run/docker.sock:/var/run/docker.sock \
         -v "$HOME/projects:/home/dev/projects" \
@@ -67,7 +98,6 @@ cmd_start() {
         -v "$DOTFILES_DIR/.p10k.zsh:/home/dev/.p10k.zsh:ro" \
         -v "$DOTFILES_DIR/.config/git:/home/dev/.config/git:ro" \
         -v "$DOTFILES_DIR/.local/bin:/home/dev/.local/bin:ro" \
-        "${ssh_agent_args[@]}" \
         "$IMAGE"
       ;;
     *)
@@ -87,9 +117,10 @@ Usage:
   devbox help    Show this help message
 
 Environment variables:
-  DEVBOX_IMAGE      Image name (default: devbox)
-  DEVBOX_CONTAINER  Container name (default: devbox)
-  DOTFILES_DIR      Path to dotfiles repo (default: ~/projects/dotfiles)
+  DEVBOX_IMAGE            Image name (default: devbox)
+  DEVBOX_CONTAINER        Container name (default: devbox)
+  DOTFILES_DIR            Path to dotfiles repo (default: ~/projects/dotfiles)
+  DEVBOX_SSH_BRIDGE_PORT  TCP port for SSH agent bridge (default: 12345)
 EOF
 }
 

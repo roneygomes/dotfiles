@@ -9,14 +9,21 @@ fi
 sudo chmod 666 /var/run/docker.sock
 
 # ── SSH setup ─────────────────────────────────────────────────────────────────
-# The host ~/.ssh is mounted read-only at ~/.ssh-host. Copy it to ~/.ssh so we
-# can set the strict ownership/permissions SSH requires.
+# Copy ~/.ssh-host (read-only bind mount) to ~/.ssh with correct permissions.
 if [ -d "$HOME/.ssh-host" ]; then
     mkdir -p "$HOME/.ssh"
     cp -r "$HOME/.ssh-host/." "$HOME/.ssh/"
     chmod 700 "$HOME/.ssh"
     chmod 600 "$HOME/.ssh"/* 2>/dev/null || true
     chmod 644 "$HOME/.ssh"/*.pub 2>/dev/null || true
+fi
+
+# ── SSH agent bridge ──────────────────────────────────────────────────────────
+# Connect to the macOS SSH agent via the TCP bridge started by `devbox start`,
+# and expose it locally as a Unix socket that SSH clients expect.
+if [ -n "${SSH_AGENT_BRIDGE_PORT:-}" ]; then
+    socat "UNIX-LISTEN:/tmp/ssh-auth.sock,fork,reuseaddr,unlink-early" \
+          "TCP:host.docker.internal:${SSH_AGENT_BRIDGE_PORT}" &
 fi
 
 exec "$@"

@@ -20,6 +20,9 @@ PATH=$HOME/.local/bin:$PATH
 # node
 export NODE_OPTIONS="--max-old-space-size=2048"
 
+# ssh agent (socket created by entrypoint via socat bridge)
+export SSH_AUTH_SOCK=/tmp/ssh-auth.sock
+
 # docker
 export DOCKER_CONFIG=$HOME/.config/docker
 export COMPOSE_BAKE=true
