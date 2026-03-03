@@ -80,15 +80,11 @@ RUN export NVM_DIR="$HOME/.nvm" \
     && nvm alias default 'lts/*'
 SHELL ["/bin/sh", "-c"]
 
-# ── Config files ──────────────────────────────────────────────────────────────
-COPY --chown=dev:dev .p10k.zsh /home/dev/.p10k.zsh
-COPY --chown=dev:dev .config/git/ /home/dev/.config/git/
-COPY --chown=dev:dev .local/bin/ /home/dev/.local/bin/
-COPY --chown=dev:dev docker/.zshrc /home/dev/.zshrc
-COPY --chown=dev:dev docker/.zshenv /home/dev/.zshenv
+# ── Entrypoint ────────────────────────────────────────────────────────────────
+# Dotfiles are mounted as a volume at runtime (/home/dev/.dotfiles).
+# The entrypoint symlinks them into place on each container start.
 COPY --chown=dev:dev docker/entrypoint.sh /home/dev/.local/bin/entrypoint.sh
-
-RUN chmod +x /home/dev/.local/bin/*
+RUN chmod +x /home/dev/.local/bin/entrypoint.sh
 
 ENV SHELL=/bin/zsh
 ENV IN_CONTAINER=1
