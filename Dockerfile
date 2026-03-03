@@ -36,7 +36,8 @@ RUN install -m 0755 -d /etc/apt/keyrings \
 RUN usermod -l dev -d /home/dev -m -s /bin/zsh ubuntu \
     && groupmod -n dev ubuntu \
     && echo "dev ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/dev \
-    && chmod 0440 /etc/sudoers.d/dev
+    && chmod 0440 /etc/sudoers.d/dev \
+    && rm -f /etc/ssh/ssh_config
 
 RUN mkdir -p /nix && chown dev:dev /nix
 
@@ -72,6 +73,7 @@ RUN mkdir -p ~/.config/oh-my-zsh-custom/themes \
 # ── Entrypoint ────────────────────────────────────────────────────────────────
 # Dotfiles are mounted as a volume at runtime (/home/dev/.dotfiles).
 # The entrypoint symlinks them into place on each container start.
+COPY docker/ssh_config /etc/ssh/ssh_config
 COPY --chmod=755 docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 
 ENV SHELL=/bin/zsh

@@ -1,6 +1,21 @@
 #!/bin/sh
 set -e
 
+# ── Nix profile repair ───────────────────────────────────────────────────────
+# The home directory lives on a persistent volume, so the nix profile symlink
+# may point to a store path from a previous image build. Re-link if broken.
+NIX_PROFILE="$HOME/.nix-profile"
+if [ -L "$NIX_PROFILE" ] && [ ! -e "$NIX_PROFILE/bin" ]; then
+    PROFILE=$(find /nix/store -maxdepth 1 -name "*-profile" -type d 2>/dev/null | head -1)
+    if [ -n "$PROFILE" ] && [ -d "$PROFILE/bin" ]; then
+        rm -f "$HOME/.local/state/nix/profiles"/profile*
+        ln -s "$PROFILE" "$HOME/.local/state/nix/profiles/profile-1-link"
+        ln -s profile-1-link "$HOME/.local/state/nix/profiles/profile"
+    fi
+fi
+
+export PATH="$NIX_PROFILE/bin:$PATH"
+
 if [ ! -S /var/run/docker.sock ]; then
     echo "error: Docker socket not found. Mount it with -v /var/run/docker.sock:/var/run/docker.sock"
     exit 1
@@ -9,12 +24,15 @@ fi
 sudo chmod 666 /var/run/docker.sock
 
 # ── SSH setup ─────────────────────────────────────────────────────────────────
-# Copy ~/.ssh-host (read-only bind mount) to ~/.ssh with correct permissions.
+# Start fresh — the volume may have stale files from a previous image.
+# Copy only known_hosts from the host; keys come via the agent bridge.
+rm -rf "$HOME/.ssh"
 if [ -d "$HOME/.ssh-host" ]; then
-    sudo cp -r "$HOME/.ssh-host/." "$HOME/.ssh/"
-    sudo chown -R dev:dev "$HOME/.ssh"
-    chmod -R u=rwX,go= "$HOME/.ssh"
-    chmod 644 "$HOME/.ssh"/*.pub 2>/dev/null || true
+    mkdir -p "$HOME/.ssh"
+    cp "$HOME/.ssh-host"/known_hosts* "$HOME/.ssh/" 2>/dev/null || true
+    chown -R dev:dev "$HOME/.ssh"
+    chmod 700 "$HOME/.ssh"
+    chmod 644 "$HOME/.ssh"/known_hosts* 2>/dev/null || true
 fi
 
 # ── SSH agent bridge ──────────────────────────────────────────────────────────
