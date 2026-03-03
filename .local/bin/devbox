@@ -52,6 +52,7 @@ cmd_start() {
         -v /var/run/docker.sock:/var/run/docker.sock \
         -v "$HOME/projects:/home/dev/projects" \
         -v "$HOME/.claude:/home/dev/.claude" \
+        -v "$HOME/.ssh:/home/dev/.ssh:ro" \
         -v "$DOTFILES_DIR/docker/.zshrc:/home/dev/.zshrc:ro" \
         -v "$DOTFILES_DIR/docker/.zshenv:/home/dev/.zshenv:ro" \
         -v "$DOTFILES_DIR/.p10k.zsh:/home/dev/.p10k.zsh:ro" \
