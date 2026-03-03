@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     git \
     locales \
+    openssh-client \
     sudo \
     xz-utils \
     zsh \
