@@ -48,9 +48,11 @@ cmd_start() {
       echo "Creating container '$CONTAINER' from image '$IMAGE' ..."
       exec docker run -it \
         --name "$CONTAINER" \
+        -v "${CONTAINER}_home:/home/dev" \
         -v /var/run/docker.sock:/var/run/docker.sock \
         -v "$HOME/projects:/home/dev/projects" \
         -v "$HOME/.claude:/home/dev/.claude" \
+        -v "$DOTFILES_DIR:/home/dev/.dotfiles:ro" \
         "$IMAGE"
       ;;
     *)
