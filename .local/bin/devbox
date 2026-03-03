@@ -78,8 +78,7 @@ cmd_start() {
     exited|created|paused)
       ensure_ssh_bridge
       echo "Starting container '$CONTAINER' ..."
-      docker start "$CONTAINER" > /dev/null
-      exec docker exec -it "$CONTAINER" /bin/zsh
+      exec docker start -ai "$CONTAINER"
       ;;
     missing)
       ensure_ssh_bridge

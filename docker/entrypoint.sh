@@ -11,10 +11,9 @@ sudo chmod 666 /var/run/docker.sock
 # ── SSH setup ─────────────────────────────────────────────────────────────────
 # Copy ~/.ssh-host (read-only bind mount) to ~/.ssh with correct permissions.
 if [ -d "$HOME/.ssh-host" ]; then
-    mkdir -p "$HOME/.ssh"
-    cp -r "$HOME/.ssh-host/." "$HOME/.ssh/"
-    chmod 700 "$HOME/.ssh"
-    chmod 600 "$HOME/.ssh"/* 2>/dev/null || true
+    sudo cp -r "$HOME/.ssh-host/." "$HOME/.ssh/"
+    sudo chown -R dev:dev "$HOME/.ssh"
+    chmod -R u=rwX,go= "$HOME/.ssh"
     chmod 644 "$HOME/.ssh"/*.pub 2>/dev/null || true
 fi
 
