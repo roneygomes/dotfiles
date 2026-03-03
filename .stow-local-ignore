@@ -13,7 +13,10 @@ _darcs
 \.stow-local-ignore
 
 # Project-specific files (not meant for $HOME)
+AGENTS\.md
 CLAUDE\.md
+docker
+flake\.nix
 \.claude/settings\.local\.json
 \.config/op/config
 LICENSE\.txt
