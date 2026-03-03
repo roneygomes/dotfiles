@@ -84,8 +84,7 @@ SHELL ["/bin/sh", "-c"]
 # ── Entrypoint ────────────────────────────────────────────────────────────────
 # Dotfiles are mounted as a volume at runtime (/home/dev/.dotfiles).
 # The entrypoint symlinks them into place on each container start.
-COPY --chown=dev:dev docker/entrypoint.sh /home/dev/.local/bin/entrypoint.sh
-RUN chmod +x /home/dev/.local/bin/entrypoint.sh
+COPY --chmod=755 docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 
 ENV SHELL=/bin/zsh
 ENV IN_CONTAINER=1
@@ -93,5 +92,5 @@ ENV POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true
 
 WORKDIR /home/dev/projects
 
-ENTRYPOINT ["/home/dev/.local/bin/entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["/bin/zsh"]
