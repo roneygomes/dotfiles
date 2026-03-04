@@ -75,5 +75,8 @@ export CLOUDSDK_PYTHON_SITEPACKAGES=1
 # OpenAI Codex
 export CODEX_HOME=$HOME/.config/codex
 
+# Google Antigravity
+PATH=$HOME/.antigravity/antigravity/bin:$PATH
+
 # keep at the end
 export PATH=$PATH

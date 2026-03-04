@@ -41,4 +41,5 @@ cask "markedit"
 cask "codex"
 cask "slack"
 cask "visual-studio-code"
+cask "antigravity"
 
