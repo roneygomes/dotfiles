@@ -30,7 +30,7 @@ export OPENSSL_ROOT_DIR
 PATH=/usr/local/opt/openssl@3/bin:$PATH:
 
 # bitwarden SSH agent
-SSH_AUTH_SOCK=/Users/roney/Library/Containers/com.bitwarden.desktop/Data/.bitwarden-ssh-agent.sock
+SSH_AUTH_SOCK=$HOME/.bitwarden-ssh-agent.sock
 
 # bins
 PATH=$HOME/.local/bin:$PATH:
