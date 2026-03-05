@@ -1,5 +1,8 @@
 FROM ubuntu:24.04
 
+ARG USERNAME=dev
+ARG USER_HOME=/home/dev
+
 ENV DEBIAN_FRONTEND=noninteractive
 
 # ── Bootstrap (bare minimum for nix to run) ───────────────────────────────────
@@ -31,32 +34,33 @@ RUN install -m 0755 -d /etc/apt/keyrings \
     docker-compose-plugin \
     && rm -rf /var/lib/apt/lists/*
 
-# ── Create dev user ───────────────────────────────────────────────────────────
-# Ubuntu 24.04 ships an 'ubuntu' user at UID 1000; rename it to 'dev'
-RUN usermod -l dev -d /home/dev -m -s /bin/zsh ubuntu \
-    && groupmod -n dev ubuntu \
-    && echo "dev ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/dev \
-    && chmod 0440 /etc/sudoers.d/dev \
+# ── Create user ────────────────────────────────────────────────────────────────
+# Ubuntu 24.04 ships an 'ubuntu' user at UID 1000; rename to match the host user
+RUN mkdir -p "$(dirname "${USER_HOME}")" \
+    && usermod -l "${USERNAME}" -d "${USER_HOME}" -m -s /bin/zsh ubuntu \
+    && groupmod -n "${USERNAME}" ubuntu \
+    && echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/"${USERNAME}" \
+    && chmod 0440 /etc/sudoers.d/"${USERNAME}" \
     && rm -f /etc/ssh/ssh_config
 
-RUN mkdir -p /nix && chown dev:dev /nix
+RUN mkdir -p /nix && chown "${USERNAME}:${USERNAME}" /nix
 
-USER dev
-WORKDIR /home/dev
+USER ${USERNAME}
+WORKDIR ${USER_HOME}
 
 # ── Nix (single-user, no daemon) ──────────────────────────────────────────────
 RUN curl -L https://nixos.org/nix/install | sh -s -- --no-daemon \
     && mkdir -p ~/.config/nix \
     && printf 'experimental-features = nix-command flakes\nconnect-timeout = 120\nhttp-connections = 1\n' > ~/.config/nix/nix.conf
 
-ENV PATH=/home/dev/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH
+ENV PATH=${USER_HOME}/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH
 
 # ── nixpkgs channel (downloaded from nixos.org, avoids GitHub CDN inside Docker)
 RUN nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs \
     && nix-channel --update
 
 # ── Dev tools via flake ───────────────────────────────────────────────────────
-COPY --chown=dev:dev flake.nix /tmp/devenv/flake.nix
+COPY --chown=${USERNAME}:${USERNAME} flake.nix /tmp/devenv/flake.nix
 RUN NIXPKGS_PATH=$(nix-instantiate --find-file nixpkgs) \
     && nix profile install 'path:/tmp/devenv' \
        --override-input nixpkgs "path:$NIXPKGS_PATH" \
@@ -71,7 +75,7 @@ RUN mkdir -p ~/.config/oh-my-zsh-custom/themes \
        ~/.config/oh-my-zsh-custom/themes/powerlevel10k
 
 # ── Entrypoint ────────────────────────────────────────────────────────────────
-# Dotfiles are mounted as a volume at runtime (/home/dev/.dotfiles).
+# Dotfiles are mounted as a volume at runtime.
 # The entrypoint symlinks them into place on each container start.
 COPY docker/ssh_config /etc/ssh/ssh_config
 COPY --chmod=755 docker/entrypoint.sh /usr/local/bin/entrypoint.sh
@@ -80,7 +84,7 @@ ENV SHELL=/bin/zsh
 ENV IN_CONTAINER=1
 ENV POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true
 
-WORKDIR /home/dev/projects
+WORKDIR ${USER_HOME}/projects
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["/bin/zsh"]

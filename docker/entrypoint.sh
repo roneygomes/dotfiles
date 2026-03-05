@@ -30,7 +30,7 @@ rm -rf "$HOME/.ssh"
 if [ -d "$HOME/.ssh-host" ]; then
     mkdir -p "$HOME/.ssh"
     cp "$HOME/.ssh-host"/known_hosts* "$HOME/.ssh/" 2>/dev/null || true
-    chown -R dev:dev "$HOME/.ssh"
+    chown -R "$(whoami):$(id -gn)" "$HOME/.ssh"
     chmod 700 "$HOME/.ssh"
     chmod 644 "$HOME/.ssh"/known_hosts* 2>/dev/null || true
 fi
@@ -41,6 +41,23 @@ fi
 if [ -n "${SSH_AGENT_BRIDGE_PORT:-}" ]; then
     socat "UNIX-LISTEN:/tmp/ssh-auth.sock,fork,reuseaddr,unlink-early" \
           "TCP:host.docker.internal:${SSH_AGENT_BRIDGE_PORT}" &
+fi
+
+# ── 1Password daemon bridge ─────────────────────────────────────────────────
+if [ -n "${OP_AGENT_BRIDGE_PORT:-}" ]; then
+    OP_DAEMON_SOCK="/tmp/op-daemon.sock"
+    socat "UNIX-LISTEN:${OP_DAEMON_SOCK},fork,reuseaddr,unlink-early" \
+          "TCP:host.docker.internal:${OP_AGENT_BRIDGE_PORT}" &
+
+    mkdir -p -m 700 "$HOME/.config/op"
+    cat > "$HOME/.config/op/config" <<OPEOF
+{
+  "daemon": {
+    "socketPath": "${OP_DAEMON_SOCK}"
+  }
+}
+OPEOF
+    chmod 600 "$HOME/.config/op/config"
 fi
 
 exec "$@"

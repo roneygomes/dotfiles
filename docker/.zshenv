@@ -34,4 +34,9 @@ export NX_CACHE_DIRECTORY=$HOME/.local/nx/cache
 # OpenAI Codex
 export CODEX_HOME=$HOME/.config/codex
 
+# 1Password CLI plugins
+if [ -f "$HOME/.config/op/plugins.sh" ]; then
+    . "$HOME/.config/op/plugins.sh"
+fi
+
 export PATH=$PATH

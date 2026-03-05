@@ -13,9 +13,15 @@ DOTFILES_DIR="${DOTFILES_DIR:-$HOME/projects/dotfiles}"
 
 # Port used to bridge the macOS SSH agent socket into the container via TCP.
 SSH_BRIDGE_PORT="${DEVBOX_SSH_BRIDGE_PORT:-12345}"
-SSH_BRIDGE_STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/devbox"
-SSH_BRIDGE_PID_FILE="$SSH_BRIDGE_STATE_DIR/ssh-bridge.pid"
-SSH_BRIDGE_SOCK_FILE="$SSH_BRIDGE_STATE_DIR/ssh-bridge.sock"
+BRIDGE_STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/devbox"
+SSH_BRIDGE_PID_FILE="$BRIDGE_STATE_DIR/ssh-bridge.pid"
+SSH_BRIDGE_SOCK_FILE="$BRIDGE_STATE_DIR/ssh-bridge.sock"
+
+# Port used to bridge the 1Password daemon socket into the container via TCP.
+OP_BRIDGE_PORT="${DEVBOX_OP_BRIDGE_PORT:-12346}"
+OP_BRIDGE_PID_FILE="$BRIDGE_STATE_DIR/op-bridge.pid"
+OP_BRIDGE_SOCK_FILE="$BRIDGE_STATE_DIR/op-bridge.sock"
+OP_DAEMON_SOCK="$HOME/.config/op/op-daemon.sock"
 
 # ---------------------------------------------------------------------------
 # SSH agent bridge
@@ -25,26 +31,51 @@ SSH_BRIDGE_SOCK_FILE="$SSH_BRIDGE_STATE_DIR/ssh-bridge.sock"
 # socat TCP listener on the Mac that forwards to $SSH_AUTH_SOCK, and a
 # corresponding socat inside the container that exposes it as a Unix socket.
 # ---------------------------------------------------------------------------
-ensure_ssh_bridge() {
-  [[ -S "${SSH_AUTH_SOCK:-}" ]] || return 0
-  command -v socat &>/dev/null || { echo "warning: socat not found, SSH agent forwarding disabled" >&2; return 0; }
+# Start a socat TCP bridge for a Unix socket.
+# Usage: _ensure_bridge <socket_path> <tcp_port> <pid_file> <sock_file> <label>
+_ensure_bridge() {
+  local socket="$1" port="$2" pid_file="$3" sock_file="$4" label="$5"
 
-  mkdir -p "$SSH_BRIDGE_STATE_DIR"
+  [[ -S "$socket" ]] || return 0
+  command -v socat &>/dev/null || { echo "warning: socat not found, $label forwarding disabled" >&2; return 0; }
 
-  # Kill stale bridge (dead PID or SSH_AUTH_SOCK changed since last start)
-  if [[ -f "$SSH_BRIDGE_PID_FILE" && -f "$SSH_BRIDGE_SOCK_FILE" ]]; then
-    local pid; pid=$(cat "$SSH_BRIDGE_PID_FILE")
-    local last_sock; last_sock=$(cat "$SSH_BRIDGE_SOCK_FILE")
-    if kill -0 "$pid" 2>/dev/null && [[ "$last_sock" == "$SSH_AUTH_SOCK" ]]; then
-      return 0  # already running with the correct socket
+  mkdir -p "$BRIDGE_STATE_DIR"
+
+  if [[ -f "$pid_file" && -f "$sock_file" ]]; then
+    local pid; pid=$(cat "$pid_file")
+    local last_sock; last_sock=$(cat "$sock_file")
+    if kill -0 "$pid" 2>/dev/null && [[ "$last_sock" == "$socket" ]]; then
+      return 0
     fi
     kill "$pid" 2>/dev/null || true
   fi
 
-  socat "TCP-LISTEN:${SSH_BRIDGE_PORT},fork,reuseaddr" \
-        "UNIX-CONNECT:${SSH_AUTH_SOCK}" &
-  echo $! > "$SSH_BRIDGE_PID_FILE"
-  echo "$SSH_AUTH_SOCK" > "$SSH_BRIDGE_SOCK_FILE"
+  socat "TCP-LISTEN:${port},fork,reuseaddr" \
+        "UNIX-CONNECT:${socket}" &
+  echo $! > "$pid_file"
+  echo "$socket" > "$sock_file"
+}
+
+ensure_ssh_bridge() {
+  _ensure_bridge "${SSH_AUTH_SOCK:-}" "$SSH_BRIDGE_PORT" \
+    "$SSH_BRIDGE_PID_FILE" "$SSH_BRIDGE_SOCK_FILE" "SSH agent"
+}
+
+ensure_op_bridge() {
+  _ensure_bridge "$OP_DAEMON_SOCK" "$OP_BRIDGE_PORT" \
+    "$OP_BRIDGE_PID_FILE" "$OP_BRIDGE_SOCK_FILE" "1Password daemon"
+}
+
+# Export Claude Code OAuth credentials from the macOS Keychain into the
+# plaintext fallback file that Claude Code uses on Linux (~/.claude/.credentials.json).
+sync_claude_credentials() {
+  local cred_file="$HOME/.claude/.credentials.json"
+  local creds
+  creds=$(security find-generic-password -s "Claude Code-credentials" -w 2>/dev/null) || return 0
+  [[ -n "$creds" ]] || return 0
+
+  printf '%s' "$creds" > "$cred_file"
+  chmod 600 "$cred_file"
 }
 
 # ---------------------------------------------------------------------------
@@ -58,7 +89,10 @@ cmd_build() {
   fi
 
   echo "Building image '$IMAGE' from $DOTFILES_DIR ..."
-  docker build -t "$IMAGE" "$DOTFILES_DIR"
+  docker build \
+    --build-arg "USERNAME=$USER" \
+    --build-arg "USER_HOME=$HOME" \
+    -t "$IMAGE" "$DOTFILES_DIR"
   echo "Done."
 }
 
@@ -77,26 +111,33 @@ cmd_start() {
       ;;
     exited|created|paused)
       ensure_ssh_bridge
+      ensure_op_bridge
+      sync_claude_credentials
       echo "Starting container '$CONTAINER' ..."
       exec docker start -ai "$CONTAINER"
       ;;
     missing)
       ensure_ssh_bridge
+      ensure_op_bridge
+      sync_claude_credentials
       echo "Creating container '$CONTAINER' from image '$IMAGE' ..."
       exec docker run -it \
         --name "$CONTAINER" \
         --add-host=host.docker.internal:host-gateway \
         -e "SSH_AGENT_BRIDGE_PORT=${SSH_BRIDGE_PORT}" \
-        -v "${CONTAINER}_home:/home/dev" \
+        -e "OP_AGENT_BRIDGE_PORT=${OP_BRIDGE_PORT}" \
+        -e "HOME=$HOME" \
+        -v "${CONTAINER}_home:$HOME" \
         -v /var/run/docker.sock:/var/run/docker.sock \
-        -v "$HOME/projects:/home/dev/projects" \
-        -v "$HOME/.claude:/home/dev/.claude" \
-        -v "$HOME/.ssh:/home/dev/.ssh-host:ro" \
-        -v "$DOTFILES_DIR/docker/.zshrc:/home/dev/.zshrc:ro" \
-        -v "$DOTFILES_DIR/docker/.zshenv:/home/dev/.zshenv:ro" \
-        -v "$DOTFILES_DIR/.p10k.zsh:/home/dev/.p10k.zsh:ro" \
-        -v "$DOTFILES_DIR/.config/git:/home/dev/.config/git:ro" \
-        -v "$DOTFILES_DIR/.local/bin:/home/dev/.local/bin:ro" \
+        -v "$HOME/projects:$HOME/projects" \
+        -v "$HOME/.claude:$HOME/.claude" \
+        -v "$HOME/.claude.json:$HOME/.claude.json" \
+        -v "$HOME/.ssh:$HOME/.ssh-host:ro" \
+        -v "$DOTFILES_DIR/docker/.zshrc:$HOME/.zshrc:ro" \
+        -v "$DOTFILES_DIR/docker/.zshenv:$HOME/.zshenv:ro" \
+        -v "$DOTFILES_DIR/.p10k.zsh:$HOME/.p10k.zsh:ro" \
+        -v "$DOTFILES_DIR/.config/git:$HOME/.config/git:ro" \
+        -v "$DOTFILES_DIR/.local/bin:$HOME/.local/bin:ro" \
         "$IMAGE"
       ;;
     *)
@@ -120,6 +161,7 @@ Environment variables:
   DEVBOX_CONTAINER        Container name (default: devbox)
   DOTFILES_DIR            Path to dotfiles repo (default: ~/projects/dotfiles)
   DEVBOX_SSH_BRIDGE_PORT  TCP port for SSH agent bridge (default: 12345)
+  DEVBOX_OP_BRIDGE_PORT   TCP port for 1Password daemon bridge (default: 12346)
 EOF
 }
 

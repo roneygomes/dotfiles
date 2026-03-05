@@ -22,6 +22,7 @@
           default = pkgs.buildEnv {
             name = "dev-env";
             paths = with pkgs; [
+              _1password-cli
               claude-code
               codex
               fzf
