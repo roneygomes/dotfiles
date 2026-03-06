@@ -8,11 +8,34 @@ NIX_PROFILE="$HOME/.nix-profile"
 if [ -L "$NIX_PROFILE" ] && [ ! -e "$NIX_PROFILE/bin" ]; then
     PROFILE=$(find /nix/store -maxdepth 1 -name "*-profile" -type d 2>/dev/null | head -1)
     if [ -n "$PROFILE" ] && [ -d "$PROFILE/bin" ]; then
+        mkdir -p "$HOME/.local/state/nix/profiles"
         rm -f "$HOME/.local/state/nix/profiles"/profile*
         ln -s "$PROFILE" "$HOME/.local/state/nix/profiles/profile-1-link"
         ln -s profile-1-link "$HOME/.local/state/nix/profiles/profile"
+        ln -sf "$HOME/.local/state/nix/profiles/profile" "$NIX_PROFILE"
     fi
 fi
+
+# ── Fix stale home-path symlinks ──────────────────────────────────────────────
+# The volume may contain symlinks targeting a previous USER_HOME (e.g. /home/dev
+# when the current HOME is /Users/roney). Find broken symlinks whose target
+# starts with a home-like prefix and rebase them to the current $HOME.
+find "$HOME" -xdev -type l ! -exec test -e {} \; -print 2>/dev/null \
+| while IFS= read -r link; do
+    target=$(readlink "$link")
+    # Match absolute paths starting with /home/<user>/... or /Users/<user>/...
+    case "$target" in
+        /home/*/*|/Users/*/*)
+            # Strip the old home prefix (first 3 path components: /home/user or /Users/user)
+            old_home=$(echo "$target" | cut -d/ -f1-3)
+            suffix=${target#"$old_home"}
+            new_target="$HOME$suffix"
+            if [ -e "$new_target" ] || [ -L "$new_target" ]; then
+                ln -sf "$new_target" "$link"
+            fi
+            ;;
+    esac
+done
 
 export PATH="$NIX_PROFILE/bin:$PATH"
 
