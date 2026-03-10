@@ -87,7 +87,11 @@ fi
 # The bind mount for .devbox-token may cause Docker to create ~/.config/gh/
 # as root. Fix ownership so gh can write hosts.yml if needed.
 if [ -d "$HOME/.config/gh" ]; then
-    chown "$(whoami):$(id -gn)" "$HOME/.config/gh"
+    sudo chown "$(whoami):$(id -gn)" "$HOME/.config/gh"
 fi
+
+# ── npm cache permissions ─────────────────────────────────────────────────────
+# npx bin stubs on Docker volumes may lose the execute bit.
+chmod -R u+x "$HOME/.npm/_npx" 2>/dev/null || true
 
 exec "$@"
