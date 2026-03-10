@@ -83,4 +83,12 @@ OPEOF
     chmod 600 "$HOME/.config/op/config"
 fi
 
+# ── GitHub CLI credentials ────────────────────────────────────────────────────
+# Read the token synced from the macOS Keychain by `devbox start`.
+GH_TOKEN_FILE="$HOME/.config/gh/.devbox-token"
+if [ -f "$GH_TOKEN_FILE" ] && [ -s "$GH_TOKEN_FILE" ]; then
+    export GH_TOKEN
+    GH_TOKEN=$(cat "$GH_TOKEN_FILE")
+fi
+
 exec "$@"

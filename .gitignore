@@ -18,6 +18,7 @@
 # private
 .private
 .ssh/config
+.config/gh/.devbox-token
 
 # iterm2 - ignore everything except the main config file
 .config/iterm2/*

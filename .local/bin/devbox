@@ -79,6 +79,28 @@ sync_claude_credentials() {
   chmod 600 "$cred_file"
 }
 
+# Export the GitHub CLI OAuth token from the macOS Keychain into a file
+# that the container entrypoint sources as GH_TOKEN.
+sync_gh_credentials() {
+  local token_file="$HOME/.config/gh/.devbox-token"
+  mkdir -p "$(dirname "$token_file")"
+
+  local raw
+  raw=$(security find-generic-password -s "gh:github.com" -w 2>/dev/null) || { touch "$token_file"; return 0; }
+  [[ -n "$raw" ]] || { touch "$token_file"; return 0; }
+
+  # go-keyring stores the value as base64 with a prefix
+  local token
+  if [[ "$raw" == go-keyring-base64:* ]]; then
+    token=$(printf '%s' "${raw#go-keyring-base64:}" | base64 -d)
+  else
+    token="$raw"
+  fi
+
+  printf '%s' "$token" > "$token_file"
+  chmod 600 "$token_file"
+}
+
 # ---------------------------------------------------------------------------
 # Container naming
 # ---------------------------------------------------------------------------
@@ -142,6 +164,7 @@ cmd_start() {
       ensure_ssh_bridge
       ensure_op_bridge
       sync_claude_credentials
+      sync_gh_credentials
       echo "Starting container '$container' ($target_dir) ..."
       exec docker start -ai "$container"
       ;;
@@ -149,6 +172,7 @@ cmd_start() {
       ensure_ssh_bridge
       ensure_op_bridge
       sync_claude_credentials
+      sync_gh_credentials
       echo "Creating container '$container' for $target_dir ..."
       exec docker run -it \
         --name "$container" \
@@ -162,6 +186,7 @@ cmd_start() {
         -v "$target_dir:$target_dir" \
         -v "$HOME/.claude:$HOME/.claude" \
         -v "$HOME/.claude.json:$HOME/.claude.json" \
+        -v "$HOME/.config/gh/.devbox-token:$HOME/.config/gh/.devbox-token:ro" \
         -v "$HOME/.ssh:$HOME/.ssh-host:ro" \
         -v "$DOTFILES_DIR/docker/.zshrc:$HOME/.zshrc:ro" \
         -v "$DOTFILES_DIR/docker/.zshenv:$HOME/.zshenv:ro" \
