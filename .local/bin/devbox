@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
-# devbox - manage the dev container
+# devbox - manage per-directory dev containers
 #
 # Commands:
-#   devbox build   Build the image from the dotfiles repo
-#   devbox start   Create (or resume) the container and attach a shell
+#   devbox build          Build the image from the dotfiles repo
+#   devbox start [path]   Create (or resume) a container scoped to path (default: $PWD)
+#   devbox stop  [path]   Stop the container for path (default: $PWD)
+#   devbox list           List all devbox containers
 
 set -e
 
 IMAGE="${DEVBOX_IMAGE:-devbox}"
-CONTAINER="${DEVBOX_CONTAINER:-devbox}"
 DOTFILES_DIR="${DOTFILES_DIR:-$HOME/projects/dotfiles}"
 
 # Port used to bridge the macOS SSH agent socket into the container via TCP.
@@ -79,6 +80,22 @@ sync_claude_credentials() {
 }
 
 # ---------------------------------------------------------------------------
+# Container naming
+# ---------------------------------------------------------------------------
+# Derive a unique container name from an absolute directory path.
+# Format: devbox-<sanitized-basename>-<8-char-hash>
+_container_name_from_path() {
+  local abs_path="$1"
+  local base
+  base=$(basename "$abs_path")
+  # Lowercase, replace non-alphanumeric with hyphens, collapse runs, strip edges
+  base=$(printf '%s' "$base" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]' '-' | sed 's/^-//;s/-$//')
+  local hash
+  hash=$(printf '%s' "$abs_path" | shasum -a 256 | cut -c1-8)
+  printf 'devbox-%s-%s' "$base" "$hash"
+}
+
+# ---------------------------------------------------------------------------
 # Commands
 # ---------------------------------------------------------------------------
 cmd_build() {
@@ -97,39 +114,52 @@ cmd_build() {
 }
 
 cmd_start() {
+  local target_dir
+  target_dir="$(realpath "${1:-.}")"
+
+  if [[ ! -d "$target_dir" ]]; then
+    echo "error: not a directory: $target_dir" >&2
+    exit 1
+  fi
+
+  local container volume
+  container="$(_container_name_from_path "$target_dir")"
+  volume="${container}_home"
+
   local status
-  if docker inspect --type container "$CONTAINER" &>/dev/null; then
-    status=$(docker inspect --type container --format='{{.State.Status}}' "$CONTAINER")
+  if docker inspect --type container "$container" &>/dev/null; then
+    status=$(docker inspect --type container --format='{{.State.Status}}' "$container")
   else
     status="missing"
   fi
 
   case "$status" in
     running)
-      echo "Attaching to running container '$CONTAINER' ..."
-      exec docker exec -it "$CONTAINER" /bin/zsh
+      echo "Attaching to running container '$container' ($target_dir) ..."
+      exec docker exec -it -w "$target_dir" "$container" /bin/zsh
       ;;
     exited|created|paused)
       ensure_ssh_bridge
       ensure_op_bridge
       sync_claude_credentials
-      echo "Starting container '$CONTAINER' ..."
-      exec docker start -ai "$CONTAINER"
+      echo "Starting container '$container' ($target_dir) ..."
+      exec docker start -ai "$container"
       ;;
     missing)
       ensure_ssh_bridge
       ensure_op_bridge
       sync_claude_credentials
-      echo "Creating container '$CONTAINER' from image '$IMAGE' ..."
+      echo "Creating container '$container' for $target_dir ..."
       exec docker run -it \
-        --name "$CONTAINER" \
+        --name "$container" \
+        --label "devbox.project.dir=$target_dir" \
         --add-host=host.docker.internal:host-gateway \
         -e "SSH_AGENT_BRIDGE_PORT=${SSH_BRIDGE_PORT}" \
         -e "OP_AGENT_BRIDGE_PORT=${OP_BRIDGE_PORT}" \
         -e "HOME=$HOME" \
-        -v "${CONTAINER}_home:$HOME" \
+        -v "${volume}:$HOME" \
         -v /var/run/docker.sock:/var/run/docker.sock \
-        -v "$HOME/projects:$HOME/projects" \
+        -v "$target_dir:$target_dir" \
         -v "$HOME/.claude:$HOME/.claude" \
         -v "$HOME/.claude.json:$HOME/.claude.json" \
         -v "$HOME/.ssh:$HOME/.ssh-host:ro" \
@@ -138,27 +168,58 @@ cmd_start() {
         -v "$DOTFILES_DIR/.p10k.zsh:$HOME/.p10k.zsh:ro" \
         -v "$DOTFILES_DIR/.config/git:$HOME/.config/git:ro" \
         -v "$DOTFILES_DIR/.local/bin:$HOME/.local/bin:ro" \
+        -w "$target_dir" \
         "$IMAGE"
       ;;
     *)
-      echo "error: container '$CONTAINER' is in unexpected state: $status" >&2
+      echo "error: container '$container' is in unexpected state: $status" >&2
       exit 1
       ;;
   esac
 }
 
+cmd_stop() {
+  local target_dir
+  target_dir="$(realpath "${1:-.}")"
+
+  if [[ ! -d "$target_dir" ]]; then
+    echo "error: not a directory: $target_dir" >&2
+    exit 1
+  fi
+
+  local container
+  container="$(_container_name_from_path "$target_dir")"
+
+  if docker inspect --type container "$container" &>/dev/null; then
+    echo "Stopping container '$container' ($target_dir) ..."
+    docker stop "$container"
+  else
+    echo "No devbox container found for $target_dir" >&2
+    exit 1
+  fi
+}
+
+cmd_list() {
+  printf "%-40s %-20s %s\n" "CONTAINER" "STATUS" "PROJECT"
+  docker ps -a --filter "name=^devbox-" --format '{{.Names}}\t{{.Status}}\t{{.Label "devbox.project.dir"}}' \
+    | while IFS=$'\t' read -r name status dir; do
+        printf "%-40s %-20s %s\n" "$name" "$status" "$dir"
+      done
+}
+
 cmd_help() {
   cat << EOF
-devbox - manage the dev container
+devbox - manage per-directory dev containers
 
 Usage:
-  devbox build   Build the Docker image
-  devbox start   Attach to the container (creates it if needed)
-  devbox help    Show this help message
+  devbox build          Build the Docker image
+  devbox start [path]   Attach to the container for path (default: current directory)
+  devbox stop  [path]   Stop the container for path (default: current directory)
+  devbox list           List all devbox containers
+  devbox help           Show this help message
 
 Environment variables:
   DEVBOX_IMAGE            Image name (default: devbox)
-  DEVBOX_CONTAINER        Container name (default: devbox)
   DOTFILES_DIR            Path to dotfiles repo (default: ~/projects/dotfiles)
   DEVBOX_SSH_BRIDGE_PORT  TCP port for SSH agent bridge (default: 12345)
   DEVBOX_OP_BRIDGE_PORT   TCP port for 1Password daemon bridge (default: 12346)
@@ -169,8 +230,10 @@ EOF
 # Router
 # ---------------------------------------------------------------------------
 case "${1:-}" in
-  build) cmd_build ;;
-  start) cmd_start ;;
+  build) shift; cmd_build "$@" ;;
+  start) shift; cmd_start "$@" ;;
+  stop)  shift; cmd_stop "$@" ;;
+  list)  shift; cmd_list "$@" ;;
   help|--help|-h) cmd_help ;;
   "")
     echo "error: command required" >&2

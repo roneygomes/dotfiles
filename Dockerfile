@@ -84,7 +84,7 @@ ENV SHELL=/bin/zsh
 ENV IN_CONTAINER=1
 ENV POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true
 
-WORKDIR ${USER_HOME}/projects
+WORKDIR ${USER_HOME}
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["/bin/zsh"]
