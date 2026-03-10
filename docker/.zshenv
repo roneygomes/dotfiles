@@ -34,6 +34,12 @@ export NX_CACHE_DIRECTORY=$HOME/.local/nx/cache
 # OpenAI Codex
 export CODEX_HOME=$HOME/.config/codex
 
+# GitHub CLI credentials (synced from macOS Keychain by devbox start)
+if [ -z "$GH_TOKEN" ] && [ -s "$HOME/.config/gh/.devbox-token" ]; then
+    export GH_TOKEN
+    GH_TOKEN=$(cat "$HOME/.config/gh/.devbox-token")
+fi
+
 # 1Password CLI plugins
 if [ -f "$HOME/.config/op/plugins.sh" ]; then
     . "$HOME/.config/op/plugins.sh"
