@@ -5,6 +5,7 @@
 #   devbox build          Build the image from the dotfiles repo
 #   devbox start [path]   Create (or resume) a container scoped to path (default: $PWD)
 #   devbox stop  [path]   Stop the container for path (default: $PWD)
+#   devbox rm             Remove all stopped containers and their volumes
 #   devbox list           List all devbox containers
 
 set -e
@@ -158,7 +159,10 @@ cmd_start() {
   case "$status" in
     running)
       echo "Attaching to running container '$container' ($target_dir) ..."
-      exec docker exec -it -w "$target_dir" "$container" /bin/zsh
+      exec docker exec -it \
+        -e "LC_TERMINAL=${LC_TERMINAL:-}" \
+        -e "TERM_PROGRAM=${TERM_PROGRAM:-}" \
+        -w "$target_dir" "$container" /bin/zsh
       ;;
     exited|created|paused)
       ensure_ssh_bridge
@@ -181,6 +185,8 @@ cmd_start() {
         -e "SSH_AGENT_BRIDGE_PORT=${SSH_BRIDGE_PORT}" \
         -e "OP_AGENT_BRIDGE_PORT=${OP_BRIDGE_PORT}" \
         -e "HOME=$HOME" \
+        -e "LC_TERMINAL=${LC_TERMINAL:-}" \
+        -e "TERM_PROGRAM=${TERM_PROGRAM:-}" \
         -v "${volume}:$HOME" \
         -v /var/run/docker.sock:/var/run/docker.sock \
         -v "$target_dir:$target_dir" \
@@ -232,6 +238,38 @@ cmd_list() {
       done
 }
 
+cmd_rm() {
+  local containers
+  containers=$(docker ps -a --filter "name=^devbox-" --filter "status=exited" --filter "status=created" \
+    --format '{{.Names}}\t{{.Label "devbox.project.dir"}}')
+
+  if [[ -z "$containers" ]]; then
+    echo "No stopped devbox containers to remove."
+    return 0
+  fi
+
+  echo "Stopped devbox containers:"
+  while IFS=$'\t' read -r name dir; do
+    printf "  %-40s %s\n" "$name" "$dir"
+  done <<< "$containers"
+  echo ""
+
+  printf "Remove these containers and their home volumes? [y/N] "
+  read -r confirm
+  [[ "$confirm" == [yY] ]] || { echo "Aborted."; return 0; }
+
+  while IFS=$'\t' read -r name _; do
+    local volume="${name}_home"
+    echo "Removing container '$name' ..."
+    docker rm "$name"
+    if docker volume inspect "$volume" &>/dev/null; then
+      echo "Removing volume '$volume' ..."
+      docker volume rm "$volume"
+    fi
+  done <<< "$containers"
+  echo "Done."
+}
+
 cmd_help() {
   cat << EOF
 devbox - manage per-directory dev containers
@@ -240,6 +278,7 @@ Usage:
   devbox build          Build the Docker image
   devbox start [path]   Attach to the container for path (default: current directory)
   devbox stop  [path]   Stop the container for path (default: current directory)
+  devbox rm             Remove all stopped containers and their home volumes
   devbox list           List all devbox containers
   devbox help           Show this help message
 
@@ -258,6 +297,7 @@ case "${1:-}" in
   build) shift; cmd_build "$@" ;;
   start) shift; cmd_start "$@" ;;
   stop)  shift; cmd_stop "$@" ;;
+  rm)    shift; cmd_rm "$@" ;;
   list)  shift; cmd_list "$@" ;;
   help|--help|-h) cmd_help ;;
   "")
