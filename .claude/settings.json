@@ -3,5 +3,9 @@
     "defaultMode": "plan"
   },
   "model": "opus",
-  "skipDangerousModePermissionPrompt": true
+  "enabledPlugins": {
+    "skill-creator@claude-plugins-official": true
+  },
+  "skipDangerousModePermissionPrompt": true,
+  "voiceEnabled": true
 }
