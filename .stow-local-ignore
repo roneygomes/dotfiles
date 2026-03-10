@@ -18,7 +18,10 @@ CLAUDE\.md
 docker
 flake\.nix
 \.claude/settings\.local\.json
-\.config/op/config
 LICENSE\.txt
 README\.md
 Dockerfile
+
+# 1Password
+\.config/op
+
