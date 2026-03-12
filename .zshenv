@@ -66,9 +66,6 @@ export NODE_OPTIONS="--max-old-space-size=2048"
 export DOCKER_CONFIG=$HOME/.config/docker
 export COMPOSE_BAKE=true
 
-# nx
-export NX_CACHE_DIRECTORY=$HOME/.local/nx/cache
-
 # gcloud
 export CLOUDSDK_PYTHON_SITEPACKAGES=1
 
