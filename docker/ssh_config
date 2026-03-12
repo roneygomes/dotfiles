@@ -1,2 +1,0 @@
-# devbox SSH config
-# The SSH agent is provided via socat bridge (see entrypoint.sh).
