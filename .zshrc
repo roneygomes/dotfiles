@@ -68,11 +68,6 @@ autoload -Uz compinit && compinit
 # KEY BINDINGS
 # ==============================================================================
 
-# Disable fzf ctrl-r binding (atuin will rebind ctrl-r at the end)
-bindkey -r '^R'
-
-# Prevent fzf from binding ctrl-r if it loads later
-export FZF_CTRL_R_OPTS=''
 
 # ==============================================================================
 # ALIASES
@@ -241,10 +236,5 @@ if [[ "$INSIDE_EMACS" = 'vterm' ]]; then
 fi
 
 # ==============================================================================
-# SHELL HISTORY (ATUIN) - Keep at end to ensure ctrl-r binding
-# ==============================================================================
-
-eval "$(atuin init zsh --disable-up-arrow)"
-
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
