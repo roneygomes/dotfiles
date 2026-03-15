@@ -21,7 +21,7 @@ fi
 ctx_info=""
 if [ -n "$used" ]; then
   used_int=$(printf "%.0f" "$used")
-  ctx_info=" ctx:${used_int}%"
+  ctx_info=" ctx: ${used_int}%"
 fi
 
 # Build git segment
