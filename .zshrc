@@ -169,6 +169,37 @@ quote_lines() {
 	done
 }
 
+# Append a timestamped entry to today's Apple Notes daily note
+quicknote() {
+  if [ -z "$1" ]; then
+    echo "Usage: quicknote <your note text>"
+    return 1
+  fi
+
+  local CURRENT_DATE=$(date +"%Y-%m-%d")
+  local CURRENT_TIME=$(date +"%H:%M")
+  local NOTE_TEXT="$*"
+
+  osascript - "$CURRENT_DATE" "$CURRENT_TIME" "$NOTE_TEXT" <<'EOF'
+  on run argv
+      set noteTitle to item 1 of argv
+      set currentTime to item 2 of argv
+      set noteText to item 3 of argv
+
+      set newEntry to "<div><b>" & currentTime & "</b> " & noteText & "</div>"
+
+      tell application "Notes"
+          if not (exists note noteTitle) then
+              make new note with properties {body:"<h1>" & noteTitle & "</h1>"}
+          end if
+
+          set theNote to note noteTitle
+          set body of theNote to (body of theNote) & newEntry
+      end tell
+  end run
+EOF
+}
+
 # ==============================================================================
 # GIT FUNCTIONS
 # ==============================================================================
