@@ -34,4 +34,5 @@ cask "claude-code"
 cask "font-jetbrains-mono"
 cask "slack"
 cask "visual-studio-code"
+cask "alt-tab"
 
