@@ -169,35 +169,52 @@ quote_lines() {
 	done
 }
 
-# Append a timestamped entry to today's Apple Notes daily note
+# Append a timestamped entry to today's markdown daily note in iCloud Drive
 quicknote() {
   if [ -z "$1" ]; then
     echo "Usage: quicknote <your note text>"
     return 1
   fi
 
+  local NOTES_DIR="$HOME/Library/Mobile Documents/com~apple~CloudDocs/Notes"
   local CURRENT_DATE=$(date +"%Y-%m-%d")
   local CURRENT_TIME=$(date +"%H:%M")
-  local NOTE_TEXT="$*"
+  local NOTE_FILE="$NOTES_DIR/$CURRENT_DATE.md"
 
-  osascript - "$CURRENT_DATE" "$CURRENT_TIME" "$NOTE_TEXT" <<'EOF'
-  on run argv
-      set noteTitle to item 1 of argv
-      set currentTime to item 2 of argv
-      set noteText to item 3 of argv
+  mkdir -p "$NOTES_DIR"
 
-      set newEntry to "<div><b>" & currentTime & "</b> " & noteText & "</div>"
+  if [ ! -f "$NOTE_FILE" ]; then
+    echo "# $CURRENT_DATE" > "$NOTE_FILE"
+  fi
 
-      tell application "Notes"
-          if not (exists note noteTitle) then
-              make new note with properties {body:"<h1>" & noteTitle & "</h1>"}
-          end if
+  echo "- **$CURRENT_TIME** $*" >> "$NOTE_FILE"
+}
 
-          set theNote to note noteTitle
-          set body of theNote to (body of theNote) & newEntry
-      end tell
-  end run
-EOF
+# Open today's daily note in Vim
+dailynote() {
+  local NOTES_DIR="$HOME/Library/Mobile Documents/com~apple~CloudDocs/Notes"
+  local NOTE_FILE="$NOTES_DIR/$(date +"%Y-%m-%d").md"
+  mkdir -p "$NOTES_DIR"
+  vim "$NOTE_FILE"
+}
+
+# Browse notes with fzf and open selection in Vim
+notelist() {
+  local NOTES_DIR="$HOME/Library/Mobile Documents/com~apple~CloudDocs/Notes"
+  local file=$(ls -1t "$NOTES_DIR"/*.md 2>/dev/null | xargs -I{} basename {} | fzf --height 80% --reverse --prompt='Select note: ' --preview "cat '$NOTES_DIR/{}'")
+
+  [ -n "$file" ] && vim "$NOTES_DIR/$file"
+}
+
+# Search notes content with fzf and open selection in Vim
+notesearch() {
+  local NOTES_DIR="$HOME/Library/Mobile Documents/com~apple~CloudDocs/Notes"
+  local result=$(rg --line-number --no-heading . "$NOTES_DIR" 2>/dev/null | sed "s|$NOTES_DIR/||" | fzf --height 40% --reverse --prompt='Search notes: ')
+  if [ -n "$result" ]; then
+    local file=$(echo "$result" | cut -d: -f1)
+    local line=$(echo "$result" | cut -d: -f2)
+    vim "+$line" "$NOTES_DIR/$file"
+  fi
 }
 
 # ==============================================================================
