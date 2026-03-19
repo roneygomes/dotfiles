@@ -5,7 +5,7 @@ export PROJECTS_DIR=~/projects
 
 # oh-my-zsh
 export ZSH_DISABLE_COMPFIX=true
-export plugins=(cp vi-mode git git-extras fzf z)
+export plugins=(cp vi-mode git git-extras fzf z nvm)
 export ZSH_THEME="powerlevel10k/powerlevel10k"
 
 # homebrew
@@ -38,28 +38,10 @@ PATH=$HOME/.local/bin:$PATH:
 # rancher desktop
 PATH=$HOME/.rd/bin:$PATH:
 
-# asdf
-PATH=$HOME/.asdf/shims:$PATH:
-
-# go
-_go="$(asdf where golang 2>/dev/null)"
-[[ -n "$_go" ]] && PATH=$_go/packages/bin:$PATH
-unset _go
-
-# rust
-_rust_env="$(asdf where rust 2>/dev/null)/env"
-[[ -f "$_rust_env" ]] && . "$_rust_env"
-unset _rust_env
-
 # java
-_java="$(asdf where java 2>/dev/null)"
-[[ -n "$_java" ]] && export JAVA_HOME=$_java
-unset _java
+PATH=/opt/homebrew/opt/openjdk/bin:$PATH
 
 # nodejs
-_nodejs="$(asdf where nodejs 2>/dev/null)"
-[[ -n "$_nodejs" ]] && PATH=$_nodejs/bin:$PATH
-unset _nodejs
 export NODE_OPTIONS="--max-old-space-size=2048"
 
 # docker
@@ -68,12 +50,6 @@ export COMPOSE_BAKE=true
 
 # gcloud
 export CLOUDSDK_PYTHON_SITEPACKAGES=1
-
-# OpenAI Codex
-export CODEX_HOME=$HOME/.config/codex
-
-# Google Antigravity
-PATH=$HOME/.antigravity/antigravity/bin:$PATH
 
 # keep at the end
 export PATH=$PATH
