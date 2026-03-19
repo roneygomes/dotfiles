@@ -61,31 +61,42 @@ ctx_tree() {
 
 # ── tmux helpers ──────────────────────────────────────────────────────────────
 
-# Create a named window in a session (creates session if needed).
-# Sets allow-rename off so context names persist.
-ensure_window() {
-    local session="$1" window="$2" dir="${3:-}"
+# Find a window index by its @cs_name user option (empty string if not found).
+_window_idx() {
+    local session="$1" cs_name="$2"
+    tmux list-windows -t "$session" -F '#{window_index} #{@cs_name}' 2>/dev/null \
+        | awk -v n="$cs_name" '$2 == n {print $1; exit}'
+}
 
+# Create a cs-managed window in a session (creates session if needed).
+# Stores the logical name in @cs_name so auto-rename can change the display name freely.
+ensure_window() {
+    local session="$1" cs_name="$2" dir="${3:-}"
+
+    # Already exists — nothing to do
+    [[ -z "$(_window_idx "$session" "$cs_name")" ]] || return 0
+
+    local idx
     if ! tmux has-session -t "$session" 2>/dev/null; then
         if [[ -n "$dir" ]]; then
-            tmux new-session -d -s "$session" -n "$window" -c "$dir"
+            tmux new-session -d -s "$session" -n "$cs_name" -c "$dir"
         else
-            tmux new-session -d -s "$session" -n "$window"
+            tmux new-session -d -s "$session" -n "$cs_name"
         fi
-    elif ! tmux list-windows -t "$session" -F '#{window_name}' 2>/dev/null | grep -qxF "$window"; then
+        idx=1
+    else
         if [[ -n "$dir" ]]; then
-            tmux new-window -d -t "$session" -n "$window" -c "$dir"
+            idx=$(tmux new-window -d -t "$session" -n "$cs_name" -c "$dir" -P -F '#{window_index}')
         else
-            tmux new-window -d -t "$session" -n "$window"
+            idx=$(tmux new-window -d -t "$session" -n "$cs_name" -P -F '#{window_index}')
         fi
     fi
 
-    tmux set-window-option -t "$session:$window" allow-rename off 2>/dev/null || true
+    tmux set-window-option -t "$session:$idx" @cs_name "$cs_name"
 }
 
-switch_to() {
-    local session="$1" window="${2:-}"
-    local target="${session}${window:+:$window}"
+_do_switch() {
+    local target="$1"
     if [[ -n "${TMUX:-}" ]]; then
         tmux switch-client -t "$target"
     else
@@ -93,14 +104,28 @@ switch_to() {
     fi
 }
 
-# Try switching to a target; return non-zero (don't die) if not found.
-try_switch_to() {
-    local session="$1" window="${2:-}"
-    local target="${session}${window:+:$window}"
-    if [[ -n "${TMUX:-}" ]]; then
-        tmux switch-client -t "$target" 2>/dev/null
+switch_to() {
+    local session="$1" cs_name="${2:-}"
+    if [[ -n "$cs_name" ]]; then
+        local idx
+        idx=$(_window_idx "$session" "$cs_name")
+        [[ -n "$idx" ]] || die "window '$cs_name' not found in session '$session'"
+        _do_switch "$session:$idx"
     else
-        tmux attach -t "$target" 2>/dev/null
+        _do_switch "$session"
+    fi
+}
+
+# Try switching; return non-zero silently if not found.
+try_switch_to() {
+    local session="$1" cs_name="${2:-}"
+    if [[ -n "$cs_name" ]]; then
+        local idx
+        idx=$(_window_idx "$session" "$cs_name") || return 1
+        [[ -n "$idx" ]] || return 1
+        _do_switch "$session:$idx" 2>/dev/null
+    else
+        _do_switch "$session" 2>/dev/null
     fi
 }
 
@@ -296,9 +321,10 @@ cmd_done() {
     window_name=$(basename "$wt_path")
     local full_window="$project/$window_name"
 
-    if tmux has-session -t work 2>/dev/null \
-    && tmux list-windows -t work -F '#{window_name}' 2>/dev/null | grep -qxF "$full_window"; then
-        tmux kill-window -t "work:$full_window"
+    local widx
+    widx=$(_window_idx work "$full_window") || true
+    if [[ -n "$widx" ]]; then
+        tmux kill-window -t "work:$widx"
         echo "→ closed tmux window"
     fi
 }
@@ -366,7 +392,7 @@ cmd_go() {
 
         # fzf within session (filtered to current project if known)
         local windows
-        windows=$(tmux list-windows -t "$mode" -F '#{window_name}' 2>/dev/null | grep -v '^$') \
+        windows=$(tmux list-windows -t "$mode" -F '#{@cs_name}' 2>/dev/null | grep -v '^$') \
             || die "no windows in '$mode'"
         local selected
         selected=$(echo "$windows" | fzf --height 40% --reverse --border \
@@ -383,7 +409,7 @@ cmd_go() {
         tmux has-session -t "$s" 2>/dev/null || continue
         while IFS= read -r w; do
             [[ -n "$w" ]] && entries+=("$(printf '%-10s %s' "$s" "$w")")
-        done < <(tmux list-windows -t "$s" -F '#{window_name}' 2>/dev/null)
+        done < <(tmux list-windows -t "$s" -F '#{@cs_name}' 2>/dev/null)
     done
 
     [[ ${#entries[@]} -gt 0 ]] || die "no cs sessions found — run 'cs init'"
