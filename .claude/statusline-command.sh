@@ -1,34 +1,26 @@
 #!/bin/sh
 input=$(cat)
 
-user=$(whoami)
-host=$(hostname -s)
-cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd // ""')
 model=$(echo "$input" | jq -r '.model.display_name // ""')
-used=$(echo "$input" | jq -r '.context_window.used_percentage // empty')
+used=$(echo "$input"  | jq -r '.context_window.used_percentage // empty')
 
-# Shorten home directory to ~
-home="$HOME"
-short_cwd=$(echo "$cwd" | sed "s|^$home|~|")
+# "Claude Sonnet 4.6 (1M context)" → "sonnet 4.6" + "1m"
+short_model=$(echo "$model" | sed 's/^Claude //i' | sed 's/ ([^)]*context)//i' | tr '[:upper:]' '[:lower:]')
+ctx_size=$(echo "$model" | grep -oiE '[0-9]+[km] context' | grep -oiE '[0-9]+[km]' | tr '[:upper:]' '[:lower:]')
 
-# Git branch (skip optional locks to avoid blocking)
-git_branch=""
-if git -C "$cwd" rev-parse --git-dir > /dev/null 2>&1; then
-  git_branch=$(GIT_OPTIONAL_LOCKS=0 git -C "$cwd" symbolic-ref --short HEAD 2>/dev/null)
+if [ -n "$ctx_size" ]; then
+  model_str=$(printf "\033[36m%s \033[90m%s\033[0m" "$short_model" "$ctx_size")
+else
+  model_str=$(printf "\033[36m%s\033[0m" "$short_model")
 fi
 
-# Build context usage indicator
-ctx_info=""
 if [ -n "$used" ]; then
   used_int=$(printf "%.0f" "$used")
-  ctx_info=" ctx: ${used_int}%"
+  if   [ "$used_int" -ge 75 ]; then ctx_color="\033[31m"   # red
+  elif [ "$used_int" -ge 50 ]; then ctx_color="\033[33m"   # yellow
+  else                               ctx_color="\033[32m"   # green
+  fi
+  printf "%s \033[90m·\033[0m ${ctx_color}%d%%\033[0m" "$model_str" "$used_int"
+else
+  printf "%s" "$model_str"
 fi
-
-# Build git segment
-git_segment=""
-if [ -n "$git_branch" ]; then
-  git_segment=$(printf " \x1b[33m(%s)\x1b[0m" "$git_branch")
-fi
-
-printf "\x1b[32m%s@%s\x1b[0m \x1b[34m%s\x1b[0m%s \x1b[90m| %s%s\x1b[0m" \
-  "$user" "$host" "$short_cwd" "$git_segment" "$model" "$ctx_info"

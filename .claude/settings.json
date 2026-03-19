@@ -26,9 +26,13 @@
     "linear@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true
   },
+  "sandbox": {
+    "enabled": false
+  },
   "voiceEnabled": true,
   "skipDangerousModePermissionPrompt": true,
   "trustedDirectories": [
     "/Users/roney/.config/gcloud/logs"
-  ]
+  ],
+  "model": "sonnet[1m]"
 }
