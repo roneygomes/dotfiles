@@ -1,0 +1,436 @@
+#!/usr/bin/env bash
+# cs - context-switch: mode-centric worktrees + tmux sessions
+#
+# Sessions: research | review | work
+# Worktrees: ~/worktrees/<project>/{research,review,<branch-slug>}
+
+set -euo pipefail
+
+CS_WORKTREES="${CS_WORKTREES_DIR:-$HOME/worktrees}"
+CS_PROJECTS="${CS_PROJECTS_DIR:-$HOME/projects}"
+
+die() { printf 'cs: %s\n' "$*" >&2; exit 1; }
+
+branch_slug() { printf '%s' "$1" | tr '/' '-' | tr -cd '[:alnum:]_.-'; }
+
+# ── context detection ─────────────────────────────────────────────────────────
+
+# Resolve the git worktree root of the current directory (silent on failure).
+_git_toplevel() { git rev-parse --show-toplevel 2>/dev/null || true; }
+
+# Detect project name from CWD. Checks CS_WORKTREES and CS_PROJECTS first,
+# then falls back to the git repo root's basename.
+ctx_project() {
+    local toplevel
+    toplevel=$(_git_toplevel)
+    local check="${toplevel:-$PWD}"
+
+    if [[ "$check" == "$CS_WORKTREES"/* ]]; then
+        local rel="${check#"$CS_WORKTREES"/}"
+        echo "${rel%%/*}"; return
+    fi
+    if [[ "$PWD" == "$CS_WORKTREES"/* ]]; then
+        local rel="${PWD#"$CS_WORKTREES"/}"
+        echo "${rel%%/*}"; return
+    fi
+    if [[ "$check" == "$CS_PROJECTS"/* ]]; then
+        local rel="${check#"$CS_PROJECTS"/}"
+        echo "${rel%%/*}"; return
+    fi
+    if [[ -n "$toplevel" ]]; then
+        basename "$toplevel"; return
+    fi
+}
+
+# Detect tree name (research | review | <slug>) if we're inside a cs worktree.
+ctx_tree() {
+    local toplevel
+    toplevel=$(_git_toplevel)
+    local check="${toplevel:-$PWD}"
+
+    if [[ "$check" == "$CS_WORKTREES"/* ]]; then
+        local rel="${check#"$CS_WORKTREES"/}"
+        # rel is now "project/tree" — return tree part
+        echo "${rel#*/}"; return
+    fi
+    if [[ "$PWD" == "$CS_WORKTREES"/* ]]; then
+        local rel="${PWD#"$CS_WORKTREES"/}"
+        echo "${rel#*/}"; return
+    fi
+}
+
+# ── tmux helpers ──────────────────────────────────────────────────────────────
+
+# Create a named window in a session (creates session if needed).
+# Sets allow-rename off so context names persist.
+ensure_window() {
+    local session="$1" window="$2" dir="${3:-}"
+
+    if ! tmux has-session -t "$session" 2>/dev/null; then
+        if [[ -n "$dir" ]]; then
+            tmux new-session -d -s "$session" -n "$window" -c "$dir"
+        else
+            tmux new-session -d -s "$session" -n "$window"
+        fi
+    elif ! tmux list-windows -t "$session" -F '#{window_name}' 2>/dev/null | grep -qxF "$window"; then
+        if [[ -n "$dir" ]]; then
+            tmux new-window -d -t "$session" -n "$window" -c "$dir"
+        else
+            tmux new-window -d -t "$session" -n "$window"
+        fi
+    fi
+
+    tmux set-window-option -t "$session:$window" allow-rename off 2>/dev/null || true
+}
+
+switch_to() {
+    local session="$1" window="${2:-}"
+    local target="${session}${window:+:$window}"
+    if [[ -n "${TMUX:-}" ]]; then
+        tmux switch-client -t "$target"
+    else
+        tmux attach -t "$target"
+    fi
+}
+
+# Try switching to a target; return non-zero (don't die) if not found.
+try_switch_to() {
+    local session="$1" window="${2:-}"
+    local target="${session}${window:+:$window}"
+    if [[ -n "${TMUX:-}" ]]; then
+        tmux switch-client -t "$target" 2>/dev/null
+    else
+        tmux attach -t "$target" 2>/dev/null
+    fi
+}
+
+# ── git helpers ───────────────────────────────────────────────────────────────
+
+default_branch() {
+    local repo="$1"
+    local branch
+    branch=$(git -C "$repo" symbolic-ref refs/remotes/origin/HEAD 2>/dev/null \
+        | sed 's|refs/remotes/origin/||') && [[ -n "$branch" ]] && echo "$branch" && return
+    for b in devnet main master develop; do
+        if git -C "$repo" show-ref --verify --quiet "refs/remotes/origin/$b" 2>/dev/null \
+        || git -C "$repo" show-ref --verify --quiet "refs/heads/$b" 2>/dev/null; then
+            echo "$b"; return
+        fi
+    done
+    die "cannot determine default branch for $repo"
+}
+
+find_repo() {
+    local project="$1"
+    local path="$CS_PROJECTS/$project"
+    [[ -d "$path" ]] || die "project not found: $path"
+    echo "$path"
+}
+
+ensure_tracking_branch() {
+    local repo="$1" name="$2" upstream="$3"
+    if ! git -C "$repo" show-ref --verify --quiet "refs/heads/$name" 2>/dev/null; then
+        git -C "$repo" branch --track "$name" "$upstream" >/dev/null
+    fi
+    echo "$name"
+}
+
+# ── commands ──────────────────────────────────────────────────────────────────
+
+cmd_init() {
+    local project repo_path
+
+    case $# in
+        0)  # infer everything from CWD
+            local toplevel
+            toplevel=$(_git_toplevel) || die "not inside a git repo"
+            [[ -n "$toplevel" ]] || die "not inside a git repo"
+            repo_path="$toplevel"
+            project=$(basename "$toplevel")
+            ;;
+        1)  # project name given, repo from CWD
+            project="$1"
+            local toplevel
+            toplevel=$(_git_toplevel) || die "not inside a git repo"
+            [[ -n "$toplevel" ]] || die "not inside a git repo"
+            repo_path="$toplevel"
+            ;;
+        2)  # fully explicit
+            project="$1"
+            repo_path="${2/#\~/$HOME}"
+            ;;
+        *)  die "usage: cs init [project] [repo-path]" ;;
+    esac
+
+    [[ -d "$repo_path" ]] || die "repo not found: $repo_path"
+
+    local db
+    db=$(default_branch "$repo_path")
+    echo "→ project: $project  branch: $db"
+
+    local wt_dir="$CS_WORKTREES/$project"
+    mkdir -p "$wt_dir"
+
+    if [[ ! -d "$wt_dir/research" ]]; then
+        local rb
+        rb=$(ensure_tracking_branch "$repo_path" "cs/research/$project" "origin/$db")
+        git -C "$repo_path" worktree add "$wt_dir/research" "$rb" >/dev/null
+        echo "→ created research worktree"
+    else
+        echo "→ research worktree already exists"
+    fi
+
+    if [[ ! -d "$wt_dir/review" ]]; then
+        local rvb
+        rvb=$(ensure_tracking_branch "$repo_path" "cs/review/$project" "origin/$db")
+        git -C "$repo_path" worktree add "$wt_dir/review" "$rvb" >/dev/null
+        echo "→ created review worktree"
+    else
+        echo "→ review worktree already exists"
+    fi
+
+    ensure_window research "$project" "$wt_dir/research"
+    ensure_window review   "$project" "$wt_dir/review"
+
+    echo "→ done — run 'cs go' to navigate"
+}
+
+cmd_work() {
+    local project branch
+
+    case $# in
+        1)  branch="$1"
+            project=$(ctx_project) || true
+            [[ -n "$project" ]] || die "usage: cs work [project] <branch>  (can't detect project from CWD)"
+            ;;
+        2)  project="$1"; branch="$2" ;;
+        *)  die "usage: cs work [project] <branch>" ;;
+    esac
+
+    local repo_path
+    repo_path=$(find_repo "$project")
+
+    local slug
+    slug=$(branch_slug "$branch")
+
+    local wt_path="$CS_WORKTREES/$project/$slug"
+
+    if [[ ! -d "$wt_path" ]]; then
+        if git -C "$repo_path" show-ref --verify --quiet "refs/remotes/origin/$branch" 2>/dev/null; then
+            git -C "$repo_path" worktree add -b "$branch" "$wt_path" "origin/$branch" >/dev/null
+        elif git -C "$repo_path" show-ref --verify --quiet "refs/heads/$branch" 2>/dev/null; then
+            git -C "$repo_path" worktree add "$wt_path" "$branch" >/dev/null
+        else
+            local db
+            db=$(default_branch "$repo_path")
+            echo "→ branch '$branch' not found, creating from origin/$db"
+            git -C "$repo_path" worktree add -b "$branch" "$wt_path" "origin/$db" >/dev/null
+        fi
+        echo "→ created worktree: $wt_path"
+    fi
+
+    local window="$project/$slug"
+    ensure_window work "$window" "$wt_path"
+    switch_to work "$window"
+}
+
+cmd_done() {
+    local project branch
+
+    case $# in
+        0)  # if we're in a work tree, use it directly; otherwise fzf
+            local cp ct
+            cp=$(ctx_project) || true
+            ct=$(ctx_tree)    || true
+            if [[ -n "$cp" && -n "$ct" && "$ct" != "research" && "$ct" != "review" ]]; then
+                project="$cp"
+                branch="$ct"
+            else
+                # fzf picker
+                local entries=()
+                if [[ -d "$CS_WORKTREES" ]]; then
+                    while IFS= read -r proj_dir; do
+                        local proj
+                        proj=$(basename "$proj_dir")
+                        while IFS= read -r tree_dir; do
+                            [[ -d "$tree_dir" ]] || continue
+                            local tree
+                            tree=$(basename "$tree_dir")
+                            [[ "$tree" == "research" || "$tree" == "review" ]] && continue
+                            entries+=("$proj/$tree")
+                        done < <(find "$proj_dir" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | sort)
+                    done < <(find "$CS_WORKTREES" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | sort)
+                fi
+                [[ ${#entries[@]} -gt 0 ]] || die "no work trees found"
+                local selected
+                selected=$(printf '%s\n' "${entries[@]}" | \
+                    fzf --height 40% --reverse --border \
+                        --header "select work tree to remove:")
+                [[ -n "$selected" ]] || return 0
+                project="${selected%%/*}"
+                branch="${selected#*/}"
+            fi
+            ;;
+        1)  branch="$1"
+            project=$(ctx_project) || true
+            [[ -n "$project" ]] || die "usage: cs done [project] <branch>  (can't detect project from CWD)"
+            ;;
+        2)  project="$1"; branch="$2" ;;
+        *)  die "usage: cs done [project] [branch]" ;;
+    esac
+
+    local slug
+    slug=$(branch_slug "$branch")
+
+    local wt_path="$CS_WORKTREES/$project/$branch"
+    [[ -d "$wt_path" ]] || wt_path="$CS_WORKTREES/$project/$slug"
+    [[ -d "$wt_path" ]] || die "worktree not found for $project/$branch"
+
+    local repo_path
+    repo_path=$(find_repo "$project")
+
+    git -C "$repo_path" worktree remove "$wt_path" --force
+    echo "→ removed worktree: $project/$(basename "$wt_path")"
+
+    local window_name
+    window_name=$(basename "$wt_path")
+    local full_window="$project/$window_name"
+
+    if tmux has-session -t work 2>/dev/null \
+    && tmux list-windows -t work -F '#{window_name}' 2>/dev/null | grep -qxF "$full_window"; then
+        tmux kill-window -t "work:$full_window"
+        echo "→ closed tmux window"
+    fi
+}
+
+cmd_review() {
+    local project branch
+
+    case $# in
+        1)  branch="$1"
+            project=$(ctx_project) || true
+            [[ -n "$project" ]] || die "usage: cs review [project] <branch>  (can't detect project from CWD)"
+            ;;
+        2)  project="$1"; branch="$2" ;;
+        *)  die "usage: cs review [project] <branch>" ;;
+    esac
+
+    local wt_path="$CS_WORKTREES/$project/review"
+    [[ -d "$wt_path" ]] || die "no review worktree for '$project' — run: cs init $project"
+
+    git -C "$wt_path" fetch origin
+    git -C "$wt_path" checkout "$branch" 2>/dev/null \
+        || git -C "$wt_path" checkout -b "$branch" "origin/$branch"
+    echo "→ review worktree on: $branch"
+
+    ensure_window review "$project" "$wt_path"
+    switch_to review "$project"
+}
+
+cmd_go() {
+    local mode="${1:-}" given_project="${2:-}"
+
+    # Detect where we are
+    local cp ct
+    cp=$(ctx_project) || true
+    ct=$(ctx_tree)    || true
+
+    # cs go <mode> <project> — explicit, direct jump
+    if [[ -n "$mode" && -n "$given_project" ]]; then
+        tmux has-session -t "$mode" 2>/dev/null || die "session '$mode' not found"
+        switch_to "$mode" "$given_project"
+        return
+    fi
+
+    # cs go <mode> — jump using CWD context, or fzf within session
+    if [[ -n "$mode" ]]; then
+        tmux has-session -t "$mode" 2>/dev/null || die "session '$mode' not found"
+
+        if [[ -n "$cp" ]]; then
+            local target_window
+            case "$mode" in
+                research|review) target_window="$cp" ;;
+                work)
+                    # If we're in a work tree, jump to its window; else fzf-filter to this project
+                    if [[ -n "$ct" && "$ct" != "research" && "$ct" != "review" ]]; then
+                        target_window="$cp/$ct"
+                    fi
+                    ;;
+            esac
+
+            if [[ -n "${target_window:-}" ]]; then
+                try_switch_to "$mode" "$target_window" && return
+                # Window doesn't exist yet — fall through to fzf
+            fi
+        fi
+
+        # fzf within session (filtered to current project if known)
+        local windows
+        windows=$(tmux list-windows -t "$mode" -F '#{window_name}' 2>/dev/null | grep -v '^$') \
+            || die "no windows in '$mode'"
+        local selected
+        selected=$(echo "$windows" | fzf --height 40% --reverse --border \
+            --query "${cp:-}" \
+            --header "[$mode] select project:")
+        [[ -n "$selected" ]] || return 0
+        switch_to "$mode" "$selected"
+        return
+    fi
+
+    # cs go — global picker, pre-filtered to current project
+    local entries=()
+    for s in research review work; do
+        tmux has-session -t "$s" 2>/dev/null || continue
+        while IFS= read -r w; do
+            [[ -n "$w" ]] && entries+=("$(printf '%-10s %s' "$s" "$w")")
+        done < <(tmux list-windows -t "$s" -F '#{window_name}' 2>/dev/null)
+    done
+
+    [[ ${#entries[@]} -gt 0 ]] || die "no cs sessions found — run 'cs init'"
+
+    local selected
+    selected=$(printf '%s\n' "${entries[@]}" | \
+        fzf --height 40% --reverse --border \
+            --query "${cp:-}" \
+            --header "switch context:")
+    [[ -n "$selected" ]] || return 0
+
+    local sel_mode sel_window
+    sel_mode=$(awk '{print $1}' <<< "$selected")
+    sel_window=$(awk '{print $2}' <<< "$selected")
+    switch_to "$sel_mode" "$sel_window"
+}
+
+cmd_help() {
+    cat <<EOF
+cs — context-switch
+
+Usage:
+  cs init [project] [repo-path]   scaffold research + review worktrees
+  cs work [project] <branch>      create work worktree and switch to it
+  cs done [project] [branch]      remove work worktree
+  cs review [project] <branch>    checkout branch in review worktree
+  cs go [mode] [project]          switch context (fzf picker if no args)
+
+All project args are optional when run from inside a project directory or
+worktree — cs detects context from the current path.
+
+'cs done' and 'cs go' with no args open an fzf picker.
+'cs go <mode>' jumps directly to the current project in that mode.
+
+Modes: research | review | work
+
+Worktrees:  \$CS_WORKTREES_DIR  (default: ~/worktrees)
+Projects:   \$CS_PROJECTS_DIR   (default: ~/projects)
+EOF
+}
+
+case "${1:-}" in
+    init)           shift; cmd_init   "$@" ;;
+    work)           shift; cmd_work   "$@" ;;
+    done)           shift; cmd_done   "$@" ;;
+    review)         shift; cmd_review "$@" ;;
+    go)             shift; cmd_go     "$@" ;;
+    help|--help|-h) cmd_help ;;
+    *) printf 'cs: unknown command: %s\n\n' "${1:-}" >&2; cmd_help; exit 1 ;;
+esac
