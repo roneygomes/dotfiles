@@ -3,6 +3,8 @@ export DISABLE_AUTO_TITLE=true
 
 export PROJECTS_DIR=~/projects
 
+export POWERLEVEL9K_INSTANT_PROMPT=quiet
+
 # oh-my-zsh
 export ZSH_DISABLE_COMPFIX=true
 export plugins=(cp vi-mode git git-extras fzf z nvm)

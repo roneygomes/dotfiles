@@ -590,6 +590,10 @@
 	<string>0x6b-0x40000-0x28</string>
 	<key>NeverBlockSystemShutdown</key>
 	<true/>
+	<key>NeverWarnAboutShortLivedSessions_3C60C9C9-76F6-4E30-BE65-EA8CF38F7FAE</key>
+	<true/>
+	<key>NeverWarnAboutShortLivedSessions_3C60C9C9-76F6-4E30-BE65-EA8CF38F7FAE_selection</key>
+	<integer>0</integer>
 	<key>New Bookmarks</key>
 	<array>
 		<dict>
@@ -1868,7 +1872,7 @@
 			<key>Thin Strokes</key>
 			<integer>0</integer>
 			<key>Title Components</key>
-			<integer>2</integer>
+			<integer>1</integer>
 			<key>Transparency</key>
 			<real>0.0</real>
 			<key>Unicode Normalization</key>
