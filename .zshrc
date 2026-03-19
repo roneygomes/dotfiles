@@ -69,7 +69,24 @@ autoload -Uz compinit && compinit
 # ==============================================================================
 
 if [[ -z "$TMUX" && "$TERM_PROGRAM" != "vscode" ]]; then
-  exec tmux new-session -A -s main
+  if ! tmux has-session -t main 2>/dev/null; then
+    tmux new-session -d -s main -n research
+    tmux set-window-option -t main:1 @cs_name research
+    local idx
+    idx=$(tmux new-window -d -t main -n review -P -F '#{window_index}')
+    tmux set-window-option -t "main:$idx" @cs_name review
+    idx=$(tmux new-window -d -t main -n work -P -F '#{window_index}')
+    tmux set-window-option -t "main:$idx" @cs_name work
+  else
+    for mode in research review work; do
+      if ! tmux list-windows -t main -F '#{@cs_name}' 2>/dev/null | grep -qx "$mode"; then
+        local idx
+        idx=$(tmux new-window -d -t main -n "$mode" -P -F '#{window_index}')
+        tmux set-window-option -t "main:$idx" @cs_name "$mode"
+      fi
+    done
+  fi
+  exec tmux attach -t main
 fi
 
 # ==============================================================================
