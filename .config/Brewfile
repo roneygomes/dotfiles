@@ -21,6 +21,7 @@ brew "ripgrep"
 brew "bat"
 brew "tmux"
 brew "rtk"
+brew "openjdk"
 
 cask "pantsbuild/tap/pants"
 cask "orbstack"
@@ -36,4 +37,5 @@ cask "font-jetbrains-mono"
 cask "slack"
 cask "visual-studio-code"
 cask "alt-tab"
+cask "openwebstart"
 
