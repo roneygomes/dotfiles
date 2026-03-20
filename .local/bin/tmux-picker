@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# tmux-picker: window picker with pinned research/review and work windows
+set -euo pipefail
+
+current=$(tmux display-message -p '#{window_name}')
+
+items=()
+
+# Pinned windows first
+for name in research review; do
+  if tmux list-windows -F '#{window_name}' | grep -qx "$name"; then
+    if [[ "$name" == "$current" ]]; then
+      items+=("● $name")
+    else
+      items+=("  $name")
+    fi
+  fi
+done
+
+# Separator
+items+=("── work ──")
+
+# Work windows (everything not pinned)
+while IFS= read -r name; do
+  [[ "$name" == "research" || "$name" == "review" ]] && continue
+  if [[ "$name" == "$current" ]]; then
+    items+=("● $name")
+  else
+    items+=("  $name")
+  fi
+done < <(tmux list-windows -F '#{window_name}')
+
+selected=$(printf '%s\n' "${items[@]}" | fzf --reverse --border --no-sort)
+[[ -n "$selected" ]] || exit 0
+[[ "$selected" != "── work ──" ]] || exit 0
+
+# Strip marker
+selected="${selected#● }"
+selected="${selected#  }"
+
+# Find window index by name and switch
+target=$(tmux list-windows -F '#{window_index}|#{window_name}' | while IFS='|' read -r idx name; do
+  [[ "$name" == "$selected" ]] && echo "$idx" && break
+done)
+[[ -n "$target" ]] && tmux select-window -t "$target"

@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# tmux-winlist: show a one-line window indicator via display-message
+msg=""
+while IFS='|' read -r active name; do
+  if [[ "$active" == "1" ]]; then
+    msg+="#[fg=cyan,bold]▸ ${name}#[default]  "
+  else
+    msg+="  ${name}  "
+  fi
+done < <(tmux list-windows -F '#{?window_active,1,0}|#{window_name}')
+tmux display-message " $msg"
