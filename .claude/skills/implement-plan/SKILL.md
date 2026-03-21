@@ -1,7 +1,6 @@
 ---
 name: implement-plan
 description: Implement a task according to its implementation plan, run quality gates, commit, ship, and monitor. Use this skill whenever the user wants to implement, execute, or build out a planned task — even if they just say "implement this", "build it", "implement PE-XXXX", or "implement the plan in <file>".
-disable-model-invocation: true
 argument-hint: issue-id or plan file path
 ---
 

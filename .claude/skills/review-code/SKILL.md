@@ -1,7 +1,6 @@
 ---
 name: review-code
 description: Self-review code changes before shipping. Reviews the diff against the implementation plan for correctness, completeness, and quality. Use when the user says "review my changes", "check the code", "self-review", or as part of the implement-plan flow before marking a PR as ready.
-disable-model-invocation: true
 argument-hint: (optional) plan file path or issue ID for context
 ---
 

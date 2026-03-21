@@ -1,7 +1,6 @@
 ---
 name: watch-pr
 description: Monitor a PR's CI pipeline and review comments in a combined polling loop. Automatically triages CI failures and review feedback, fixes issues, and pushes. Use when the user says "watch the PR", "monitor CI", "babysit the PR", or as the post-ship phase of implement-plan.
-disable-model-invocation: true
 argument-hint: (optional) PR number or branch name
 ---
 
