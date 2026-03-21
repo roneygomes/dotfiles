@@ -17,9 +17,6 @@ for name in research review; do
   fi
 done
 
-# Separator
-items+=("── work ──")
-
 # Work windows (everything not pinned)
 while IFS= read -r name; do
   [[ "$name" == "research" || "$name" == "review" ]] && continue
@@ -30,9 +27,8 @@ while IFS= read -r name; do
   fi
 done < <(tmux list-windows -F '#{window_name}')
 
-selected=$(printf '%s\n' "${items[@]}" | fzf --reverse --border --no-sort)
+selected=$(printf '%s\n' "${items[@]}" | fzf --reverse --border=rounded --no-sort)
 [[ -n "$selected" ]] || exit 0
-[[ "$selected" != "── work ──" ]] || exit 0
 
 # Strip marker
 selected="${selected#● }"
