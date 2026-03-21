@@ -39,21 +39,26 @@ cmd_list() {
     fi
 
     # Interactive selection with fzf
-    local selected
-    selected=$(echo "$sessions" | fzf \
+    local fzf_output query selected
+    fzf_output=$(echo "$sessions" | fzf \
         --height 40% \
         --reverse \
         --border \
-        --header 'Select tmux session:' \
-        --preview 'tmux list-windows -t {} -F "#{window_name}"' \
-        --preview-window=right:50%:wrap)
+        --print-query \
+        --header 'Select or type new session name:' \
+        --preview 'tmux list-windows -t {} -F "#{window_name}" 2>/dev/null || echo "(new session)"' \
+        --preview-window=right:50%:wrap) || true
 
-    if [ -z "$selected" ]; then
-        # User cancelled (pressed ESC)
-        return 0
+    query=$(echo "$fzf_output" | sed -n '1p')
+    selected=$(echo "$fzf_output" | sed -n '2p')
+
+    if [ -n "$selected" ]; then
+        cmd_switch "$selected"
+    elif [ -n "$query" ]; then
+        # No match — create and switch to new session
+        cmd_new "$query"
+        cmd_switch "$query"
     fi
-
-    cmd_switch "$selected"
 }
 
 cmd_switch() {
