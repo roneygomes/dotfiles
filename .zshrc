@@ -70,14 +70,7 @@ autoload -Uz compinit && compinit
 
 if [[ -z "$TMUX" && "$TERM_PROGRAM" != "vscode" ]]; then
   if ! tmux has-session -t main 2>/dev/null; then
-    tmux new-session -d -s main -n research
-    tmux new-window -d -t main -n review
-  else
-    for win in research review; do
-      if ! tmux list-windows -t main -F '#{window_name}' 2>/dev/null | grep -qx "$win"; then
-        tmux new-window -d -t main -n "$win"
-      fi
-    done
+    tmux new-session -d -s main
   fi
   exec tmux attach -t main
 fi

@@ -1,25 +1,12 @@
 #!/usr/bin/env bash
-# tmux-picker: window picker with pinned research/review and work windows
+# tmux-picker: window picker
 set -euo pipefail
 
 current=$(tmux display-message -p '#{window_name}')
 
 items=()
 
-# Pinned windows first
-for name in research review; do
-  if tmux list-windows -F '#{window_name}' | grep -qx "$name"; then
-    if [[ "$name" == "$current" ]]; then
-      items+=("● $name")
-    else
-      items+=("  $name")
-    fi
-  fi
-done
-
-# Work windows (everything not pinned)
 while IFS= read -r name; do
-  [[ "$name" == "research" || "$name" == "review" ]] && continue
   if [[ "$name" == "$current" ]]; then
     items+=("● $name")
   else
