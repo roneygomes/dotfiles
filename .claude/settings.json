@@ -2,6 +2,7 @@
   "permissions": {
     "defaultMode": "plan"
   },
+  "model": "opus",
   "hooks": {
     "PreToolUse": [
       {
@@ -33,6 +34,5 @@
   "skipDangerousModePermissionPrompt": true,
   "trustedDirectories": [
     "/Users/roney/.config/gcloud/logs"
-  ],
-  "model": "opus[1m]"
+  ]
 }
