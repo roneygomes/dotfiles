@@ -55,6 +55,12 @@ This creates/updates symlinks from `$HOME` to files in this repository. The repo
 - Global: Edit `.claude/settings.json`, commit changes
 - Project-specific: Edit `.claude/settings.local.json` (not committed)
 
+**Granting cco sandbox access to new paths:**
+- `cco` is a sandbox wrapper for Claude Code (installed at `~/.local/share/cco/cco`, symlinked to `/usr/local/bin/cco`)
+- The `cco` alias in `.zshrc` adds `--add-dir <path>:rw` flags for directories that need write access inside the sandbox
+- To grant access to a new directory, add another `--add-dir <path>:rw` to the alias in `.zshrc`
+- Do NOT modify `~/.claude/settings.json` for sandbox path access — that's for Claude Code permissions, not cco sandbox rules
+
 ## Testing Changes
 
 Test configuration changes before committing by sourcing or restarting affected applications. Stow creates symlinks, so changes to files in this repo immediately affect the live environment.

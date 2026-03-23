@@ -100,6 +100,9 @@ alias prettier="npx prettier"
 # Edit Brewfile
 alias brewfile="vim ~/.config/Brewfile"
 
+# cco with additional directory access
+alias cco="cco --add-dir ~/.config/gcloud:rw --add-dir ~/.config/docker:rw"
+
 # ==============================================================================
 # UTILITY FUNCTIONS
 # ==============================================================================
