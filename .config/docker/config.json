@@ -1,10 +1,11 @@
 {
-	"auths": {},
-	"credHelpers": {
-		"us-central1-docker.pkg.dev": "gcloud"
-	},
-	"currentContext": "orbstack",
-	"cliPluginsExtraDirs": [
-		"/opt/homebrew/lib/docker/cli-plugins"
-	]
+  "auths": {},
+  "credHelpers": {
+    "us-central1-docker.pkg.dev": "gcloud",
+    "southamerica-east1-docker.pkg.dev": "gcloud"
+  },
+  "currentContext": "orbstack",
+  "cliPluginsExtraDirs": [
+    "/opt/homebrew/lib/docker/cli-plugins"
+  ]
 }
