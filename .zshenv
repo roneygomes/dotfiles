@@ -51,6 +51,7 @@ export DOCKER_CONFIG=$HOME/.config/docker
 export COMPOSE_BAKE=true
 
 # gcloud
+export CLOUDSDK_PYTHON=/opt/homebrew/bin/python3
 export CLOUDSDK_PYTHON_SITEPACKAGES=1
 
 # keep at the end
