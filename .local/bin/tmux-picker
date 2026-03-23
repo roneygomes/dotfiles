@@ -1,28 +1,26 @@
 #!/usr/bin/env bash
-# tmux-picker: window picker
+# tmux-picker: window picker (select existing or create new)
 set -euo pipefail
 
-current=$(tmux display-message -p '#{window_name}')
+windows=$(tmux list-windows -F '#{window_name}')
 
-items=()
+fzf_output=$(echo "$windows" | fzf \
+    --reverse \
+    --border \
+    --no-sort \
+    --print-query \
+    --header 'Select or type new window name:') || true
 
-while IFS= read -r name; do
-  if [[ "$name" == "$current" ]]; then
-    items+=("● $name")
-  else
-    items+=("  $name")
-  fi
-done < <(tmux list-windows -F '#{window_name}')
+query=$(echo "$fzf_output" | sed -n '1p')
+selected=$(echo "$fzf_output" | sed -n '2p')
 
-selected=$(printf '%s\n' "${items[@]}" | fzf --reverse --border=rounded --no-sort)
-[[ -n "$selected" ]] || exit 0
-
-# Strip marker
-selected="${selected#● }"
-selected="${selected#  }"
-
-# Find window index by name and switch
-target=$(tmux list-windows -F '#{window_index}|#{window_name}' | while IFS='|' read -r idx name; do
-  [[ "$name" == "$selected" ]] && echo "$idx" && break
-done)
-[[ -n "$target" ]] && tmux select-window -t "$target"
+if [[ -n "$selected" ]]; then
+    # Matched an existing window — switch to it
+    target=$(tmux list-windows -F '#{window_index}|#{window_name}' | while IFS='|' read -r idx name; do
+        [[ "$name" == "$selected" ]] && echo "$idx" && break
+    done)
+    [[ -n "$target" ]] && tmux select-window -t "$target"
+elif [[ -n "$query" ]]; then
+    # No match — create new window with that name
+    tmux new-window -n "$query"
+fi

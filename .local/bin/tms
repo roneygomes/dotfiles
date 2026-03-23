@@ -45,9 +45,7 @@ cmd_list() {
         --reverse \
         --border \
         --print-query \
-        --header 'Select or type new session name:' \
-        --preview 'tmux list-windows -t {} -F "#{window_name}" 2>/dev/null || echo "(new session)"' \
-        --preview-window=right:50%:wrap) || true
+        --header 'Select or type new session name:') || true
 
     query=$(echo "$fzf_output" | sed -n '1p')
     selected=$(echo "$fzf_output" | sed -n '2p')
