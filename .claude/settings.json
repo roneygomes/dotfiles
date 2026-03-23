@@ -2,7 +2,7 @@
   "permissions": {
     "defaultMode": "plan"
   },
-  "model": "opus",
+  "model": "opus[1m]",
   "hooks": {
     "PreToolUse": [
       {
@@ -24,7 +24,7 @@
     "skill-creator@claude-plugins-official": true,
     "commit-commands@claude-plugins-official": true,
     "github@claude-plugins-official": true,
-    "linear@claude-plugins-official": true,
+    "linear@claude-plugins-official": false,
     "typescript-lsp@claude-plugins-official": true
   },
   "sandbox": {
@@ -33,6 +33,6 @@
   "voiceEnabled": true,
   "skipDangerousModePermissionPrompt": true,
   "trustedDirectories": [
-    "/Users/roney/.config/gcloud/logs"
+    "/Users/roney/.config/gcloud"
   ]
 }
