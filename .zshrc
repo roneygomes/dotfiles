@@ -232,6 +232,82 @@ notesearch() {
 }
 
 # ==============================================================================
+# CLAUDE CODE PROFILES
+# ==============================================================================
+
+# Switch Claude Code profile for the current shell
+# Usage: claude-use <profile>   (e.g., claude-use personal)
+claude-use() {
+  if [[ $# -ne 1 ]]; then
+    echo "Usage: claude-use <profile>"
+    echo "Available profiles:"
+    ls -1 "$HOME/.claude-profiles/" 2>/dev/null || echo "  (none — run claude-profile-setup <name> first)"
+    return 1
+  fi
+
+  local profile_dir="$HOME/.claude-profiles/$1"
+  if [[ ! -d "$profile_dir" ]]; then
+    echo "Profile '$1' not found. Run: claude-profile-setup $1"
+    return 1
+  fi
+
+  export CLAUDE_CONFIG_DIR="$profile_dir"
+  echo "Claude profile: $1"
+}
+
+# Run cco with a specific profile (one-shot, doesn't change shell)
+# Falls back to bare claude for initial login when no credentials exist yet.
+# Usage: claude-as <profile> [cco/claude args...]
+claude-as() {
+  if [[ $# -lt 1 ]]; then
+    echo "Usage: claude-as <profile> [args...]"
+    return 1
+  fi
+
+  local profile="$1"
+  shift
+  local profile_dir="$HOME/.claude-profiles/$profile"
+
+  if [[ ! -d "$profile_dir" ]]; then
+    echo "Profile '$profile' not found. Run: claude-profile-setup $profile"
+    return 1
+  fi
+
+  # Check if credentials exist (file or keychain) — if not, use bare claude
+  # so the user can /login without cco's preflight blocking it.
+  local has_creds=false
+  if [[ -f "$profile_dir/.credentials.json" ]]; then
+    has_creds=true
+  elif command -v security &>/dev/null; then
+    # Check macOS Keychain — Claude Code hashes custom config dirs into the
+    # service name: "Claude Code-credentials-<sha256prefix8>"
+    local hash
+    hash=$(printf '%s' "$profile_dir" | shasum -a 256 | cut -c1-8)
+    if security find-generic-password -s "Claude Code-credentials-$hash" -w &>/dev/null 2>&1; then
+      has_creds=true
+    fi
+  fi
+
+  if [[ "$has_creds" == false ]]; then
+    echo "No credentials for profile '$profile' — launching bare claude for login."
+    echo "Run /login, then exit. After that, claude-as $profile will use cco."
+    CLAUDE_CONFIG_DIR="$profile_dir" command claude "$@"
+  else
+    CLAUDE_CONFIG_DIR="$profile_dir" cco "$@"
+  fi
+}
+
+# Show current Claude profile
+claude-profile() {
+  if [[ -n "${CLAUDE_CONFIG_DIR:-}" ]]; then
+    echo "Profile: $(basename "$CLAUDE_CONFIG_DIR")"
+    echo "Config:  $CLAUDE_CONFIG_DIR"
+  else
+    echo "Using default config (~/.claude)"
+  fi
+}
+
+# ==============================================================================
 # GIT FUNCTIONS
 # ==============================================================================
 
