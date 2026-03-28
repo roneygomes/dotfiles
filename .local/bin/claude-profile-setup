@@ -1,0 +1,171 @@
+#!/bin/bash
+#
+# claude-profile-setup: Initialize Claude Code profile directories
+#
+# Creates profile-specific config dirs (~/.claude-profiles/<name>) that have
+# their own credentials/sessions but symlink shared config from ~/.claude.
+#
+# Usage:
+#   claude-profile-setup <profile-name>
+#   claude-profile-setup <profile-name> --migrate   # move existing state from ~/.claude
+
+set -euo pipefail
+
+PROFILES_DIR="$HOME/.claude-profiles"
+SHARED_SOURCE="$HOME/.claude"
+
+# Files/dirs that should be shared (symlinked) across profiles
+SHARED_ITEMS=(
+  settings.json
+  settings.local.json
+  skills
+  hooks
+  plugins
+  CLAUDE.md
+  RTK.md
+  statusline-command.sh
+  keybindings.json
+  projects
+)
+
+# Files/dirs that are per-profile (credentials, sessions, caches, state)
+PROFILE_ITEMS=(
+  .credentials.json
+  sessions
+  history.jsonl
+  statsig
+  telemetry
+  todos
+  tasks
+  cache
+  backups
+  debug
+  file-history
+  paste-cache
+  session-env
+  shell-snapshots
+  stats-cache.json
+  remote-settings.json
+  mcp-needs-auth-cache.json
+)
+
+PROFILE=""
+MIGRATE=false
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --migrate)
+      MIGRATE=true
+      shift
+      ;;
+    -*)
+      echo "Unknown option: $1" >&2
+      echo "Usage: claude-profile-setup <profile-name> [--migrate]"
+      exit 1
+      ;;
+    *)
+      if [[ -n "$PROFILE" ]]; then
+        echo "Error: unexpected argument '$1'" >&2
+        exit 1
+      fi
+      PROFILE="$1"
+      shift
+      ;;
+  esac
+done
+
+if [[ -z "$PROFILE" ]]; then
+  echo "Usage: claude-profile-setup <profile-name> [--migrate]"
+  echo ""
+  echo "Options:"
+  echo "  --migrate    Move existing sessions, credentials, and history from ~/.claude"
+  echo ""
+  echo "Example: claude-profile-setup work --migrate"
+  exit 1
+fi
+
+PROFILE_DIR="$PROFILES_DIR/$PROFILE"
+
+if [[ -d "$PROFILE_DIR" ]]; then
+  echo "Profile '$PROFILE' already exists at $PROFILE_DIR"
+  echo "Updating symlinks..."
+else
+  echo "Creating profile '$PROFILE' at $PROFILE_DIR"
+  mkdir -p "$PROFILE_DIR"
+fi
+
+# Create symlinks for shared items
+for item in "${SHARED_ITEMS[@]}"; do
+  source_path="$SHARED_SOURCE/$item"
+  target_path="$PROFILE_DIR/$item"
+
+  # Skip if source doesn't exist
+  if [[ ! -e "$source_path" ]]; then
+    continue
+  fi
+
+  # Remove existing target if it's not already the correct symlink
+  if [[ -L "$target_path" ]]; then
+    current_target=$(readlink "$target_path")
+    if [[ "$current_target" == "$source_path" ]]; then
+      echo "  [ok] $item -> $source_path"
+      continue
+    fi
+    rm "$target_path"
+  elif [[ -e "$target_path" ]]; then
+    echo "  [skip] $item exists and is not a symlink — remove manually if needed"
+    continue
+  fi
+
+  ln -s "$source_path" "$target_path"
+  echo "  [link] $item -> $source_path"
+done
+
+# Migrate per-profile data from ~/.claude if requested
+if [[ "$MIGRATE" == true ]]; then
+  echo ""
+  echo "Migrating state from $SHARED_SOURCE..."
+
+  for item in "${PROFILE_ITEMS[@]}"; do
+    source_path="$SHARED_SOURCE/$item"
+    target_path="$PROFILE_DIR/$item"
+
+    if [[ ! -e "$source_path" ]]; then
+      continue
+    fi
+
+    if [[ -e "$target_path" ]]; then
+      echo "  [skip] $item already exists in profile"
+      continue
+    fi
+
+    mv "$source_path" "$target_path"
+    echo "  [moved] $item"
+  done
+
+  # Claude Code also stores state in ~/.claude.json (outside ~/.claude/).
+  # When CLAUDE_CONFIG_DIR is set, it looks for .claude.json inside that dir.
+  local home_state="$HOME/.claude.json"
+  local profile_state="$PROFILE_DIR/.claude.json"
+  if [[ -f "$home_state" && ! -e "$profile_state" ]]; then
+    cp "$home_state" "$profile_state"
+    echo "  [copied] .claude.json (from \$HOME)"
+  fi
+
+  echo "Migration complete."
+fi
+
+echo ""
+echo "Profile '$PROFILE' is ready."
+echo ""
+echo "Usage:"
+echo "  claude-use $PROFILE         # switch current shell to this profile"
+echo "  claude-as $PROFILE           # one-shot launch with cco"
+echo "  claude-profile               # show active profile"
+echo ""
+if [[ "$MIGRATE" == true ]]; then
+  echo "Your existing sessions and credentials have been moved to this profile."
+else
+  echo "First time? Log in with:  claude-as $PROFILE /login"
+fi
