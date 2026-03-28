@@ -307,6 +307,25 @@ claude-profile() {
   fi
 }
 
+# Fuzzy-pick a gcloud configuration
+gcp-switch() {
+  local config
+  config="$(gcloud config configurations list --format='value(name)' | fzf --height 40% --reverse --prompt='GCP config: ')"
+  [[ -n "$config" ]] && gcloud config configurations activate "$config"
+}
+
+# Fuzzy-pick a Claude profile and launch cco with it
+claude-switch() {
+  local profiles_dir="$HOME/.claude-profiles"
+  if [[ ! -d "$profiles_dir" ]]; then
+    echo "No profiles directory. Run: claude-profile-setup <name>"
+    return 1
+  fi
+  local profile
+  profile="$(ls -1 "$profiles_dir" | fzf --height 40% --reverse --prompt='Claude profile: ')"
+  [[ -n "$profile" ]] && claude-as "$profile" "$@"
+}
+
 # ==============================================================================
 # GIT FUNCTIONS
 # ==============================================================================
