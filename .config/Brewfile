@@ -22,6 +22,7 @@ brew "bat"
 brew "tmux"
 brew "rtk"
 brew "openjdk"
+brew "python@3.12"
 
 cask "pantsbuild/tap/pants"
 cask "orbstack"
