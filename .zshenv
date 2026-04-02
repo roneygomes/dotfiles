@@ -54,5 +54,8 @@ export COMPOSE_BAKE=true
 export CLOUDSDK_PYTHON=/opt/homebrew/bin/python3
 export CLOUDSDK_PYTHON_SITEPACKAGES=1
 
+# claude code — default to work profile
+export CLAUDE_CONFIG_DIR="$HOME/.claude-profiles/work"
+
 # keep at the end
 export PATH=$PATH

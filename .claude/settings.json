@@ -1,20 +1,10 @@
 {
   "permissions": {
-    "defaultMode": "plan"
+    "defaultMode": "auto"
   },
   "model": "opus[1m]",
   "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/Users/roney/.claude/hooks/rtk-rewrite.sh"
-          }
-        ]
-      }
-    ]
+    "PreToolUse": []
   },
   "statusLine": {
     "type": "command",
@@ -34,5 +24,6 @@
   "skipDangerousModePermissionPrompt": true,
   "trustedDirectories": [
     "/Users/roney/.config/gcloud"
-  ]
+  ],
+  "skipAutoPermissionPrompt": true
 }

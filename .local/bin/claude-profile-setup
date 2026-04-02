@@ -105,11 +105,10 @@ for item in "${SHARED_ITEMS[@]}"; do
     continue
   fi
 
-  # Remove existing target if it's not already the correct symlink
+  # Skip if target is already a symlink that resolves to the same file (stow or manual)
   if [[ -L "$target_path" ]]; then
-    current_target=$(readlink "$target_path")
-    if [[ "$current_target" == "$source_path" ]]; then
-      echo "  [ok] $item -> $source_path"
+    if [[ "$(realpath "$target_path" 2>/dev/null)" == "$(realpath "$source_path" 2>/dev/null)" ]]; then
+      echo "  [ok] $item -> $(readlink "$target_path")"
       continue
     fi
     rm "$target_path"
