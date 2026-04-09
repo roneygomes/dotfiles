@@ -14,10 +14,7 @@
     "skill-creator@claude-plugins-official": true,
     "commit-commands@claude-plugins-official": true,
     "github@claude-plugins-official": true,
-    "linear@claude-plugins-official": false,
-    "typescript-lsp@claude-plugins-official": true,
-    "credix-claude-skills@credix-plugins": true,
-    "dev-workflow@agent-skills": true
+    "credix-claude-skills@credix-plugins": true
   },
   "sandbox": {
     "enabled": false
