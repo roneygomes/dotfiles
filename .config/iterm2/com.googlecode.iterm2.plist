@@ -1172,15 +1172,15 @@
 			<key>Background Color</key>
 			<dict>
 				<key>Alpha Component</key>
-				<integer>1</integer>
+				<real>1</real>
 				<key>Blue Component</key>
-				<real>0.90844470262527466</real>
+				<real>0.97254902124404907</real>
 				<key>Color Space</key>
 				<string>P3</string>
 				<key>Green Component</key>
-				<real>0.93567293882369995</real>
+				<real>0.99215686321258545</real>
 				<key>Red Component</key>
-				<real>0.94692164659500122</real>
+				<real>0.99215686321258545</real>
 			</dict>
 			<key>Background Color (Dark)</key>
 			<dict>
@@ -1382,12 +1382,16 @@
 			</dict>
 			<key>Cursor Text Color</key>
 			<dict>
+				<key>Alpha Component</key>
+				<real>1</real>
 				<key>Blue Component</key>
-				<string>1</string>
+				<real>0.97254902124404907</real>
+				<key>Color Space</key>
+				<string>P3</string>
 				<key>Green Component</key>
-				<string>1</string>
+				<real>0.99215686321258545</real>
 				<key>Red Component</key>
-				<string>1</string>
+				<real>0.99215686321258545</real>
 			</dict>
 			<key>Cursor Text Color (Dark)</key>
 			<dict>
@@ -1490,7 +1494,7 @@
 			<key>Link Color</key>
 			<dict>
 				<key>Alpha Component</key>
-				<integer>1</integer>
+				<real>1</real>
 				<key>Blue Component</key>
 				<real>0.7093239426612854</real>
 				<key>Color Space</key>
@@ -1529,7 +1533,7 @@
 			<key>Match Background Color</key>
 			<dict>
 				<key>Alpha Component</key>
-				<integer>1</integer>
+				<real>1</real>
 				<key>Blue Component</key>
 				<real>0.32116127014160156</real>
 				<key>Color Space</key>
@@ -1916,7 +1920,7 @@
 			<key>Use Underline Color (Light)</key>
 			<false/>
 			<key>Vertical Spacing</key>
-			<integer>1</integer>
+			<real>1</real>
 			<key>Visual Bell</key>
 			<true/>
 			<key>Window Type</key>
