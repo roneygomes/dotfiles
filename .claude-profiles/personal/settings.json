@@ -1,1 +1,29 @@
-../../.claude/settings.json
+{
+  "permissions": {
+    "defaultMode": "auto"
+  },
+  "model": "opus[1m]",
+  "hooks": {
+    "PreToolUse": []
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "sh ~/.claude/statusline-command.sh"
+  },
+  "enabledPlugins": {
+    "skill-creator@claude-plugins-official": true,
+    "commit-commands@claude-plugins-official": true,
+    "github@claude-plugins-official": true,
+    "dev-workflow@rg-agent-skills": true,
+    "linear@claude-plugins-official": true
+  },
+  "sandbox": {
+    "enabled": false
+  },
+  "voiceEnabled": true,
+  "skipDangerousModePermissionPrompt": true,
+  "skipAutoPermissionPrompt": true,
+  "trustedDirectories": [
+    "/Users/roney/.config/gcloud"
+  ]
+}
