@@ -43,8 +43,7 @@ PATH=$HOME/.rd/bin:$PATH:
 # java
 PATH=/opt/homebrew/opt/openjdk/bin:$PATH
 
-# nodejs
-export NODE_OPTIONS="--max-old-space-size=2048"
+# nodejs — NODE_OPTIONS is set in .zshrc to avoid breaking VS Code's Electron
 
 # docker
 export DOCKER_CONFIG=$HOME/.config/docker

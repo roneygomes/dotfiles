@@ -1,3 +1,8 @@
+# Exit early for VS Code shell env resolution
+if [[ "$VSCODE_RESOLVING_ENVIRONMENT" == "1" ]]; then
+	return
+fi
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -69,10 +74,18 @@ autoload -Uz compinit && compinit
 # ==============================================================================
 
 if [[ -z "$TMUX" && "$TERM_PROGRAM" != "vscode" ]]; then
-  if ! tmux has-session -t main 2>/dev/null; then
-    tmux new-session -d -s main
+  # Pick the first unattached session, or create a new one
+  local _sess
+  _sess=$(tmux list-sessions -F '#{session_name}:#{session_attached}' 2>/dev/null \
+    | awk -F: '$2 == 0 { print $1; exit }')
+
+  if [[ -z "$_sess" ]]; then
+    # No unattached session — create a new one with a unique name
+    _sess="iterm-$$"
+    tmux new-session -d -s "$_sess"
   fi
-  exec tmux attach -t main
+
+  tmux attach -t "$_sess" && exit || echo "tmux attach failed — dropping to plain shell"
 fi
 
 # ==============================================================================
@@ -398,6 +411,9 @@ fi
 
 # iTerm2 shell integration
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh" || true
+
+# nodejs
+export NODE_OPTIONS="--max-old-space-size=2048"
 
 # nvm
 export NVM_DIR="$HOME/.nvm"
