@@ -55,6 +55,7 @@ export CLOUDSDK_PYTHON_SITEPACKAGES=1
 
 # claude code — default to work profile
 export CLAUDE_CONFIG_DIR="$HOME/.claude-profiles/work"
+export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
 
 # keep at the end
 export PATH=$PATH
