@@ -23,8 +23,8 @@ This creates/updates symlinks from `$HOME` to files in this repository. The repo
 - `.zshrc` - Shell configuration, functions, aliases
 - `.zshenv` - Environment variables, PATH setup
 - `.config/` - Application-specific configs (git, gh, emacs, iterm2, etc.)
-- `.claude/settings.json` - Claude Code permissions (tracked in git)
-- `.claude/settings.local.json` - Local permission overrides (git-ignored)
+- `.claude-profiles/<profile>/settings.json` - Per-profile Claude Code config (one per profile, tracked in git)
+- `~/.claude/settings.local.json` - Personal overrides for env, secrets, machine-specific paths (real file, not tracked)
 
 **Executable scripts:**
 - `.local/bin/` - Custom shell scripts and utilities
@@ -53,15 +53,15 @@ This creates/updates symlinks from `$HOME` to files in this repository. The repo
 1. Add to `Brewfile`
 2. Run `brew bundle install`
 
-**Modifying Claude Code permissions:**
-- Global: Edit `.claude/settings.json`, commit changes
-- Project-specific: Edit `.claude/settings.local.json` (not committed)
+**Modifying Claude Code config:**
+- Edit the profile you use: `.claude-profiles/personal/settings.json` or `.claude-profiles/work/settings.json`. `.zshenv` selects the profile by hostname (personal on `bluestar`, work elsewhere) via `CLAUDE_CONFIG_DIR`.
+- Machine-local overrides (env vars, paths that shouldn't be committed): edit `~/.claude/settings.local.json` directly — that file is not tracked or stowed.
 
 **Granting cco sandbox access to new paths:**
 - `cco` is a sandbox wrapper for Claude Code (installed at `~/.local/share/cco/cco`, symlinked to `/usr/local/bin/cco`)
 - The `cco` alias in `.zshrc` adds `--add-dir <path>:rw` flags for directories that need write access inside the sandbox
 - To grant access to a new directory, add another `--add-dir <path>:rw` to the alias in `.zshrc`
-- Do NOT modify `~/.claude/settings.json` for sandbox path access — that's for Claude Code permissions, not cco sandbox rules
+- Do NOT modify the profile `settings.json` for sandbox path access — that's for Claude Code permissions, not cco sandbox rules
 
 ## Testing Changes
 
