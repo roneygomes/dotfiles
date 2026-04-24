@@ -53,8 +53,12 @@ export COMPOSE_BAKE=true
 export CLOUDSDK_PYTHON=/opt/homebrew/bin/python3
 export CLOUDSDK_PYTHON_SITEPACKAGES=1
 
-# claude code — default to work profile
-export CLAUDE_CONFIG_DIR="$HOME/.claude-profiles/work"
+# claude code — default to personal on bluestar, work elsewhere
+if [[ "$HOST" == "bluestar" ]]; then
+  export CLAUDE_CONFIG_DIR="$HOME/.claude-profiles/personal"
+else
+  export CLAUDE_CONFIG_DIR="$HOME/.claude-profiles/work"
+fi
 export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
 
 # keep at the end
