@@ -19,10 +19,12 @@
   "sandbox": {
     "enabled": false
   },
-  "voiceEnabled": true,
   "skipDangerousModePermissionPrompt": true,
+  "theme": "light",
   "skipAutoPermissionPrompt": true,
+  "voiceEnabled": true,
   "trustedDirectories": [
     "/Users/roney/.config/gcloud"
-  ]
+  ],
+  "agentPushNotifEnabled": true
 }

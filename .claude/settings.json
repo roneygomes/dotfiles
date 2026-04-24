@@ -18,10 +18,13 @@
   "sandbox": {
     "enabled": false
   },
-  "voiceEnabled": true,
   "skipDangerousModePermissionPrompt": true,
+  "skipAutoPermissionPrompt": true,
+  "voiceEnabled": true,
   "trustedDirectories": [
     "/Users/roney/.config/gcloud"
   ],
-  "skipAutoPermissionPrompt": true
+  "theme": "light",
+  "editorMode": "vim",
+  "remoteControlAtStartup": true
 }
