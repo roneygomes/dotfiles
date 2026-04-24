@@ -9,8 +9,32 @@ brew: ## Install Homebrew packages from Brewfile
 	brew upgrade
 
 .PHONY: stow
-stow: ## Symlink dotfiles to home directory
-	stow --verbose 1 --adopt --target $(HOME) .
+stow: ## Symlink dotfiles to home directory (per-file symlinks, never folds dirs)
+	stow --verbose 1 --adopt --no-folding --target $(HOME) .
+
+.PHONY: unfold-claude-profiles
+unfold-claude-profiles: ## One-shot: convert ~/.claude-profiles from wholesale symlink to real dir. RUN FROM A NON-CLAUDE SHELL.
+	@if [ -n "$$CLAUDECODE" ]; then \
+		echo "ERROR: refusing to run inside a Claude Code session — runtime files are open."; \
+		echo "Open a fresh terminal and try again."; \
+		exit 1; \
+	fi
+	@if [ ! -L "$(HOME)/.claude-profiles" ]; then \
+		echo "~/.claude-profiles is already a real dir — nothing to do."; \
+		exit 0; \
+	fi
+	@echo "Breaking wholesale symlink at ~/.claude-profiles..."
+	rm "$(HOME)/.claude-profiles"
+	mkdir -p "$(HOME)/.claude-profiles/personal" "$(HOME)/.claude-profiles/work"
+	@echo "Moving runtime data out of repo into ~/.claude-profiles/..."
+	@for profile in personal work; do \
+		for item in .claude.json backups cache file-history history.jsonl plans plugins projects session-env sessions shell-snapshots; do \
+			src="$(CURDIR)/.claude-profiles/$$profile/$$item"; \
+			dst="$(HOME)/.claude-profiles/$$profile/$$item"; \
+			if [ -e "$$src" ]; then mv "$$src" "$$dst" && echo "  moved $$profile/$$item"; fi; \
+		done; \
+	done
+	@$(MAKE) stow
 
 .PHONY: oh-my-zsh
 oh-my-zsh: ## Install oh-my-zsh if not present

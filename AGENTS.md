@@ -10,10 +10,12 @@ Personal dotfiles repository managing shell configuration, application settings,
 
 After modifying any configuration file:
 ```sh
-stow --verbose 1 --target $HOME .
+make stow
 ```
 
 This creates/updates symlinks from `$HOME` to files in this repository. The repository structure mirrors `$HOME` directory layout.
+
+`make stow` runs stow with `--no-folding` so directories like `~/.config` stay as real dirs with per-file symlinks — never wholesale-symlinked into the repo. Always go through `make stow`; calling `stow` directly without `--no-folding` will refold and cause apps to write their state into the repo.
 
 ## Repository Organization
 
@@ -34,17 +36,17 @@ This creates/updates symlinks from `$HOME` to files in this repository. The repo
 
 **Adding a new script:**
 1. Create executable in `.local/bin/`
-2. Run `stow --verbose 1 --target $HOME .`
+2. Run `make stow`
 3. Script becomes available in `$PATH`
 
 **Modifying shell config:**
 1. Edit `.zshrc` or `.zshenv`
-2. Run `stow --verbose 1 --target $HOME .`
+2. Run `make stow`
 3. Source with `source ~/.zshrc` or restart shell
 
 **Adding application config:**
 1. Create/modify file in `.config/<app-name>/`
-2. Run `stow --verbose 1 --target $HOME .`
+2. Run `make stow`
 3. Config symlinked to `~/.config/<app-name>/`
 
 **Installing new packages:**

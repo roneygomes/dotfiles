@@ -15,13 +15,53 @@ _darcs
 # Project-specific files (not meant for $HOME)
 AGENTS\.md
 CLAUDE\.md
-docker
-flake\.nix
 \.claude/settings\.local\.json
 LICENSE\.txt
 README\.md
-Dockerfile
 
-# 1Password
+# App data / runtime state — lives under $HOME, not stowed from the repo.
+
+# .config/ — top-level app data dirs
+\.config/gcloud
+\.config/htop
 \.config/op
+\.config/packer
+\.config/raycast
+\.config/yarn
+
+# .config/ — runtime files inside otherwise-tracked subdirs
+\.config/iterm2/AppSupport
+\.config/iterm2/sockets
+\.config/emacs/\.cache
+\.config/emacs/\.lsp-session-v1
+\.config/emacs/custom\.el
+\.config/emacs/eln-cache
+\.config/emacs/elpa
+\.config/emacs/history
+\.config/emacs/perspective-state
+\.config/emacs/places
+\.config/emacs/projects
+\.config/emacs/recentf
+\.config/emacs/transient
+\.config/emacs/tree-sitter
+\.config/docker/buildx
+\.config/docker/cli-plugins
+\.config/docker/contexts
+
+# .local/bin/ — pipx-managed shims
+\.local/bin/f2py
+\.local/bin/numpy-config
+
+# .claude-profiles/ — Claude Code runtime/state per profile
+\.claude-profiles/[^/]+/\.claude\.json
+\.claude-profiles/[^/]+/backups
+\.claude-profiles/[^/]+/cache
+\.claude-profiles/[^/]+/file-history
+\.claude-profiles/[^/]+/history\.jsonl
+\.claude-profiles/[^/]+/plans
+\.claude-profiles/[^/]+/plugins
+\.claude-profiles/[^/]+/projects
+\.claude-profiles/[^/]+/session-env
+\.claude-profiles/[^/]+/sessions
+\.claude-profiles/[^/]+/shell-snapshots
 

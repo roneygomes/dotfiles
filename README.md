@@ -1,11 +1,11 @@
 # dotfiles
 
 These dotfiles are managed with [stow](https://www.gnu.org/software/stow/). To
-install the dotfiles run the following command line at this project's root
+install the dotfiles run the following command at this project's root
 directory.
 
 ```sh
-stow --verbose 1 --target $HOME .
+make stow
 ```
 
 ## What's tracked

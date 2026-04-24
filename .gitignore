@@ -6,6 +6,8 @@
 .config/raycast/
 .config/github-copilot
 .config/jgit
+.config/htop/
+.config/packer/
 
 .config/docker/buildx/
 .config/docker/contexts/
@@ -44,8 +46,18 @@
 .config/emacs/tree-sitter/
 .config/emacs/.lsp-session-v1
 
-# .local/bin - ignore large binaries
+# .local/bin - ignore large binaries and pipx-managed shims
 .local/bin/cloud-sql-proxy
+.local/bin/f2py
+.local/bin/numpy-config
 
 # codex
 .config/codex
+
+# claude-profiles: ~/.claude-profiles is a symlink into this repo, so Claude
+# Code's runtime data (sessions, cache, plugins, history, projects, backups,
+# .claude.json) lands here. Only track settings + the skills/statusline symlinks.
+.claude-profiles/*/*
+!.claude-profiles/*/settings.json
+!.claude-profiles/*/skills
+!.claude-profiles/*/statusline-command.sh
