@@ -1,4 +1,5 @@
 tap "hashicorp/tap"
+tap "oven-sh/bun"
 tap "pantsbuild/tap"
 
 brew "asdf"
@@ -22,16 +23,26 @@ brew "bat"
 brew "tmux"
 brew "openjdk"
 brew "python@3.12"
+brew "oven-sh/bun/bun"
 
-cask "pantsbuild/tap/pants"
-cask "orbstack"
-cask "gcloud-cli"
-cask "iterm2"
 cask "bitwarden"
 cask "1password-cli"
+
+cask "gcloud-cli"
 cask "claude-code@latest"
-cask "font-jetbrains-mono"
+cask "pantsbuild/tap/pants"
+
+cask "orbstack"
+cask "iterm2"
+
 cask "slack"
 cask "alt-tab"
 cask "obsidian"
 cask "puremac"
+
+cask "font-jetbrains-mono"
+cask "font-iosevka"
+cask "font-bricolage-grotesque"
+cask "font-ia-writer-quattro"
+cask "font-ibm-plex-sans"
+cask "font-ibm-plex-sans-condensed"
