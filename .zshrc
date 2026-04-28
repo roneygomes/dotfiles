@@ -116,6 +116,9 @@ alias brewfile="vim ~/.config/Brewfile"
 # cco with additional directory access
 alias cco="cco --add-dir ~/.config/gcloud:rw --add-dir ~/.config/docker:rw"
 
+# personal assistant
+alias zima="claude --channels plugin:telegram@claude-plugins-official"
+
 # ==============================================================================
 # UTILITY FUNCTIONS
 # ==============================================================================
