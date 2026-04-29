@@ -13,18 +13,20 @@
   "enabledPlugins": {
     "skill-creator@claude-plugins-official": true,
     "commit-commands@claude-plugins-official": true,
-    "github@claude-plugins-official": true,
-    "credix-claude-skills@credix-plugins": true
+    "credix-claude-skills@credix-plugins": true,
+    "superpowers@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true
   },
   "sandbox": {
     "enabled": false
   },
   "skipDangerousModePermissionPrompt": true,
   "theme": "light",
+  "editorMode": "vim",
+  "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
   "voiceEnabled": true,
   "trustedDirectories": [
     "/Users/roney/.config/gcloud"
-  ],
-  "agentPushNotifEnabled": true
+  ]
 }
