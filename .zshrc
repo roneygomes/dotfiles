@@ -447,5 +447,3 @@ load-nvmrc() {
 add-zsh-hook chpwd load-nvmrc
 load-nvmrc
 
-# OpenClaw Completion
-source "/Users/roney/.openclaw/completions/openclaw.zsh"
