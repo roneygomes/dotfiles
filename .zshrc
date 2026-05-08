@@ -70,25 +70,6 @@ fpath=(${ASDF_DATA_DIR:-$HOME/.asdf}/completions $fpath)
 autoload -Uz compinit && compinit
 
 # ==============================================================================
-# TMUX AUTO-ATTACH
-# ==============================================================================
-
-if [[ -z "$TMUX" && "$TERM_PROGRAM" != "vscode" ]]; then
-  # Pick the first unattached session, or create a new one
-  local _sess
-  _sess=$(tmux list-sessions -F '#{session_name}:#{session_attached}' 2>/dev/null \
-    | awk -F: '$2 == 0 { print $1; exit }')
-
-  if [[ -z "$_sess" ]]; then
-    # No unattached session — create a new one with a unique name
-    _sess="iterm-$$"
-    tmux new-session -d -s "$_sess"
-  fi
-
-  tmux attach -t "$_sess" && exit || echo "tmux attach failed — dropping to plain shell"
-fi
-
-# ==============================================================================
 # KEY BINDINGS
 # ==============================================================================
 
@@ -446,4 +427,10 @@ load-nvmrc() {
 
 add-zsh-hook chpwd load-nvmrc
 load-nvmrc
+
+# Tab title: user@host — cwd (OSC 1 sets just the tab/icon title)
+_set_tab_title() {
+  print -Pn '\e]1;%n@%m — %1~\a'
+}
+add-zsh-hook precmd _set_tab_title
 
