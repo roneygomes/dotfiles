@@ -587,7 +587,7 @@
 	<key>HotkeyMigratedFromSingleToMulti</key>
 	<true/>
 	<key>Leader</key>
-	<string>0x6b-0x40000-0x28</string>
+	<string>0x77-0x40000-0xd</string>
 	<key>NeverBlockSystemShutdown</key>
 	<true/>
 	<key>NeverWarnAboutShortLivedSessions_3C60C9C9-76F6-4E30-BE65-EA8CF38F7FAE</key>
