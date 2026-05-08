@@ -32,18 +32,6 @@ README\.md
 # .config/ — runtime files inside otherwise-tracked subdirs
 \.config/iterm2/AppSupport
 \.config/iterm2/sockets
-\.config/emacs/\.cache
-\.config/emacs/\.lsp-session-v1
-\.config/emacs/custom\.el
-\.config/emacs/eln-cache
-\.config/emacs/elpa
-\.config/emacs/history
-\.config/emacs/perspective-state
-\.config/emacs/places
-\.config/emacs/projects
-\.config/emacs/recentf
-\.config/emacs/transient
-\.config/emacs/tree-sitter
 \.config/docker/buildx
 \.config/docker/cli-plugins
 \.config/docker/contexts
