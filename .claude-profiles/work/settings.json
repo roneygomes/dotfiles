@@ -27,5 +27,6 @@
   "voiceEnabled": true,
   "trustedDirectories": [
     "/Users/roney/.config/gcloud"
-  ]
+  ],
+  "inputNeededNotifEnabled": true
 }
