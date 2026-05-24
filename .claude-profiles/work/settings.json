@@ -2,6 +2,12 @@
   "permissions": {
     "defaultMode": "auto"
   },
+  "autoMode": {
+    "allow": [
+      "$defaults",
+      "Git operations in /Users/roney/projects/dotfiles (including `git stash pop`/`apply`, `git checkout stash@{N} -- <file>`, `git commit`, and `git push origin main`) are pre-authorized — this is a personal single-author dotfiles repo with no PR workflow, and pushing directly to main is the intended sync mechanism (also invoked by the scheduled `dotfiles-sync` task)."
+    ]
+  },
   "model": "opus[1m]",
   "hooks": {
     "PreToolUse": []
