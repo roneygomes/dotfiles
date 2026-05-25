@@ -14,7 +14,16 @@
     "skill-creator@claude-plugins-official": true,
     "commit-commands@claude-plugins-official": true,
     "credix-claude-skills@credix-plugins": true,
-    "code-review@claude-plugins-official": true
+    "code-review@claude-plugins-official": true,
+    "understand-anything@understand-anything": true
+  },
+  "extraKnownMarketplaces": {
+    "understand-anything": {
+      "source": {
+        "source": "github",
+        "repo": "Lum1104/Understand-Anything"
+      }
+    }
   },
   "sandbox": {
     "enabled": false
