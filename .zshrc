@@ -385,8 +385,6 @@ if [[ "$INSIDE_EMACS" = 'vterm' ]]; then
 fi
 
 # ==============================================================================
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # iTerm2 shell integration
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh" || true
@@ -405,4 +403,7 @@ _set_tab_title() {
   print -Pn '\e]1;%n@%m — %1~\a'
 }
 add-zsh-hook precmd _set_tab_title
+
+# To customize prompt, run `p10k configure` or edit ~/projects/dotfiles/.p10k.zsh.
+[[ ! -f ~/projects/dotfiles/.p10k.zsh ]] || source ~/projects/dotfiles/.p10k.zsh
 
