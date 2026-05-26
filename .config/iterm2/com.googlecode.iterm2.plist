@@ -1386,6 +1386,8 @@
 				<key>Red Component</key>
 				<real>0.52338262643729649</real>
 			</dict>
+			<key>Cursor Hidden When Unfocused</key>
+			<true/>
 			<key>Cursor Text Color</key>
 			<dict>
 				<key>Alpha Component</key>
@@ -1588,7 +1590,7 @@
 			<key>Non-ASCII Anti Aliased</key>
 			<true/>
 			<key>Normal Font</key>
-			<string>JetBrainsMono-Regular 17</string>
+			<string>MesloLGS-NF-Regular 14</string>
 			<key>Option Key Sends</key>
 			<integer>2</integer>
 			<key>Prompt Before Closing 2</key>
