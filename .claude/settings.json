@@ -1,0 +1,7 @@
+{
+  "theme": "light",
+  "editorMode": "vim",
+  "preferredNotifChannel": "iterm2",
+  "agentPushNotifEnabled": true,
+  "inputNeededNotifEnabled": true
+}
