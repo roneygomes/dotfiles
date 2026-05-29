@@ -41,6 +41,7 @@ cask "obsidian"
 cask "puremac"
 
 cask "font-jetbrains-mono"
+cask "font-jetbrains-mono-nerd-font"
 cask "font-iosevka"
 cask "font-bricolage-grotesque"
 cask "font-ia-writer-quattro"
