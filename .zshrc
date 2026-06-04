@@ -154,12 +154,12 @@ quote_lines() {
 			return 1
 		fi
 
-		while IFS= read -r line; do
-			lines+=("$line")
+		while IFS= read -r line || [[ -n "$line" ]]; do
+			lines+=("${line%$'\r'}")
 		done < "$input_source"
 	else
-		while IFS= read -r line; do
-			lines+=("$line")
+		while IFS= read -r line || [[ -n "$line" ]]; do
+			lines+=("${line%$'\r'}")
 		done
 	fi
 
