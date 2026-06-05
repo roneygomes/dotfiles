@@ -78,7 +78,7 @@ autoload -Uz compinit && compinit
 
 # Brew bundle install
 alias bbi="brew update && \
-    brew bundle install --cleanup --file=~/.config/Brewfile && \
+    brew bundle install --force-cleanup --file=~/.config/Brewfile && \
     brew upgrade"
 
 # Milliseconds since epoch
