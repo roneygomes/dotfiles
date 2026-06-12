@@ -17,9 +17,9 @@
 	<key>AIVectorStore</key>
 	<integer>0</integer>
 	<key>AiMaxTokens</key>
-	<integer>400000</integer>
+	<integer>1050000</integer>
 	<key>AiModel</key>
-	<string>gpt-5.2</string>
+	<string>gpt-5.5</string>
 	<key>AiResponseMaxTokens</key>
 	<integer>128000</integer>
 	<key>AitermURL</key>
@@ -1487,7 +1487,7 @@
 			<key>Horizontal Spacing</key>
 			<real>0.90000000000000002</real>
 			<key>Icon</key>
-			<integer>1</integer>
+			<integer>0</integer>
 			<key>Idle Code</key>
 			<integer>0</integer>
 			<key>Jobs to Ignore</key>
@@ -1538,6 +1538,8 @@
 				<key>Red Component</key>
 				<real>0.19802422821521759</real>
 			</dict>
+			<key>Load Shell Integration Automatically</key>
+			<true/>
 			<key>Match Background Color</key>
 			<dict>
 				<key>Alpha Component</key>
@@ -1590,7 +1592,7 @@
 			<key>Non-ASCII Anti Aliased</key>
 			<true/>
 			<key>Normal Font</key>
-			<string>JetBrainsMonoNFM-Regular 15</string>
+			<string>JetBrainsMonoNFM-Regular 16</string>
 			<key>Option Key Sends</key>
 			<integer>2</integer>
 			<key>Prompt Before Closing 2</key>
@@ -4625,6 +4627,8 @@
 	<false/>
 	<key>QuitWhenAllWindowsClosed</key>
 	<true/>
+	<key>RemoveAddTabButton</key>
+	<false/>
 	<key>SeparateStatusBarsPerPane</key>
 	<true/>
 	<key>ShowFullScreenTabBar</key>
