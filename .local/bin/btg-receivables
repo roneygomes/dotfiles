@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+#
+# btg-receivables — fetch BTG SCF bordero receivables for a list of tracking
+# UUIDs (read from stdin, one per line) and emit one CSV row per receivable.
+#
+# Usage:
+#   export BTG_TOKEN='Bearer eyJ...'        # the Authorization header value
+#   btg-receivables < uuids.txt > out.csv
+#   echo 15baf287-f64b-43e5-a260-cf5be0c61ef8 | btg-receivables
+#
+# Columns:
+#   tracking_id,created_at,identification,maturity_date,
+#   maturity_amount,receivable_status,payer_tax_id,payee_tax_id
+
+set -euo pipefail
+
+base_url='https://api.empresas.btgpactual.com/v1/scf/borderos'
+
+if [[ -z "${BTG_TOKEN:-}" ]]; then
+  echo "btg-receivables: set BTG_TOKEN to the Authorization header value" >&2
+  exit 1
+fi
+
+# Header row.
+echo "tracking_id,created_at,identification,maturity_date,maturity_amount,receivable_status,payer_tax_id,payee_tax_id"
+
+while IFS= read -r uuid || [[ -n "$uuid" ]]; do
+  # Trim whitespace; skip blank lines.
+  uuid="${uuid//[$' \t\r\n']/}"
+  [[ -z "$uuid" ]] && continue
+
+  if ! response=$(curl --silent --show-error --fail-with-body \
+        --location "${base_url}/${uuid}/receivables" \
+        --header "Authorization: ${BTG_TOKEN}"); then
+    echo "btg-receivables: request failed for ${uuid}" >&2
+    continue
+  fi
+
+  # Flatten each receivable into a properly-quoted CSV row via @csv.
+  echo "$response" | jq -r '
+    .trackingId as $tid
+    | .createdAt as $created
+    | .receivables[]
+    | [
+        $tid,
+        $created,
+        .identification,
+        .maturityDate,
+        .maturityAmount,
+        .receivableStatus,
+        .payerTaxId,
+        .payeeTaxId
+      ]
+    | @csv
+  '
+done
