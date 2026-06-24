@@ -1,6 +1,4 @@
 tap "hashicorp/tap"
-tap "oven-sh/bun"
-tap "pantsbuild/tap"
 
 brew "asdf"
 brew "stow"
@@ -24,14 +22,12 @@ brew "bat"
 brew "tmux"
 brew "openjdk"
 brew "python@3.12"
-brew "oven-sh/bun/bun"
 
 cask "bitwarden"
 cask "1password-cli"
 
 cask "gcloud-cli"
 cask "claude-code@latest"
-cask "pantsbuild/tap/pants"
 
 cask "orbstack"
 cask "iterm2"
