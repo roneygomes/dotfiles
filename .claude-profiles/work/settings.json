@@ -42,6 +42,5 @@
   "voiceEnabled": true,
   "trustedDirectories": [
     "/Users/roney/.config/gcloud"
-  ],
-  "model": "claude-fable-5[1m]"
+  ]
 }
