@@ -42,5 +42,6 @@
   "voiceEnabled": true,
   "trustedDirectories": [
     "/Users/roney/.config/gcloud"
-  ]
+  ],
+  "tui": "fullscreen"
 }
