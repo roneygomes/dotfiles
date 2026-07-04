@@ -26,6 +26,7 @@
   "sandbox": {
     "enabled": false
   },
+  "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
   "theme": "light",
   "editorMode": "vim",
@@ -43,5 +44,5 @@
   "trustedDirectories": [
     "/Users/roney/.config/gcloud"
   ],
-  "tui": "fullscreen"
+  "skipWorkflowUsageWarning": true
 }
