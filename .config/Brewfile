@@ -8,7 +8,7 @@ brew "docker-compose"
 brew "docker-buildx"
 brew "libpq"
 brew "jwt-cli"
-brew "hashicorp/tap/terraform"
+brew "hashicorp/tap/terraform", trusted: true
 brew "proxychains-ng"
 brew "ffmpeg"
 brew "poppler"
