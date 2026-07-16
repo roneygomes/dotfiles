@@ -44,5 +44,6 @@
   "trustedDirectories": [
     "/Users/roney/.config/gcloud"
   ],
-  "skipWorkflowUsageWarning": true
+  "skipWorkflowUsageWarning": true,
+  "effortLevel": "high"
 }
