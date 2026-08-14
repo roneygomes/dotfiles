@@ -606,7 +606,7 @@
 			<key>ASCII Anti Aliased</key>
 			<true/>
 			<key>ASCII Ligatures</key>
-			<false/>
+			<true/>
 			<key>Allow Alternate Mouse Scroll</key>
 			<false/>
 			<key>Allow Title Setting</key>
@@ -1485,7 +1485,7 @@
 			<key>Guid</key>
 			<string>3C60C9C9-76F6-4E30-BE65-EA8CF38F7FAE</string>
 			<key>Horizontal Spacing</key>
-			<real>0.90000000000000002</real>
+			<real>0.88</real>
 			<key>Icon</key>
 			<integer>0</integer>
 			<key>Idle Code</key>
@@ -4636,6 +4636,8 @@
 	<key>ShowNewOutputIndicator</key>
 	<false/>
 	<key>ShowPaneTitles</key>
+	<false/>
+	<key>ShowSecureKeyboardEntryIndicator</key>
 	<false/>
 	<key>SoundForEsc</key>
 	<false/>
