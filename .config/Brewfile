@@ -1,4 +1,5 @@
 tap "hashicorp/tap"
+tap "hex-inc/hex-cli"
 
 brew "asdf"
 brew "stow"
@@ -9,6 +10,7 @@ brew "docker-buildx"
 brew "libpq"
 brew "jwt-cli"
 brew "hashicorp/tap/terraform", trusted: true
+brew "hex-inc/hex-cli/hex", trusted: true
 brew "proxychains-ng"
 brew "ffmpeg"
 brew "poppler"
