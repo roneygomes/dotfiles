@@ -40,11 +40,6 @@ if [[ -f "$HOME"/.config/op/plugins.sh ]]; then
 	source "$HOME"/.config/op/plugins.sh
 fi
 
-# Secret stuff that can't be versioned
-if [[ -f "$HOME"/.private ]]; then
-	source "$HOME"/.private
-fi
-
 # Google Cloud SDK
 if [ -f '/opt/homebrew/share/google-cloud-sdk/path.zsh.inc' ]; then
 	. '/opt/homebrew/share/google-cloud-sdk/path.zsh.inc'

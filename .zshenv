@@ -61,5 +61,11 @@ else
 fi
 export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
 
+# Secret stuff that can't be versioned. Sourced here rather than in .zshrc so
+# non-interactive shells (MCP servers, scripts, cron) inherit it too.
+if [[ -f "$HOME"/.private ]]; then
+	source "$HOME"/.private
+fi
+
 # keep at the end
 export PATH=$PATH
