@@ -14,7 +14,8 @@
     "commit-commands@claude-plugins-official": true,
     "credix-claude-skills@credix-plugins": true,
     "code-review@claude-plugins-official": true,
-    "aikido@claude-plugins-official": true
+    "aikido@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "understand-anything": {
