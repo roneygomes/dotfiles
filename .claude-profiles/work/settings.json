@@ -15,13 +15,20 @@
     "credix-claude-skills@credix-plugins": true,
     "code-review@claude-plugins-official": true,
     "aikido@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true
+    "superpowers@claude-plugins-official": true,
+    "i-have-adhd@i-have-adhd": true
   },
   "extraKnownMarketplaces": {
     "understand-anything": {
       "source": {
         "source": "github",
         "repo": "Lum1104/Understand-Anything"
+      }
+    },
+    "i-have-adhd": {
+      "source": {
+        "source": "github",
+        "repo": "ayghri/i-have-adhd"
       }
     }
   },
