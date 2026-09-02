@@ -61,5 +61,6 @@
   "voiceEnabled": true,
   "trustedDirectories": [
     "/Users/roney/.config/gcloud"
-  ]
+  ],
+  "model": "opus[1m]"
 }
