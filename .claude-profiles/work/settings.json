@@ -16,7 +16,8 @@
     "code-review@claude-plugins-official": true,
     "aikido@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true,
-    "i-have-adhd@i-have-adhd": true
+    "i-have-adhd@i-have-adhd": true,
+    "laconic@claude-laconic": true
   },
   "extraKnownMarketplaces": {
     "understand-anything": {
@@ -29,6 +30,12 @@
       "source": {
         "source": "github",
         "repo": "ayghri/i-have-adhd"
+      }
+    },
+    "claude-laconic": {
+      "source": {
+        "source": "github",
+        "repo": "spenhouet/claude-laconic"
       }
     }
   },
