@@ -117,7 +117,8 @@
     "aikido@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true,
     "i-have-adhd@i-have-adhd": true,
-    "laconic@claude-laconic": true
+    "laconic@claude-laconic": true,
+    "postman@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "understand-anything": {
