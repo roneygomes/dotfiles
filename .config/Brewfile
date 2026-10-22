@@ -1,6 +1,7 @@
 tap "hashicorp/tap"
 tap "hex-inc/hex-cli"
 tap "zjrosen/perles"
+tap "steipete/tap"
 
 brew "asdf"
 brew "stow"
@@ -26,6 +27,7 @@ brew "tmux"
 brew "openjdk"
 brew "python@3.12"
 brew "zjrosen/perles/perles", trusted: true
+brew "steipete/tap/remindctl", trusted: true
 
 cask "bitwarden"
 cask "1password-cli"
