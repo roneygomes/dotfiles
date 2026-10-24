@@ -165,5 +165,6 @@
   "voiceEnabled": true,
   "trustedDirectories": [
     "/Users/roney/.config/gcloud"
-  ]
+  ],
+  "outputStyle": "Concise"
 }
