@@ -1,6 +1,9 @@
 {
   "permissions": {
-    "defaultMode": "auto"
+    "defaultMode": "auto",
+    "allow": [
+      "mcp__statsig__Update_Gate_Entirely"
+    ]
   },
   "model": "opus",
   "env": {
