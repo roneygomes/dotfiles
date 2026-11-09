@@ -66,3 +66,36 @@ projectile, and switch to it (opening a new workspace)."
 
 (map! :leader
       :desc "New project" "p n" #'my/project-new)
+
+;; --- sync & restart (stays inside Emacs) ---
+;; `doom/reload' is unreliable for module changes: it re-boots in-process and can
+;; hit "Memory exhausted". This runs a real `doom sync --aot', then hard-restarts
+;; Emacs in place via `doom/restart' — the same reliable path as a terminal,
+;; without ever leaving Emacs.
+(defun my/doom-sync-and-restart ()
+  "Run `doom sync --aot -j 4', then restart Emacs when it finishes."
+  (interactive)
+  (let* ((default-directory doom-emacs-dir)
+         (doom-bin (expand-file-name "bin/doom" doom-emacs-dir))
+         (emacs-bin (expand-file-name invocation-name invocation-directory))
+         buf)
+    (let ((process-environment
+           (cons (format "EMACS=%s" emacs-bin)
+                 (cons (format "EMACSDIR=%s" doom-emacs-dir)
+                       (cons (format "DOOMDIR=%s" doom-user-dir)
+                             (cons (format "DOOMLOCALDIR=%s" doom-local-dir)
+                                   process-environment))))))
+      (setq buf (compile (format "%s sync --aot -j 4" doom-bin) t)))
+    (with-current-buffer buf
+      (add-hook 'compilation-finish-functions
+                (lambda (_buf status)
+                  (if (string-prefix-p "finished" status)
+                      (progn (message "doom sync done — restarting Emacs…")
+                             (sit-for 0.3)
+                             (doom/restart))
+                    (message "doom sync FAILED (%s) — not restarting"
+                             (string-trim status))))
+                nil 'local))))
+
+(map! :leader
+      :desc "Sync & restart" "h r s" #'my/doom-sync-and-restart)
