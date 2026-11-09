@@ -32,24 +32,8 @@
 ;; --- vterm scrollback ---
 (setq vterm-max-scrollback 100000)
 
-;; --- spacious padding (centered frame) ---
-(use-package! spacious-padding
-  :config
-  (setq spacious-padding-widths
-        '(:internal-border-width 6
-          :header-line-width 2
-          :mode-line-width 3
-          :tab-width 2
-          :right-divider-width 6
-          :fringe-width 8))
-  (spacious-padding-mode 1))
-
-;; --- mixed-pitch in prose buffers ---
-(use-package! mixed-pitch
-  :hook ((org-mode . mixed-pitch-mode)
-         (markdown-mode . mixed-pitch-mode))
-  :config
-  (setq mixed-pitch-set-height t))
+;; NOTE: spacious-padding and mixed-pitch were removed because their
+;; face-remapping makes redisplay (and thus typing) slow. Re-add if desired.
 
 ;; --- new project helper ---
 (defun my/project-new (dir)
@@ -66,13 +50,3 @@ projectile, and switch to it (opening a new workspace)."
 
 (map! :leader
       :desc "New project" "p n" #'my/project-new)
-
-;; --- garbage collection ---
-;; init.el raises `gc-cons-threshold' to prevent "Memory exhausted" while
-;; loading native-compiled packages. Reset it once startup finishes (Doom's own
-;; reset only triggers when it's still `most-positive-fixnum'). 100 MiB matches
-;; the old config and keeps GC pauses short without running GC too often.
-(add-hook 'doom-after-init-hook
-          (lambda ()
-            (setq gc-cons-threshold (* 100 1024 1024)
-                  gc-cons-percentage 0.1)))
