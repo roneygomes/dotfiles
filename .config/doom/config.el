@@ -17,7 +17,8 @@
 
 ;; --- modeline ---
 ;; Disable icons in the modeline (text-only).
-(setq doom-modeline-icon nil)
+(setq doom-modeline-icon nil
+      doom-modeline-time-icon nil)
 
 ;; --- line numbers ---
 (setq display-line-numbers-type 'relative)
