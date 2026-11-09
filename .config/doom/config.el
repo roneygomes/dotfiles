@@ -70,9 +70,9 @@ projectile, and switch to it (opening a new workspace)."
 ;; --- garbage collection ---
 ;; init.el raises `gc-cons-threshold' to prevent "Memory exhausted" while
 ;; loading native-compiled packages. Reset it once startup finishes (Doom's own
-;; reset only triggers when it's still `most-positive-fixnum'), so GC pauses stay
-;; short and typing stays responsive.
+;; reset only triggers when it's still `most-positive-fixnum'). 100 MiB matches
+;; the old config and keeps GC pauses short without running GC too often.
 (add-hook 'doom-after-init-hook
           (lambda ()
-            (setq gc-cons-threshold (* 16 1024 1024)
+            (setq gc-cons-threshold (* 100 1024 1024)
                   gc-cons-percentage 0.1)))
