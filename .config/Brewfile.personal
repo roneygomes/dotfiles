@@ -3,6 +3,7 @@
 
 tap "d12frosted/emacs-plus", trusted: true
 tap "steipete/tap"
+tap "hashicorp/tap"
 
 brew "stow"
 brew "fzf"
@@ -32,6 +33,12 @@ brew "diffutils"
 brew "gnu-tar"
 brew "gnu-sed"
 brew "libvterm"
+
+# Language servers (LSP)
+brew "gopls"
+brew "rust-analyzer"
+brew "typescript-language-server"
+brew "hashicorp/tap/terraform"
 
 cask "emacs-plus-app", trusted: true
 

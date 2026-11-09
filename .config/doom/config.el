@@ -44,15 +44,3 @@
          (markdown-mode . mixed-pitch-mode))
   :config
   (setq mixed-pitch-set-height t))
-
-;; --- macOS ⌘-key bindings (ported from the old config) ---
-(map! "s-P" #'execute-extended-command   ; ⌘-P → M-x
-      "s-p" #'project-find-file
-      "s-o" #'find-file
-      "s-s" #'save-buffer
-      "s-/" #'comment-line
-      "s-f" #'consult-line
-      "s-9" #'magit-status
-      "s-1" #'treemacs-select-window
-      "s-=" #'text-scale-increase
-      "s--" #'text-scale-decrease)
