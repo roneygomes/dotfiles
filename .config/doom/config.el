@@ -6,6 +6,10 @@
 (setq doom-font (font-spec :family "Iosevka Nerd Font" :size 16))
 (setq doom-variable-pitch-font (font-spec :family "Geneva" :size 15))
 
+;; --- window ---
+;; Start maximized.
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+
 ;; --- theme ---
 ;; Keep the light modus-operandi theme from the old config.
 ;; (Swap for 'doom-one to go back to Doom's dark default.)
