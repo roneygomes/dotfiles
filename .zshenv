@@ -1,5 +1,6 @@
 export LC_ALL=en_US.UTF-8
 export DISABLE_AUTO_TITLE=true
+export EDITOR=vim
 
 export PROJECTS_DIR=~/projects
 
@@ -9,6 +10,9 @@ export POWERLEVEL9K_INSTANT_PROMPT=quiet
 export ZSH_DISABLE_COMPFIX=true
 export plugins=(cp vi-mode git git-extras fzf z nvm)
 export ZSH_THEME="powerlevel10k/powerlevel10k"
+
+# opencode
+export PATH=$HOME/.opencode/bin:$PATH
 
 # homebrew
 PATH=/opt/homebrew/bin:$PATH:

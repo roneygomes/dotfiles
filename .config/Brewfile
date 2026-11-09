@@ -34,6 +34,7 @@ cask "1password-cli"
 
 cask "gcloud-cli"
 cask "claude-code@latest"
+cask "android-platform-tools"
 
 cask "orbstack"
 cask "iterm2"
@@ -44,6 +45,7 @@ cask "alt-tab"
 cask "obsidian"
 cask "puremac"
 cask "handy"
+cask "vorssaint"
 
 cask "font-jetbrains-mono"
 cask "font-jetbrains-mono-nerd-font"

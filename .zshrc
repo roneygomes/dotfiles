@@ -401,4 +401,3 @@ add-zsh-hook precmd _set_tab_title
 
 # To customize prompt, run `p10k configure` or edit ~/projects/dotfiles/.p10k.zsh.
 [[ ! -f ~/projects/dotfiles/.p10k.zsh ]] || source ~/projects/dotfiles/.p10k.zsh
-
