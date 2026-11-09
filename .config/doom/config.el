@@ -20,8 +20,13 @@
 (setq doom-modeline-icon nil
       doom-modeline-time-icon nil)
 
+;; --- treemacs (file tree) ---
+;; No icons: disable the nerd-glyph theme and PNG images, leaving a text-only
+;; tree (just +/- collapse indicators).
+(setq treemacs-no-png-images t)
+
 ;; --- line numbers ---
-(setq display-line-numbers-type 'relative)
+(setq display-line-numbers-type t)  ; absolute (relative recomputes on every change)
 
 ;; --- clock in the modeline ---
 (setq display-time-day-and-date t
@@ -32,8 +37,19 @@
 ;; --- vterm scrollback ---
 (setq vterm-max-scrollback 100000)
 
-;; NOTE: spacious-padding and mixed-pitch were removed because their
-;; face-remapping makes redisplay (and thus typing) slow. Re-add if desired.
+;; --- spacious padding (centered frame) ---
+;; Re-added without mixed-pitch, and with absolute line numbers, to stay
+;; under the redisplay budget. Remove if typing gets slow again.
+(use-package! spacious-padding
+  :config
+  (setq spacious-padding-widths
+        '(:internal-border-width 6
+          :header-line-width 2
+          :mode-line-width 3
+          :tab-width 2
+          :right-divider-width 6
+          :fringe-width 8))
+  (spacious-padding-mode 1))
 
 ;; --- new project helper ---
 (defun my/project-new (dir)
