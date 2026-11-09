@@ -44,6 +44,7 @@ README\.md
 \.config/emacs/recentf
 \.config/emacs/transient
 \.config/emacs/tree-sitter
+\.config/emacs/undo-fu-session
 \.config/docker/buildx
 \.config/docker/cli-plugins
 \.config/docker/contexts
