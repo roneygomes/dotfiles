@@ -1,9 +1,10 @@
+# Brewfile — work profile (all hosts other than bluestar)
+# Shared tooling + work-only packages. For the personal machine, see Brewfile.personal.
+
 tap "hashicorp/tap"
 tap "hex-inc/hex-cli"
-tap "zjrosen/perles"
-tap "steipete/tap"
+tap "d12frosted/emacs-plus", trusted: true
 
-brew "asdf"
 brew "stow"
 brew "fzf"
 brew "gh"
@@ -13,7 +14,6 @@ brew "libpq"
 brew "jwt-cli"
 brew "hashicorp/tap/terraform", trusted: true
 brew "hex-inc/hex-cli/hex", trusted: true
-brew "proxychains-ng"
 brew "ffmpeg"
 brew "poppler"
 brew "pipx"
@@ -26,31 +26,15 @@ brew "bat"
 brew "tmux"
 brew "openjdk"
 brew "python@3.12"
-brew "zjrosen/perles/perles", trusted: true
-brew "steipete/tap/remindctl", trusted: true
 
-cask "bitwarden"
-cask "1password-cli"
+cask "emacs-plus-app", trusted: true
 
 cask "gcloud-cli"
 cask "claude-code@latest"
-cask "android-platform-tools"
 
 cask "orbstack"
 cask "iterm2"
-cask "jupyterlab-app"
-
-cask "slack"
-cask "alt-tab"
-cask "obsidian"
-cask "puremac"
-cask "handy"
-cask "vorssaint"
 
 cask "font-jetbrains-mono"
 cask "font-jetbrains-mono-nerd-font"
 cask "font-iosevka"
-cask "font-bricolage-grotesque"
-cask "font-ia-writer-quattro"
-cask "font-ibm-plex-sans"
-cask "font-ibm-plex-sans-condensed"

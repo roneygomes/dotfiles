@@ -3,9 +3,23 @@
 install: brew stow oh-my-zsh p10k nvm cco ## Install all dependencies and symlink dotfiles
 
 .PHONY: brew
-brew: ## Install Homebrew packages from Brewfile
+brew: ## Install Homebrew packages for this machine (personal on bluestar, work elsewhere)
+	@profile=personal; host=$$(hostname -s); [ "$$host" != "bluestar" ] && profile=work; \
+	$(MAKE) brew-profile PROFILE=$$profile
+
+.PHONY: brew-personal
+brew-personal: ## Install Homebrew packages from the personal profile
+	@$(MAKE) brew-profile PROFILE=personal
+
+.PHONY: brew-work
+brew-work: ## Install Homebrew packages from the work profile
+	@$(MAKE) brew-profile PROFILE=work
+
+.PHONY: brew-profile
+brew-profile: ## Install a single Brewfile profile (PROFILE=personal|work)
 	brew update
-	brew bundle install --cleanup --file=.config/Brewfile
+	brew bundle install --file=.config/Brewfile.$(PROFILE)
+	brew bundle cleanup --force --file=.config/Brewfile.$(PROFILE)
 	brew upgrade
 
 .PHONY: stow

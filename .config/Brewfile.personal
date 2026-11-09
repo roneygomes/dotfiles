@@ -1,0 +1,42 @@
+# Brewfile — personal profile (host: bluestar)
+# Shared tooling + personal-only apps. For the work machine, see Brewfile.work.
+
+tap "d12frosted/emacs-plus", trusted: true
+tap "steipete/tap"
+
+brew "stow"
+brew "fzf"
+brew "gh"
+brew "docker-compose"
+brew "docker-buildx"
+brew "libpq"
+brew "ffmpeg"
+brew "poppler"
+brew "pipx"
+brew "uv"
+brew "cmake"
+brew "libtool"
+brew "openssl@3"
+brew "ripgrep"
+brew "bat"
+brew "tmux"
+brew "python@3.12"
+brew "python@3.14"
+brew "steipete/tap/remindctl", trusted: true
+
+cask "emacs-plus-app", trusted: true
+
+cask "bitwarden"
+
+cask "android-platform-tools"
+
+cask "orbstack"
+cask "iterm2"
+
+cask "puremac"
+cask "handy"
+cask "vorssaint"
+
+cask "font-jetbrains-mono"
+cask "font-jetbrains-mono-nerd-font"
+cask "font-iosevka"
