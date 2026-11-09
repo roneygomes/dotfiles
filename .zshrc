@@ -71,9 +71,15 @@ autoload -Uz compinit && compinit
 # Local IP address
 # alias ip="ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p'"
 
-# Brew bundle install
+# Brew bundle install (profile by host: personal on bluestar, work elsewhere)
+if [[ "$HOST" == "bluestar" ]]; then
+  BREWFILE="$HOME/.config/Brewfile.personal"
+else
+  BREWFILE="$HOME/.config/Brewfile.work"
+fi
+
 alias bbi="brew update && \
-    brew bundle install --force-cleanup --file=~/.config/Brewfile && \
+    brew bundle install --force-cleanup --file=$BREWFILE && \
     brew upgrade --yes"
 
 # Milliseconds since epoch
@@ -82,7 +88,7 @@ alias epoch="python3 -c 'import time; print(int(time.time() * 1000))'"
 alias prettier="npx prettier"
 
 # Edit Brewfile
-alias brewfile="vim ~/.config/Brewfile"
+alias brewfile="vim $BREWFILE"
 
 # cco with additional directory access
 alias cco="cco --add-dir ~/.config/gcloud:rw --add-dir ~/.config/docker:rw"
