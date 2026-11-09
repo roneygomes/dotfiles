@@ -1,6 +1,12 @@
 ;;; init.el -*- lexical-binding: t; -*-
 ;; Doom Emacs: module declarations (run `doom sync` after editing).
 
+;; Prevent "Memory exhausted" during startup. Doom disables GC (sets
+;; `gc-cons-threshold' to `most-positive-fixnum') to speed up boot, but loading
+;; many natively-compiled packages can exhaust the Lisp heap before Doom
+;; re-enables GC. Cap it at a large-but-finite value so GC can still run.
+(setq gc-cons-threshold (* 256 1024 1024))  ; 256 MiB
+
 (doom! :input
        ;;layout
 
