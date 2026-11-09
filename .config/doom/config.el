@@ -5,9 +5,6 @@
 ;; Iosevka Nerd Font (patched for Doom's icons) + Geneva for prose.
 (setq doom-font (font-spec :family "Iosevka Nerd Font" :size 16))
 (setq doom-variable-pitch-font (font-spec :family "Geneva" :size 15))
-;; nerd-icons normally expects the standalone "Symbols Nerd Font Mono"; use our
-;; patched Iosevka instead so Doom's icons render.
-(setq nerd-icons-font-family "Iosevka Nerd Font")
 
 ;; --- theme ---
 ;; Keep the light modus-operandi theme from the old config.
