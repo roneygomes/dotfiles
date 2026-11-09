@@ -15,6 +15,10 @@
 ;; (Swap for 'doom-one to go back to Doom's dark default.)
 (setq doom-theme 'modus-operandi-tinted)
 
+;; --- modeline ---
+;; Disable icons in the modeline (text-only).
+(setq doom-modeline-icon nil)
+
 ;; --- line numbers ---
 (setq display-line-numbers-type 'relative)
 
