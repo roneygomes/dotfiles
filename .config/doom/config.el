@@ -50,3 +50,19 @@
          (markdown-mode . mixed-pitch-mode))
   :config
   (setq mixed-pitch-set-height t))
+
+;; --- new project helper ---
+(defun my/project-new (dir)
+  "Create DIR as a new project: mkdir -p, git init, register it with
+projectile, and switch to it (opening a new workspace)."
+  (interactive (list (expand-file-name (read-file-name "Create project: " "~/projects/"))))
+  (make-directory dir t)
+  (let ((default-directory dir))
+    (unless (file-directory-p ".git")
+      (call-process "git" nil nil nil "init")))
+  (projectile-add-known-project dir)
+  (projectile-switch-project-by-name dir)
+  (message "Created project %s" dir))
+
+(map! :leader
+      :desc "New project" "p n" #'my/project-new)
