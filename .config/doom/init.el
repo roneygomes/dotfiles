@@ -11,7 +11,7 @@
        ;;layout
 
        :completion
-       (company +childframe)     ; in-buffer completion
+       company                   ; in-buffer completion (plain tooltip; no +childframe)
        vertico                   ; vertico + marginalia + consult
 
        :ui

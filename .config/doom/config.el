@@ -26,11 +26,9 @@
 (setq treemacs-no-png-images t)
 
 ;; --- company completion popup ---
-;; company-box (the `+childframe' UI) renders its nerd-glyph icons as a stray
-;; "$" in org buffers. Disable icons in the popup — also matches the no-icons
-;; preference used for the modeline and treemacs.
-(after! company-box
-  (setq company-box-enable-icon nil))
+;; `+childframe' (company-box) was removed from the company module in init.el:
+;; its childframe popup rendered as a stray "$" on macOS. With plain `company',
+;; the in-buffer overlay tooltip is used instead (no childframe, no icons).
 
 ;; --- line numbers ---
 (setq display-line-numbers-type t)  ; absolute (relative recomputes on every change)
