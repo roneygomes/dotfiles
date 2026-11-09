@@ -12,6 +12,11 @@ fi
 # ==============================================================================
 
 ZSH=$HOME/.oh-my-zsh
+
+# Lazy-load nvm/node/npm/npx/yarn/etc. on first use instead of at shell start
+# (saves ~0.6s of startup time). See the oh-my-zsh `nvm` plugin for details.
+zstyle ':omz:plugins:nvm' lazy yes
+
 source "$ZSH"/oh-my-zsh.sh
 
 # ==============================================================================
@@ -393,9 +398,8 @@ test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell
 # nodejs
 export NODE_OPTIONS="--max-old-space-size=2048"
 
-# nvm
+# nvm is lazy-loaded by the oh-my-zsh `nvm` plugin (see the `zstyle` above).
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
 autoload -U add-zsh-hook
 

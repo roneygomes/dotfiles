@@ -1030,7 +1030,9 @@
   # $(nvm version current) == $(nvm version default).
   typeset -g POWERLEVEL9K_NVM_PROMPT_ALWAYS_SHOW=false
   # If set to false, hide node version if it's equal to "system".
-  typeset -g POWERLEVEL9K_NVM_SHOW_SYSTEM=true
+  # nvm is lazy-loaded (see ~/.zshrc), so `node` resolves to the system install
+  # until nvm is first used; hide that "system" fallback rather than showing it.
+  typeset -g POWERLEVEL9K_NVM_SHOW_SYSTEM=false
   # Custom icon.
   # typeset -g POWERLEVEL9K_NVM_VISUAL_IDENTIFIER_EXPANSION='⭐'
 

@@ -25,6 +25,13 @@
 ;; tree (just +/- collapse indicators).
 (setq treemacs-no-png-images t)
 
+;; --- company completion popup ---
+;; company-box (the `+childframe' UI) renders its nerd-glyph icons as a stray
+;; "$" in org buffers. Disable icons in the popup — also matches the no-icons
+;; preference used for the modeline and treemacs.
+(after! company-box
+  (setq company-box-enable-icon nil))
+
 ;; --- line numbers ---
 (setq display-line-numbers-type t)  ; absolute (relative recomputes on every change)
 

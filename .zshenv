@@ -8,7 +8,7 @@ export POWERLEVEL9K_INSTANT_PROMPT=quiet
 
 # oh-my-zsh
 export ZSH_DISABLE_COMPFIX=true
-export plugins=(cp vi-mode git git-extras fzf z nvm)
+export plugins=(vi-mode git fzf z nvm)
 export ZSH_THEME="powerlevel10k/powerlevel10k"
 
 # opencode
@@ -27,11 +27,14 @@ export HOMEBREW_NO_ENV_HINTS=true
 export LDFLAGS="-L/usr/local/opt/openssl@3/lib"
 export CPPFLAGS="-I/usr/local/opt/openssl@3/include"
 
-[[ $(uname) == Darwin ]] && PKG_CONFIG_PATH="$(brew --prefix)/opt/cyrus-sasl/lib/pkgconfig"
-export PKG_CONFIG_PATH
-
-[[ $(uname) == Darwin ]] && OPENSSL_ROOT_DIR="$(brew --prefix)/opt/openssl@3"
-export OPENSSL_ROOT_DIR
+# Compute the Homebrew prefix once per shell (a subprocess call) and reuse it,
+# instead of calling `brew --prefix` twice. `$OSTYPE` is a zsh builtin (no fork).
+if [[ $OSTYPE == darwin* ]]; then
+  BREW_PREFIX="$(brew --prefix)"
+  export BREW_PREFIX
+  export PKG_CONFIG_PATH="$BREW_PREFIX/opt/cyrus-sasl/lib/pkgconfig"
+  export OPENSSL_ROOT_DIR="$BREW_PREFIX/opt/openssl@3"
+fi
 
 PATH=/usr/local/opt/openssl@3/bin:$PATH:
 
