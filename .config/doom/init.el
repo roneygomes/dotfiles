@@ -60,6 +60,7 @@
        javascript                ; js + typescript
        json
        markdown
+       org                       ; org-mode notes
        python
        rest                      ; restclient
        rust

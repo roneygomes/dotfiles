@@ -66,3 +66,13 @@ projectile, and switch to it (opening a new workspace)."
 
 (map! :leader
       :desc "New project" "p n" #'my/project-new)
+
+;; --- garbage collection ---
+;; init.el raises `gc-cons-threshold' to prevent "Memory exhausted" while
+;; loading native-compiled packages. Reset it once startup finishes (Doom's own
+;; reset only triggers when it's still `most-positive-fixnum'), so GC pauses stay
+;; short and typing stays responsive.
+(add-hook 'doom-after-init-hook
+          (lambda ()
+            (setq gc-cons-threshold (* 16 1024 1024)
+                  gc-cons-percentage 0.1)))
