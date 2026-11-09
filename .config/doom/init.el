@@ -68,6 +68,9 @@
        web                       ; html/css/tsx
        yaml
 
+       :term
+       vterm                     ; libvterm terminal (SPC o t / SPC o T)
+
        :config
        ;; Sets reasonable defaults (recentf, savehist, etc.).
        (default +bindings +smartparens))
