@@ -27,6 +27,8 @@ brew "tmux"
 brew "openjdk"
 brew "python@3.12"
 
+cask "bitwarden", trusted: true
+cask "slack", trusted: true
 cask "emacs-plus-app", trusted: true
 
 cask "gcloud-cli"
