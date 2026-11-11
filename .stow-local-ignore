@@ -65,3 +65,4 @@ README\.md
 \.claude-profiles/[^/]+/sessions
 \.claude-profiles/[^/]+/shell-snapshots
 
+\.claude-profiles/[^/]+/skills
