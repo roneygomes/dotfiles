@@ -181,7 +181,14 @@
 (use-package terraform-mode
   :mode ("\\.tf\\'" . terraform-mode))
 
-;; Org: plain prose + quick capture.
+;; Org: plain prose + quick capture into a chosen project.
+(defun my/org-capture-project-inbox ()
+  "Prompt for a project and return the path to its inbox.org file."
+  (expand-file-name
+   "inbox.org"
+   (projectile-completing-read "Capture into project: "
+                               (projectile-known-projects))))
+
 (use-package org
   :ensure nil
   :hook ((org-mode . org-indent-mode)      ; indent content under headings
@@ -192,7 +199,7 @@
   (org-adapt-indentation t)
   (org-default-notes-file "~/org/inbox.org")
   (org-capture-templates
-   '(("n" "Note" entry (file "~/org/inbox.org")
+   '(("n" "Note" entry (file my/org-capture-project-inbox)
       "* %?\n%U\n" :empty-lines 1)))
   :bind ("C-c c" . org-capture))
 
