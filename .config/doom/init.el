@@ -21,7 +21,6 @@
        (popup +defaults)         ; tame popup windows
        treemacs                  ; file tree
        vc-gutter                 ; git diff in the fringe
-       vi-tilde-fringe           ; vim ~ on empty lines
        workspaces                ; perspective-like workspace groups
 
        :editor
