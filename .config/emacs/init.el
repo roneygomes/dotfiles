@@ -196,11 +196,10 @@
 ;; ---------------------------------------------------------------------------
 
 (use-package projectile
-  :init
-  ;; Newer projectile leaves the keymap prefix unset by default; restore C-c p
-  ;; so `C-c p p' (switch) and `C-c p f' (find file) work.
-  (setq projectile-keymap-prefix "C-c p")
   :config
+  ;; Error instead of falling back to `default-directory' (often ~) when run
+  ;; outside a project — otherwise projectile-find-file scans $HOME.
+  (setq projectile-require-project-root t)
   (projectile-mode 1))
 
 ;; Mark a directory as a known project so it can be switched back to later.
@@ -214,6 +213,10 @@
     (projectile-add-known-project dir)
     (message "Added project: %s" dir)))
 
+;; Newer projectile leaves the keymap prefix unset by default, so bind the keys
+;; we use explicitly under C-c p.
+(global-set-key (kbd "C-c p p") #'projectile-switch-project)
+(global-set-key (kbd "C-c p f") #'projectile-find-file)
 (global-set-key (kbd "C-c p a") #'my/project-remember)
 
 ;; ---------------------------------------------------------------------------
