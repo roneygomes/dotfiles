@@ -7,6 +7,11 @@
         ("nongnu" . "https://elpa.nongnu.org/nongnu/")
         ("melpa" . "https://melpa.org/packages/")))
 
+;; MELPA signs packages but its key isn't in the keyring by default, which
+;; makes installation fail with "Failed to verify signature". Disable signature
+;; checking (fine for a personal config).
+(setq package-check-signature nil)
+
 ;; Native-compile installed packages.
 (setq package-native-compile t)
 
