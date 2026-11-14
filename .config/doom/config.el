@@ -30,6 +30,12 @@
 ;; its childframe popup rendered as a stray "$" on macOS. With plain `company',
 ;; the in-buffer overlay tooltip is used instead (no childframe, no icons).
 
+;; --- disable the leader key ---
+;; Doom binds a leader key (SPC for evil, C-c for vanilla) via
+;; `doom-init-leader-keys-h' on `doom-after-init-hook'. Remove it so no leader
+;; key is active — vanilla Emacs keys only.
+(remove-hook 'doom-after-init-hook #'doom-init-leader-keys-h)
+
 ;; --- line numbers ---
 (setq display-line-numbers-type t)  ; absolute (relative recomputes on every change)
 
@@ -69,8 +75,7 @@ projectile, and switch to it (opening a new workspace)."
   (projectile-switch-project-by-name dir)
   (message "Created project %s" dir))
 
-(map! :leader
-      :desc "New project" "p n" #'my/project-new)
+(map! "C-c C-n" #'my/project-new)
 
 ;; --- sync & restart (stays inside Emacs) ---
 ;; `doom/reload' is unreliable for module changes: it re-boots in-process and can
@@ -102,5 +107,4 @@ projectile, and switch to it (opening a new workspace)."
                              (string-trim status))))
                 nil 'local))))
 
-(map! :leader
-      :desc "Sync & restart" "h r s" #'my/doom-sync-and-restart)
+(map! "C-c C-s" #'my/doom-sync-and-restart)
