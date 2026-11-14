@@ -35,6 +35,18 @@ README\.md
 \.config/docker/buildx
 \.config/docker/cli-plugins
 \.config/docker/contexts
+\.config/emacs/\.cache
+\.config/emacs/auto-save-list
+\.config/emacs/backups
+\.config/emacs/custom\.el
+\.config/emacs/eln-cache
+\.config/emacs/elpa
+\.config/emacs/history
+\.config/emacs/places
+\.config/emacs/projects
+\.config/emacs/recentf
+\.config/emacs/transient
+\.config/emacs/tree-sitter
 
 # .local/bin/ — pipx-managed shims
 \.local/bin/f2py
