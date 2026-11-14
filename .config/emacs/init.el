@@ -31,16 +31,13 @@
 (load-theme 'modus-operandi-tinted t)  ; light, high-contrast
 (setq inhibit-startup-screen t)
 
-;; Start maximized.
-(add-to-list 'default-frame-alist '(fullscreen . maximized))
-
 ;; Minimal UI: no scroll bar, tool bar, or menu bar.
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 
-;; Iosevka Nerd Font for code, Geneva for prose.
-(set-face-attribute 'default nil :family "Iosevka Nerd Font" :height 160)
+;; Iosevka for code, Geneva for prose.
+(set-face-attribute 'default nil :family "Iosevka" :height 160)
 (set-face-attribute 'variable-pitch nil :family "Geneva" :height 150)
 
 ;; Thin "pipe" cursor instead of a block.
