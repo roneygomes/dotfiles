@@ -25,10 +25,9 @@
        workspaces                ; perspective-like workspace groups
 
        :editor
-       (evil +everywhere)        ; vim bindings everywhere
        file-templates
        (format +onsave)          ; apheleia formatting
-       multiple-cursors          ; evil-multiedit style
+       multiple-cursors          ; Atom/Sublime-style multi-cursor editing
        snippets
        word-wrap
 
