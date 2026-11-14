@@ -1,9 +1,15 @@
 ;;; early-init.el -*- lexical-binding: t; -*-
 ;; Runs before package.el and GUI frame initialization.
 
-;; Start maximized — set before the GUI frame is created so the window is
-;; fullscreen from the very first frame (not after init.el loads).
-(add-to-list 'default-frame-alist '(fullscreen . maximized))
+;; Start maximized with a minimal UI — set before the GUI frame is created so
+;; the window never flashes a toolbar, scroll bar, or menu bar during startup.
+(setq default-frame-alist
+      (append '((fullscreen . maximized)
+                (tool-bar-lines . 0)
+                (menu-bar-lines . 0)
+                (vertical-scroll-bars . nil)
+                (horizontal-scroll-bars . nil))
+              default-frame-alist))
 
 ;; Package archives — must be set before `package-initialize' (in init.el).
 (setq package-archives
