@@ -181,7 +181,7 @@
 (use-package terraform-mode
   :mode ("\\.tf\\'" . terraform-mode))
 
-;; Org: plain prose.
+;; Org: plain prose + quick capture.
 (use-package org
   :ensure nil
   :hook ((org-mode . org-indent-mode)      ; indent content under headings
@@ -189,7 +189,12 @@
   :custom
   (org-hide-emphasis-markers t)
   (org-startup-indented t)
-  (org-adapt-indentation t))
+  (org-adapt-indentation t)
+  (org-default-notes-file "~/org/inbox.org")
+  (org-capture-templates
+   '(("n" "Note" entry (file "~/org/inbox.org")
+      "* %?\n%U\n" :empty-lines 1)))
+  :bind ("C-c c" . org-capture))
 
 ;; ---------------------------------------------------------------------------
 ;; Projects (projectile)
