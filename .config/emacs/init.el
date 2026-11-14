@@ -184,9 +184,12 @@
 ;; Org: plain prose.
 (use-package org
   :ensure nil
-  :hook (org-mode . visual-line-mode)
+  :hook ((org-mode . org-indent-mode)      ; indent content under headings
+         (org-mode . visual-line-mode))
   :custom
-  (org-hide-emphasis-markers t))
+  (org-hide-emphasis-markers t)
+  (org-startup-indented t)
+  (org-adapt-indentation t))
 
 ;; ---------------------------------------------------------------------------
 ;; Git
