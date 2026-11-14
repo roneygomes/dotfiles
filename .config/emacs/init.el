@@ -192,6 +192,25 @@
   (org-adapt-indentation t))
 
 ;; ---------------------------------------------------------------------------
+;; Projects (projectile)
+;; ---------------------------------------------------------------------------
+
+(use-package projectile
+  :config
+  (projectile-mode 1))
+
+;; Mark the current directory as a project so it can be switched back to later.
+(defun my/project-remember ()
+  "Add the current directory (or its project root) to projectile's known
+projects, so it shows up in `projectile-switch-project'."
+  (interactive)
+  (let ((dir (projectile-project-root)))
+    (projectile-add-known-project dir)
+    (message "Added project: %s" dir)))
+
+(global-set-key (kbd "C-c p a") #'my/project-remember)
+
+;; ---------------------------------------------------------------------------
 ;; Git
 ;; ---------------------------------------------------------------------------
 
