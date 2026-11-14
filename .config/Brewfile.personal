@@ -26,12 +26,7 @@ brew "python@3.12"
 brew "python@3.14"
 brew "steipete/tap/remindctl", trusted: true
 
-# Doom Emacs dependencies (GNU find/ls/diff/tar/sed + vterm)
-brew "coreutils"
-brew "findutils"
-brew "diffutils"
-brew "gnu-tar"
-brew "gnu-sed"
+# vterm terminal (libvterm + cmake are needed to build its native module)
 brew "libvterm"
 
 # Language servers (LSP)
@@ -57,4 +52,3 @@ cask "font-jetbrains-mono"
 cask "font-jetbrains-mono-nerd-font"
 cask "font-iosevka"
 cask "font-iosevka-nerd-font"
-cask "font-symbols-only-nerd-font"
