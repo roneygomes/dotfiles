@@ -205,12 +205,23 @@
 
 ;; Mark a directory as a known project so it can be switched back to later.
 (defun my/project-remember ()
-  "Add a directory to projectile's known projects."
+  "Add a directory to projectile's known projects.
+If the directory isn't under version control, create an empty `.projectile'
+marker in it so projectile can recognize it as a project root."
   (interactive)
   (let* ((default (or (and (buffer-file-name)
                            (file-name-directory (buffer-file-name)))
                       default-directory))
-         (dir (read-directory-name "Project root: " default nil t)))
+         (dir (expand-file-name
+               (read-directory-name "Project root: " default nil t)))
+         (marker (expand-file-name ".projectile" dir)))
+    ;; A non-VCS directory needs a `.projectile' marker for `projectile-project-root'
+    ;; to detect it (otherwise it falls back to prompting/scanning the current dir).
+    (unless (or (locate-dominating-file dir ".git")
+                (locate-dominating-file dir ".hg")
+                (locate-dominating-file dir ".svn")
+                (locate-dominating-file dir ".bzr"))
+      (write-region "" nil marker))
     (projectile-add-known-project dir)
     (message "Added project: %s" dir)))
 
