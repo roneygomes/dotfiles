@@ -196,15 +196,21 @@
 ;; ---------------------------------------------------------------------------
 
 (use-package projectile
+  :init
+  ;; Newer projectile leaves the keymap prefix unset by default; restore C-c p
+  ;; so `C-c p p' (switch) and `C-c p f' (find file) work.
+  (setq projectile-keymap-prefix "C-c p")
   :config
   (projectile-mode 1))
 
-;; Mark the current directory as a project so it can be switched back to later.
+;; Mark a directory as a known project so it can be switched back to later.
 (defun my/project-remember ()
-  "Add the current directory (or its project root) to projectile's known
-projects, so it shows up in `projectile-switch-project'."
+  "Add a directory to projectile's known projects."
   (interactive)
-  (let ((dir (projectile-project-root)))
+  (let* ((default (or (and (buffer-file-name)
+                           (file-name-directory (buffer-file-name)))
+                      default-directory))
+         (dir (read-directory-name "Project root: " default nil t)))
     (projectile-add-known-project dir)
     (message "Added project: %s" dir)))
 
