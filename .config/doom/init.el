@@ -20,13 +20,10 @@
        modeline                  ; doom-modeline
        (popup +defaults)         ; tame popup windows
        treemacs                  ; file tree
-       vc-gutter                 ; git diff in the fringe
-       workspaces                ; perspective-like workspace groups
 
        :editor
        file-templates
        (format +onsave)          ; apheleia formatting
-       multiple-cursors          ; Atom/Sublime-style multi-cursor editing
        snippets
        word-wrap
 
