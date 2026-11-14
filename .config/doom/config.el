@@ -10,6 +10,10 @@
 ;; Start maximized.
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
+;; --- cursor ---
+;; Thin "pipe" cursor instead of a block.
+(setq-default cursor-type 'bar)
+
 ;; --- theme ---
 ;; Keep the light modus-operandi theme from the old config.
 ;; (Swap for 'doom-one to go back to Doom's dark default.)
