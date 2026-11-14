@@ -38,7 +38,16 @@
 
 ;; Iosevka for code, Geneva for prose.
 (set-face-attribute 'default nil :family "Iosevka" :height 160)
+(set-face-attribute 'fixed-pitch nil :family "Iosevka" :height 150)
 (set-face-attribute 'variable-pitch nil :family "Geneva" :height 150)
+
+;; Line spacing + no wrapping of long lines (match the old config).
+(setq-default line-spacing 0.1
+              truncate-lines t
+              truncate-partial-width-windows t)
+
+;; No blinking cursor.
+(blink-cursor-mode -1)
 
 ;; Thin "pipe" cursor instead of a block.
 (setq-default cursor-type 'bar)
