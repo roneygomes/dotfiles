@@ -195,11 +195,12 @@
 ;; Projects (projectile)
 ;; ---------------------------------------------------------------------------
 
+;; When run outside a project, prompt to pick one instead of scanning the
+;; current directory (often ~). 'prompt is the friendliest option.
+(setq projectile-require-project-root 'prompt)
+
 (use-package projectile
   :config
-  ;; Error instead of falling back to `default-directory' (often ~) when run
-  ;; outside a project — otherwise projectile-find-file scans $HOME.
-  (setq projectile-require-project-root t)
   (projectile-mode 1))
 
 ;; Mark a directory as a known project so it can be switched back to later.
