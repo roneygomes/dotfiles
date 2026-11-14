@@ -37,6 +37,9 @@
 ;; --- line numbers ---
 (setq display-line-numbers-type t)  ; absolute (relative recomputes on every change)
 
+;; No line numbers in org-mode (prose, not code).
+(add-hook 'org-mode-hook (lambda () (display-line-numbers-mode -1)))
+
 ;; --- clock in the modeline ---
 (setq display-time-day-and-date t
       display-time-default-load-average nil
