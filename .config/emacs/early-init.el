@@ -25,6 +25,10 @@
                          ("melpa" . "https://melpa.org/packages/")))
 (setq package-native-compile t)
 
+;; MELPA signs packages but its key isn't in the default keyring, so installs
+;; fail with "Failed to verify signature". Disable signature checking.
+(setq package-check-signature nil)
+
 ;; ---------------------------------------------------------------------------
 ;; Silence noise
 ;; ---------------------------------------------------------------------------
