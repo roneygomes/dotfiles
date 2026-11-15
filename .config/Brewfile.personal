@@ -42,7 +42,7 @@ cask "bitwarden"
 cask "android-platform-tools"
 
 cask "orbstack"
-cask "iterm2"
+cask "ghostty"
 
 cask "puremac"
 cask "handy"
