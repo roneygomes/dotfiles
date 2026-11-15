@@ -45,6 +45,9 @@
 .config/emacs/recentf
 .config/emacs/transient/
 .config/emacs/tree-sitter/
+.config/emacs/perspective-state
+.config/emacs/undo-fu-session/
+.config/emacs/.lsp-session-v1
 
 # .local/bin - ignore large binaries and pipx-managed shims
 .local/bin/cloud-sql-proxy
