@@ -42,13 +42,29 @@
   :config
   (setq persp-state-default-file "~/.config/emacs/perspective-state")
   (setq persp-show-modestring nil)
-  (add-hook 'kill-emacs-hook #'persp-state-save)
   (persp-mode)
-  ;; Restore the previous session's perspectives, buffers, and window
-  ;; layouts so switching back to a project returns to where you left off.
-  (when (file-exists-p persp-state-default-file)
-    (add-hook 'emacs-startup-hook
-              (lambda () (persp-state-load persp-state-default-file)))))
+  ;; Loading the previous session reopens every buffer, so don't do it at
+  ;; startup: that delays the first frame and replaces the scratch buffer.
+  ;; Load it the first time a perspective command is used instead, and never
+  ;; overwrite the saved state unless it was actually loaded.
+  (defvar my/persp-state-loaded nil)
+
+  (add-hook 'kill-emacs-hook
+            (lambda ()
+              (when my/persp-state-loaded
+                (persp-state-save))))
+
+  (defun my/persp-ensure-state (&rest _)
+    "Load the saved perspective state once, on first perspective use."
+    (unless my/persp-state-loaded
+      (setq my/persp-state-loaded t)
+      (when (file-exists-p persp-state-default-file)
+        (let ((inhibit-message t))
+          (persp-state-load persp-state-default-file)))))
+
+  (advice-add 'persp-switch :before #'my/persp-ensure-state)
+  (advice-add 'persp-switch-to-buffer :before #'my/persp-ensure-state)
+  (advice-add 'persp-switch-to-buffer* :before #'my/persp-ensure-state))
 
 ;; --- project root helper (used by vterm) ---
 (defun my/vterm-project-root ()

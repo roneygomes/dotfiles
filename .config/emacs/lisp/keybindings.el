@@ -35,6 +35,9 @@ back on the file you had open last time.  A project visited for the very
 first time opens its root directory instead of prompting for a file."
   (interactive (list (project-prompt-project-dir)))
   (my/remember-project project-root)
+  ;; Make sure the saved perspectives are available before deciding whether
+  ;; this project has been visited before.
+  (my/persp-ensure-state)
   (let* ((persp-name (file-name-nondirectory (directory-file-name project-root)))
          (new-project (not (gethash persp-name (perspectives-hash)))))
     (persp-switch persp-name)
