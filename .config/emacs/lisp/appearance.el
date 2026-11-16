@@ -72,12 +72,6 @@
 (set-face-attribute 'fixed-pitch nil :font "Iosevka" :height 150)
 (set-face-attribute 'variable-pitch nil :font "Geneva" :height 150 :weight 'regular)
 
-(use-package mixed-pitch
-  :hook ((org-mode . mixed-pitch-mode)
-         (markdown-mode . mixed-pitch-mode))
-  :config
-  (setq mixed-pitch-set-height t))
-
 ;; --- clock in the modeline ---
 (setq display-time-default-load-average nil)
 (setq display-time-day-and-date t)

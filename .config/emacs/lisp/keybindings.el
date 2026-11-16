@@ -32,9 +32,6 @@
 (global-set-key (kbd "C-x C-p") #'persp-switch)
 (global-set-key (kbd "C-M-p") #'my/persp-switch-to-project)
 
-;; --- file tree ---
-(global-set-key (kbd "s-1") #'treemacs-select-window)
-
 ;; --- terminal ---
 (defun my/new-vterm ()
   (interactive)
@@ -61,10 +58,6 @@
   (define-key company-active-map (kbd "<tab>") #'company-complete-selection))
 
 (with-eval-after-load 'lsp-mode
-  (define-key lsp-mode-map (kbd "s-0") #'lsp-treemacs-errors-list)
-  (define-key lsp-mode-map (kbd "s-2") #'lsp-treemacs-symbols)
-  (define-key lsp-mode-map (kbd "C-M-h") #'lsp-treemacs-call-hierarchy)
-
   (define-key lsp-mode-map (kbd "C-M-o") #'consult-lsp-symbols)
   (define-key lsp-mode-map (kbd "s-O") #'consult-lsp-file-symbols)
 

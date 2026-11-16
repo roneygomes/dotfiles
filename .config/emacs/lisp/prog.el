@@ -49,35 +49,6 @@
   (add-to-list 'company-backends 'company-restclient)
   (add-hook 'after-init-hook #'global-company-mode))
 
-;; --- treemacs (file tree) ---
-(use-package treemacs
-  :defer t
-  :config
-  (setq treemacs-width 40
-        treemacs-select-when-already-in-treemacs 'move-back
-        treemacs-no-delete-other-windows nil
-        treemacs-sorting 'alphabetic-case-insensitive-asc
-        treemacs-no-png-images t
-        treemacs--project-follow-delay 0.5)
-
-  (set-face-attribute 'treemacs-root-face nil :height 1.0 :font "Geneva-18" :weight 'bold)
-  (set-face-attribute 'treemacs-file-face nil :height 1.0 :font "Geneva-14")
-  (set-face-attribute 'treemacs-directory-face nil :height 1.0 :font "Geneva-14")
-  (set-face-attribute 'treemacs-directory-collapsed-face nil :height 1.0 :font "Geneva-14")
-  (set-face-attribute 'treemacs-git-modified-face nil :height 1.0 :font "Geneva-14")
-  (set-face-attribute 'treemacs-git-ignored-face nil :height 1.0 :font "Geneva-14")
-  (set-face-attribute 'treemacs-git-added-face nil :height 1.0 :font "Geneva-14")
-  (set-face-attribute 'treemacs-git-renamed-face nil :height 1.0 :font "Geneva-14")
-  (set-face-attribute 'treemacs-git-conflict-face nil :height 1.0 :font "Geneva-14")
-  (set-face-attribute 'treemacs-git-untracked-face nil :height 1.0 :font "Geneva-14")
-
-  (treemacs-follow-mode t)
-  (treemacs-hide-gitignored-files-mode t)
-  (treemacs-project-follow-mode))
-
-(use-package treemacs-evil :after treemacs)
-(use-package lsp-treemacs :after (lsp-mode treemacs))
-
 ;; --- LSP documentation popups ---
 (use-package eldoc-box
   :defer t
