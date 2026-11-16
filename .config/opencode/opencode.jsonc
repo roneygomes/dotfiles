@@ -1,0 +1,32 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "opencode-go/deepseek-v4.1-flash",
+  "agents": {
+    "build": {
+      "model": "opencode-go/deepseek-v4.1-flash"
+    },
+    "plan": {
+      "model": "opencode-go/deepseek-v4-pro"
+    },
+    "explore": {
+      "model": "opencode-go/deepseek-v4.1-flash"
+    },
+    "reviewer": {
+      "description": "Reviews changes for bugs, regressions and edge cases",
+      "mode": "subagent",
+      "model": "opencode-go/minimax-m3",
+      "system": "Review the current changes. List findings in severity order with file and line references. Do not edit files."
+    },
+    "architect": {
+      "description": "Plans complex refactors and multi-file architecture",
+      "mode": "subagent",
+      "model": "opencode-go/deepseek-v4-pro",
+      "system": "Produce a detailed step-by-step implementation plan. Do not edit files."
+    },
+    "max": {
+      "description": "Maximum-quality coding agent (high effort, use sparingly)",
+      "mode": "primary",
+      "model": "opencode-go/deepseek-v4-pro#high"
+    }
+  }
+}
