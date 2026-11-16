@@ -7,8 +7,9 @@
   (treesit-auto-install 'prompt)
   :config
   (setq treesit-auto-langs '(bash go rust typescript tsx javascript yaml json python sql toml dockerfile))
-  (dolist (lang treesit-auto-langs)
-    (treesit-auto-add-to-auto-mode-alist lang)))
+  ;; Pass all languages in one call: each call recomputes the recipe list,
+  ;; so looping over them costs ~100ms per language.
+  (treesit-auto-add-to-auto-mode-alist treesit-auto-langs))
 
 ;; --- HTTP (restclient) ---
 (use-package restclient)
