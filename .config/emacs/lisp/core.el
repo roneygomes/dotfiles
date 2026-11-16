@@ -38,12 +38,17 @@
 ;; --- workspace management ---
 (use-package perspective
   :custom
-  (persp-mode-prefix-key (kbd "s-M-p"))
+  (persp-suppress-no-prefix-key-warning t)
   :config
   (setq persp-state-default-file "~/.config/emacs/perspective-state")
   (setq persp-show-modestring nil)
   (add-hook 'kill-emacs-hook #'persp-state-save)
-  (persp-mode))
+  (persp-mode)
+  ;; Restore the previous session's perspectives, buffers, and window
+  ;; layouts so switching back to a project returns to where you left off.
+  (when (file-exists-p persp-state-default-file)
+    (add-hook 'emacs-startup-hook
+              (lambda () (persp-state-load persp-state-default-file)))))
 
 ;; --- project root helper (used by vterm) ---
 (defun my/vterm-project-root ()
