@@ -1,15 +1,8 @@
 ;;; appearance.el -*- lexical-binding: t; -*-
-;; Theme, fonts, modeline, padding, line numbers, whitespace.
-
-(setq custom-safe-themes t)
-(load-theme 'modus-operandi-tinted t)
+;; Modeline, padding, line numbers, whitespace.  Theme, fonts and spacing live
+;; in early-init.el so the first frame already looks right.
 
 (setq inhibit-splash-screen t)
-
-(setq-default line-spacing 0.1)
-(setq-default truncate-lines t)
-(setq-default truncate-partial-width-windows t)
-(setq-default tab-width 4)
 
 ;; line numbers (relative, enabled in text/prog modes below)
 (setq display-line-numbers-type 'relative)
@@ -69,11 +62,6 @@
           :right-divider-width 6
           :fringe-width 8))
   (spacious-padding-mode 1))
-
-;; --- fonts ---
-(set-face-attribute 'default nil :font "Iosevka" :height 160 :weight 'regular)
-(set-face-attribute 'fixed-pitch nil :font "Iosevka" :height 150)
-(set-face-attribute 'variable-pitch nil :font "Geneva" :height 150 :weight 'regular)
 
 ;; --- clock in the modeline ---
 (setq display-time-default-load-average nil)
