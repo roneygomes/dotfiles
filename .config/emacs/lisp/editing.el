@@ -24,13 +24,19 @@
         evil-respect-visual-line-mode t
         evil-disable-insert-state-bindings t
         evil-want-C-u-scroll nil
-        evil-want-C-i-jump nil)
+        ;; C-i / C-o walk Evil's jumplist (like vim), so you can go back to
+        ;; the dired buffer after visiting a file or directory from it.
+        evil-want-C-i-jump t)
   :config
   (global-set-key (kbd "<escape>") #'keyboard-escape-quit)
 
   ;; Modes that keep Emacs bindings instead of evil's.
-  (dolist (mode '(vterm-mode treemacs-mode dired-mode special-mode magit-mode))
+  (dolist (mode '(vterm-mode special-mode magit-mode))
     (add-to-list 'evil-emacs-state-modes mode))
+
+  ;; Dired uses evil's normal state (hjkl movement, dired keys on the
+  ;; overriding map) so vim motions work in directory listings.
+  (evil-set-initial-state 'dired-mode 'normal)
 
   ;; Jump to definition.
   (define-key evil-normal-state-map (kbd "s-b") #'evil-goto-definition)
@@ -64,6 +70,95 @@
   (define-key evil-visual-state-map (kbd "M-.") nil)
 
   (evil-mode))
+
+;; --- dired: always-editable listings with vim bindings (wdired) ---
+;; Dired buffers open in wdired (editable) and stay in evil normal state, so
+;; file and directory names can be edited with vim commands ("ce", "cw", ...).
+;; ESC leaves insert state; ⌘-s applies the renames and stays editable;
+;; RET/"o" open the entry in this window, "O" opens it in another window;
+;; "q" closes the window.  `C-c C-c'/`C-x C-s' also commit but leave for the
+;; read-only dired mode (re-enter editing with `C-x C-q').  Opening an entry
+;; records a jump, so C-o returns to the listing and C-i goes forward again.
+;; `u'/`C-r' undo/redo uncommitted text edits as usual.
+(use-package wdired
+  :ensure nil
+  :config
+  ;; Directory names are editable (default since Emacs 31); make sure a
+  ;; rename into a new parent directory works without extra setup.
+  (setq wdired-create-parent-directories t)
+  ;; wdired enters during `dired-mode-hook', before dired-aux is normally
+  ;; loaded, but it needs `dired-isearch-search-filenames' from there.
+  (require 'dired-aux)
+
+  (defvar my/wdired-suppress-auto nil
+    "Non-nil while wdired itself is driving dired reverts.")
+
+  (defun my/wdired-enter ()
+    "Make a dired buffer editable, keeping evil's normal state."
+    (when (and (eq major-mode 'dired-mode)
+               (not my/wdired-suppress-auto))
+      (let ((inhibit-message t))
+        (wdired-change-to-wdired-mode))
+      (evil-normal-state)))
+
+  (defun my/wdired-save ()
+    "Apply pending renames and remain in editable dired."
+    (interactive)
+    (if (not (buffer-modified-p))
+        (message "No changes to apply")
+      (wdired-finish-edit)
+      (my/wdired-enter)))
+
+  ;; Evil records jumps by file name (or real dired-mode) and reopens the
+  ;; target with `find-file'.  A wdired buffer is neither, so identify it by
+  ;; buffer name and let the jumplist treat that as a buffer target: jumping
+  ;; back then switches to the very same editable dired buffer.
+  (defun my/wdired-jump-file-name (orig)
+    (or (funcall orig)
+        (when (eq major-mode 'wdired-mode)
+          (buffer-name))))
+  (advice-add 'evil--jumps-current-file-name :around #'my/wdired-jump-file-name)
+  ;; Buffer names never start with "/", while file names always do.
+  (setq evil--jumps-buffer-targets
+        (format "\\`\\(?:[^/]\\|%s\\)" evil--jumps-buffer-targets))
+
+  (defun my/wdired-find-file (&optional other-window)
+    "Apply pending renames, then visit the entry at point.
+With OTHER-WINDOW, visit it in another window.  The dired position is
+recorded in Evil's jumplist, so C-o returns to it."
+    (interactive "P")
+    (let ((file (dired-get-file-for-visit)))
+      (when (buffer-modified-p)
+        (my/wdired-save))
+      (evil-set-jump)
+      (if other-window
+          (find-file-other-window file)
+        (find-file file))))
+
+  ;; Enter editable mode as soon as a directory listing has been read, and
+  ;; not in the middle of wdired's own revert/commit passes.
+  (add-hook 'dired-after-readin-hook #'my/wdired-enter)
+  (dolist (fn '(wdired-finish-edit wdired-revert))
+    (advice-add fn :around
+                (lambda (orig &rest args)
+                  (let ((my/wdired-suppress-auto t))
+                    (apply orig args)))))
+
+  ;; Evil state maps take precedence over the local map, so the dired keys
+  ;; have to be installed as evil (normal state) bindings to win over
+  ;; evil's own "o"/"q"/"RET" commands.
+  (evil-define-key 'normal wdired-mode-map
+    (kbd "s-s") #'my/wdired-save
+    (kbd "RET") #'my/wdired-find-file
+    (kbd "o") #'my/wdired-find-file
+    (kbd "O") (lambda () (interactive) (my/wdired-find-file t))
+    (kbd "q") #'quit-window)
+
+  ;; Never let a plain save write the listing text over the directory.
+  (advice-add 'save-buffer :before
+              (lambda (&rest _)
+                (when (eq major-mode 'wdired-mode)
+                  (user-error "Use Cmd-s to apply renames")))))
 
 ;; --- multi-cursor editing ---
 (use-package evil-multiedit
