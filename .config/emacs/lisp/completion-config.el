@@ -20,20 +20,26 @@
   (evil-normal-state)
   (goto-char (point-max)))
 
+(defun my/minibuffer-keep-point-at-end ()
+  "In a completion minibuffer in normal state, keep point at the input end."
+  (when (and (minibufferp) (evil-normal-state-p) (not (eobp)))
+    (goto-char (point-max))))
+
 (defun my/minibuffer-evil-normal ()
-  "Enable evil in completion minibuffers and start in normal state."
-  (when (and (minibufferp) minibuffer-completion-table)
-    (unless evil-local-mode
-      (evil-local-mode 1))
-    ;; Vertico only matches up to point, so point must stay at the end of the
-    ;; input instead of being pulled back the way evil normal state does.
-    (setq-local evil-move-beyond-eol t)
-    (my/minibuffer-enter-normal)
-    (add-hook 'pre-command-hook
-              (lambda ()
-                (when (and (minibufferp) (evil-normal-state-p) (not (eobp)))
-                  (goto-char (point-max))))
-              nil t)))
+  "Enable evil in completion minibuffers and start in normal state.
+Plain prompts (read-string, y-or-n-p, ...) must not inherit evil: the
+minibuffer buffer is reused, so evil is switched off for them."
+  (if (and (minibufferp) minibuffer-completion-table)
+      (progn
+        (unless evil-local-mode
+          (evil-local-mode 1))
+        ;; Vertico only matches up to point, so point must stay at the end of
+        ;; the input instead of being pulled back the way evil normal state does.
+        (setq-local evil-move-beyond-eol t)
+        (my/minibuffer-enter-normal)
+        (add-hook 'pre-command-hook #'my/minibuffer-keep-point-at-end nil t))
+    (when evil-local-mode
+      (evil-local-mode -1))))
 
 (with-eval-after-load 'evil
   (add-hook 'minibuffer-setup-hook #'my/minibuffer-evil-normal)
