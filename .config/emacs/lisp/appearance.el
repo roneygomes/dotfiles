@@ -26,6 +26,9 @@
 (add-hook 'text-mode-hook #'my-essential-modes)
 (add-hook 'prog-mode-hook #'my-essential-modes)
 
+;; Org buffers inherit text-mode settings; keep them free of line numbers.
+(add-hook 'org-mode-hook (lambda () (display-line-numbers-mode -1)))
+
 (defun my-toggle-whitespace-mode ()
   "Toggle display of whitespace characters (tabs and trailing spaces)."
   (interactive)
