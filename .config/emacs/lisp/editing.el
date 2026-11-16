@@ -35,8 +35,8 @@
   ;; Jump to definition.
   (define-key evil-normal-state-map (kbd "s-b") #'evil-goto-definition)
 
-  ;; Window management via a ⌘-w prefix.
-  (define-key evil-motion-state-map (kbd "C-w") nil)
+  ;; Window management: vim's C-w prefix (C-w h/j/k/l ...) in normal,
+  ;; visual, and operator states, plus a ⌘-w alternative on macOS.
   (define-prefix-command 'my-evil-window-map)
   (global-set-key (kbd "s-w") 'my-evil-window-map)
 
