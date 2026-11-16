@@ -22,6 +22,22 @@
 ;; Org buffers inherit text-mode settings; keep them free of line numbers.
 (add-hook 'org-mode-hook (lambda () (display-line-numbers-mode -1)))
 
+;; --- soft wrapping in org ---
+;; Org truncates long lines by default.  visual-line-mode wraps them (clearing
+;; `truncate-lines') and visual-fill-column-mode pins the wrap to a fixed
+;; column instead of the window edge.
+(defun my/org-soft-wrap ()
+  "Wrap org lines at `visual-fill-column-width', breaking at word boundaries."
+  (require 'visual-fill-column)
+  (visual-line-mode 1)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :hook (org-mode . my/org-soft-wrap)
+  :custom
+  (visual-fill-column-width 100)
+  (visual-fill-column-center-text nil))
+
 (defun my-toggle-whitespace-mode ()
   "Toggle display of whitespace characters (tabs and trailing spaces)."
   (interactive)

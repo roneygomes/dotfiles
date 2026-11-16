@@ -71,6 +71,36 @@
 
   (evil-mode))
 
+;; --- org: navigate screen lines (soft-wrapped text) ---
+;; Org buffers enable `visual-line-mode' (see appearance.el), so a wrapped
+;; logical line is displayed as several screen lines.  Evil's j/k always move
+;; by logical line, so point them at screen-line motions instead, making each
+;; wrapped segment behave like its own line.  The `screen-line' type keeps
+;; operators consistent (dj/yj/cj act on whole screen lines, like Vim with
+;; wrap on); `evil-respect-visual-line-mode' (set above) does the same for
+;; dd/V.
+(with-eval-after-load 'org
+  (evil-define-motion my/evil-next-screen-line (count)
+    "Move COUNT screen lines down."
+    :type screen-line
+    (let ((line-move-visual t))
+      (evil-line-move (or count 1))))
+
+  (evil-define-motion my/evil-previous-screen-line (count)
+    "Move COUNT screen lines up."
+    :type screen-line
+    (let ((line-move-visual t))
+      (evil-line-move (- (or count 1)))))
+
+  (evil-define-key '(normal motion visual) org-mode-map
+    (kbd "j") #'my/evil-next-screen-line
+    (kbd "k") #'my/evil-previous-screen-line
+    (kbd "<down>") #'my/evil-next-screen-line
+    (kbd "<up>") #'my/evil-previous-screen-line
+    (kbd "0") #'evil-beginning-of-visual-line
+    (kbd "$") #'evil-end-of-visual-line
+    (kbd "^") #'evil-first-non-blank-of-visual-line))
+
 ;; --- dired: always-editable listings with vim bindings (wdired) ---
 ;; Dired buffers open in wdired (editable) and stay in evil normal state, so
 ;; file and directory names can be edited with vim commands ("ce", "cw", ...).
