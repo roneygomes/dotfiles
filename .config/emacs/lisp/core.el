@@ -16,6 +16,9 @@
 (setq auto-revert-interval 5)
 (setq auto-save-visited-interval 5)
 
+;; Follow symlinks into version-controlled files without prompting.
+(setq vc-follow-symlinks t)
+
 (setq backup-directory-alist
       `(("." . "~/.config/emacs/backups"))
       auto-save-file-name-transforms
