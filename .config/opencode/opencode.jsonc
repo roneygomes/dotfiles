@@ -11,9 +11,13 @@
       "models": {
         "qwen3.6-35b": {
           "name": "Qwen3.6-35B-A3B Q3_K_XL",
+          "tool_call": true,
+          "reasoning": false,
+          "attachment": false,
+          "temperature": true,
           "limit": {
-            "context": 32768,
-            "output": 16384
+            "context": 131072,
+            "output": 8192
           }
         }
       }
