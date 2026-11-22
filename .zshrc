@@ -411,3 +411,10 @@ add-zsh-hook precmd _set_tab_title
 
 # To customize prompt, run `p10k configure` or edit ~/projects/dotfiles/.p10k.zsh.
 [[ ! -f ~/projects/dotfiles/.p10k.zsh ]] || source ~/projects/dotfiles/.p10k.zsh
+
+# >>> zeroclaw >>>
+export PATH="/Users/roney/.cargo/bin:$PATH"
+# <<< zeroclaw <<<
+
+# Hermes Agent command
+case ":$PATH:" in *":$HOME/.local/bin:"*) ;; *) export PATH="$HOME/.local/bin:$PATH" ;; esac

@@ -82,3 +82,7 @@ cco: ## Install cco sandbox wrapper if not present
 	else \
 		echo "cco already installed"; \
 	fi
+
+.PHONY: check-secrets
+check-secrets: ## Scan tracked files for credentials and personal data (public repo rules)
+	@scripts/check-secrets.sh --public

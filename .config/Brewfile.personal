@@ -3,7 +3,7 @@
 
 tap "d12frosted/emacs-plus", trusted: true
 tap "steipete/tap"
-tap "hashicorp/tap"
+tap "hashicorp/tap", trusted: true
 
 brew "stow"
 brew "fzf"
@@ -25,6 +25,7 @@ brew "tmux"
 brew "python@3.12"
 brew "python@3.14"
 brew "steipete/tap/remindctl", trusted: true
+brew "bitwarden-cli"
 
 # vterm terminal (libvterm + cmake are needed to build its native module)
 brew "libvterm"
@@ -33,17 +34,13 @@ brew "libvterm"
 brew "gopls"
 brew "rust-analyzer"
 brew "typescript-language-server"
-brew "hashicorp/tap/terraform"
+brew "hashicorp/tap/terraform", trusted: true
 
 cask "emacs-plus-app", trusted: true
-
 cask "bitwarden"
-
 cask "android-platform-tools"
-
 cask "orbstack"
 cask "ghostty"
-
 cask "puremac"
 cask "handy"
 cask "vorssaint"
